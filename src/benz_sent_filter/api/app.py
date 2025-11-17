@@ -5,6 +5,14 @@ from datetime import datetime
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+from benz_sent_filter.models.classification import (
+    BatchClassificationResult,
+    BatchClassifyRequest,
+    ClassificationResult,
+    ClassifyRequest,
+)
+from benz_sent_filter.services.classifier import ClassificationService
+
 app = FastAPI(
     title="Benz Sent Filter",
     description="MNLS-based sentiment classification service for article title analysis",
@@ -20,6 +28,12 @@ class HealthResponse(BaseModel):
     timestamp: datetime
 
 
+@app.on_event("startup")
+async def startup_event():
+    """Initialize classification service on startup (eager loading)."""
+    app.state.classifier = ClassificationService()
+
+
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
     """Health check endpoint."""
@@ -28,3 +42,23 @@ async def health_check():
         service="benz_sent_filter",
         timestamp=datetime.utcnow(),
     )
+
+
+@app.post("/classify", response_model=ClassificationResult)
+async def classify_headline(request: ClassifyRequest):
+    """Classify a single headline.
+
+    Returns boolean flags, temporal category, and all raw scores.
+    """
+    result = app.state.classifier.classify_headline(request.headline)
+    return result
+
+
+@app.post("/classify/batch", response_model=BatchClassificationResult)
+async def classify_batch(request: BatchClassifyRequest):
+    """Classify multiple headlines.
+
+    Returns array of classification results in same order as input.
+    """
+    results = app.state.classifier.classify_batch(request.headlines)
+    return BatchClassificationResult(results=results)

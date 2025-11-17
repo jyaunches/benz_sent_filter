@@ -26,7 +26,9 @@ def client(mock_transformers_pipeline):
 
     from benz_sent_filter.api.app import app
 
-    return TestClient(app)
+    # Use context manager to trigger startup/shutdown events
+    with TestClient(app) as client:
+        yield client
 
 
 def test_health_check(client):
