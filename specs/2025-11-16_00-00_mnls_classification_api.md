@@ -189,19 +189,19 @@ Use simple constants in config module for ML settings only:
 - Create `src/benz_sent_filter/services/classifier.py`
 - Define `ClassificationService` class with model loading in `__init__`
 - Use transformers `pipeline("zero-shot-classification")` with model from settings
-- Define class-level constant for ALL 5 candidate labels (single list):
-  - "This is an opinion piece or editorial"
-  - "This is a factual news report"
-  - "This is about a past event that already happened"
-  - "This is about a future event or forecast"
-  - "This is a general topic or analysis"
+- Define class-level constant CANDIDATE_LABELS containing ALL 5 labels in a single list (maintain this exact order):
+  1. "This is an opinion piece or editorial" (index 0 - opinion dimension)
+  2. "This is a factual news report" (index 1 - news dimension)
+  3. "This is about a past event that already happened" (index 2 - temporal dimension)
+  4. "This is about a future event or forecast" (index 3 - temporal dimension)
+  5. "This is a general topic or analysis" (index 4 - temporal dimension)
 - Implement public `classify_headline(headline)` method that:
-  - Makes ONE pipeline call with all 5 candidate labels
-  - Extracts scores from pipeline result (5 scores returned)
-  - Split scores into opinion/news dimension (first 2 labels) and temporal dimension (last 3 labels)
-  - Applies 0.6 threshold to opinion/news scores to generate boolean flags
-  - Determines temporal category from highest temporal score
-  - Returns ClassificationResult
+  - Makes ONE pipeline call with all 5 candidate labels: `pipeline(headline, candidate_labels=CANDIDATE_LABELS)`
+  - Pipeline returns dict with "labels" and "scores" keys containing lists of 5 items each
+  - Extract scores by index: opinion_score = scores[0], news_score = scores[1], past_score = scores[2], future_score = scores[3], general_score = scores[4]
+  - Apply 0.6 threshold to opinion/news scores: is_opinion = (opinion_score >= 0.6), is_straight_news = (news_score >= 0.6)
+  - Determine temporal category from highest temporal score using max([(past_score, PAST_EVENT), (future_score, FUTURE_EVENT), (general_score, GENERAL_TOPIC)], key=lambda x: x[0])
+  - Return ClassificationResult with all fields populated
 - Implement public `classify_batch(headlines)` method using list comprehension: `return [self.classify_headline(headline) for headline in headlines]`
 - Add error handling for model load failures and inference errors
 - Export service from `src/benz_sent_filter/services/__init__.py`
