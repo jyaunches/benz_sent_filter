@@ -168,10 +168,11 @@ All tests follow these principles:
 
 **Test Implementation Notes:**
 - Mock `transformers.pipeline` using pytest monkeypatch or unittest.mock
-- Mock pipeline return format: `{"labels": [...], "scores": [...]}`
+- Mock pipeline return format: `{"labels": [...], "scores": [...]}` (5 labels, 5 scores)
 - Create helper fixture for mocked pipeline with configurable scores
-- Test both opinion/news dimension and temporal dimension in each test
-- Verify candidate labels match specification
+- Mock should return all 5 labels in one call (opinion, news, past, future, general)
+- Tests verify correct splitting of scores into two dimensions
+- Verify candidate labels match specification (all 5 labels in one list)
 
 **Required Mocks:**
 ```python

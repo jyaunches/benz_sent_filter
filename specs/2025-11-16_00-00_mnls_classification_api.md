@@ -189,12 +189,18 @@ Use simple constants in config module for ML settings only:
 - Create `src/benz_sent_filter/services/classifier.py`
 - Define `ClassificationService` class with model loading in `__init__`
 - Use transformers `pipeline("zero-shot-classification")` with model from settings
-- Define class-level constants for candidate labels (opinion/news and temporal)
+- Define class-level constant for ALL 5 candidate labels (single list):
+  - "This is an opinion piece or editorial"
+  - "This is a factual news report"
+  - "This is about a past event that already happened"
+  - "This is about a future event or forecast"
+  - "This is a general topic or analysis"
 - Implement public `classify_headline(headline)` method that:
-  - Calls transformers pipeline with candidate labels
-  - Extracts scores from pipeline result
-  - Applies 0.6 threshold to generate boolean flags
-  - Determines temporal category from highest score
+  - Makes ONE pipeline call with all 5 candidate labels
+  - Extracts scores from pipeline result (5 scores returned)
+  - Split scores into opinion/news dimension (first 2 labels) and temporal dimension (last 3 labels)
+  - Applies 0.6 threshold to opinion/news scores to generate boolean flags
+  - Determines temporal category from highest temporal score
   - Returns ClassificationResult
 - Implement public `classify_batch(headlines)` method that loops over headlines
 - Add error handling for model load failures and inference errors
