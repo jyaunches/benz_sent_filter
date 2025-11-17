@@ -202,7 +202,7 @@ Use simple constants in config module for ML settings only:
   - Applies 0.6 threshold to opinion/news scores to generate boolean flags
   - Determines temporal category from highest temporal score
   - Returns ClassificationResult
-- Implement public `classify_batch(headlines)` method that loops over headlines
+- Implement public `classify_batch(headlines)` method using list comprehension: `return [self.classify_headline(headline) for headline in headlines]`
 - Add error handling for model load failures and inference errors
 - Export service from `src/benz_sent_filter/services/__init__.py`
 
