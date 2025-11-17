@@ -132,24 +132,19 @@ The codebase uses:
 7. `test_classify_headline_with_none_company_excludes_relevance_fields`
    - **Input**: Mock pipeline for existing classification only, call `classify_headline("Dell headline", company=None)`
    - **Expected**: Result has `is_about_company=None`, `company_score=None`, `company=None`
-   - **Covers**: None/empty company handled gracefully, Service excludes company fields when company is None
+   - **Covers**: None company handled gracefully, Service excludes company fields when company is None
 
-8. `test_classify_headline_with_empty_string_company_skips_relevance`
-   - **Input**: Call `classify_headline("headline", company="")`
-   - **Expected**: Treats empty string as no company, skips relevance check
-   - **Covers**: None/empty company handled gracefully
-
-9. `test_classify_batch_with_company_all_headlines`
+8. `test_classify_batch_with_company_all_headlines`
    - **Input**: Mock pipeline, call `classify_batch(["h1", "h2", "h3"], company="Dell")`
    - **Expected**: Returns 3 results, each with company relevance fields populated
    - **Covers**: Batch endpoint handles company checks for all headlines
 
-10. `test_classify_batch_with_none_company_no_relevance_checks`
+9. `test_classify_batch_with_none_company_no_relevance_checks`
     - **Input**: Mock pipeline, call `classify_batch(["h1", "h2"], company=None)`
     - **Expected**: Returns 2 results without company relevance fields
     - **Covers**: Batch processing backward compatibility
 
-11. `test_classify_headline_existing_tests_still_pass`
+10. `test_classify_headline_existing_tests_still_pass`
     - **Input**: Run existing tests without company parameter
     - **Expected**: All existing tests pass without modification
     - **Covers**: No regression in existing functionality
