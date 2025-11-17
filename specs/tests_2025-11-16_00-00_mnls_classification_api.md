@@ -54,8 +54,10 @@ All tests follow these principles:
 
 1. `test_temporal_category_enum_values`
    - **Input**: Access TemporalCategory enum (from stdlib enum.Enum)
-   - **Expected**: Has PAST_EVENT = "past_event", FUTURE_EVENT = "future_event", GENERAL_TOPIC = "general_topic" values
-   - **Covers**: Temporal category enumeration with string values
+   - **Expected**: Has three members: PAST_EVENT, FUTURE_EVENT, GENERAL_TOPIC (UPPERCASE names per PEP 8)
+   - **Expected**: Member values are "past_event", "future_event", "general_topic" (lowercase strings for API)
+   - **Expected**: `TemporalCategory.PAST_EVENT.value == "past_event"` (verify both member name and value)
+   - **Covers**: Temporal category enumeration with correct naming convention (members UPPERCASE, values lowercase)
 
 2. `test_classify_request_valid_headline`
    - **Input**: ClassifyRequest(headline="Valid headline text")

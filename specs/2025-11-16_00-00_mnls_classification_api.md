@@ -155,11 +155,17 @@ Use simple constants in config module for ML settings only:
 
 **Implementation Approach**:
 - Create models in `src/benz_sent_filter/models/classification.py`
-- Define `TemporalCategory` using Python's stdlib `enum.Enum` as `class TemporalCategory(str, Enum)` with values: PAST_EVENT = "past_event", FUTURE_EVENT = "future_event", GENERAL_TOPIC = "general_topic"
+- Define `TemporalCategory` using Python's stdlib `enum.Enum`:
+  - Pattern: `class TemporalCategory(str, Enum)` (string enum for JSON serialization)
+  - Members use UPPERCASE naming (Python convention): PAST_EVENT, FUTURE_EVENT, GENERAL_TOPIC
+  - Values use lowercase strings (RESTful API convention): "past_event", "future_event", "general_topic"
+  - Complete definition: `PAST_EVENT = "past_event"`, `FUTURE_EVENT = "future_event"`, `GENERAL_TOPIC = "general_topic"`
+  - Usage in code: `TemporalCategory.PAST_EVENT` (type-safe)
+  - JSON serialization: `"past_event"` (lowercase string value)
 - Define `ClassifyRequest` with single headline field (str, min_length=1)
 - Define `BatchClassifyRequest` with headlines field (list of str, min_items=1)
 - Define `ClassificationScores` with fields: opinion_score, news_score, past_score, future_score, general_score (all float)
-- Define `ClassificationResult` with fields: is_opinion, is_straight_news (bool), temporal_category (enum), scores (ClassificationScores), headline (str)
+- Define `ClassificationResult` with fields: is_opinion, is_straight_news (bool), temporal_category (TemporalCategory enum), scores (ClassificationScores), headline (str)
 - Define `BatchClassificationResult` with results field (list of ClassificationResult)
 - Export all models from `src/benz_sent_filter/models/__init__.py`
 
