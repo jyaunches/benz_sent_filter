@@ -72,6 +72,17 @@ class ClassificationResult(BaseModel):
     company: str | None = Field(
         default=None, description="Company name that was checked"
     )
+    far_future_forecast: bool | None = Field(
+        default=None,
+        description="Whether headline contains far-future forecast patterns (>1 year). "
+        "Only populated when temporal_category is FUTURE_EVENT and multi-year "
+        "timeframe patterns are detected.",
+    )
+    forecast_timeframe: str | None = Field(
+        default=None,
+        description="Extracted timeframe from far-future forecast (e.g., '5-year', 'by 2028'). "
+        "Only populated when far_future_forecast is True.",
+    )
 
 
 class BatchClassificationResult(BaseModel):
