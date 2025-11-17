@@ -151,7 +151,7 @@ The model will return entailment scores indicating likelihood the headline discu
 - [ ] Backward compatibility maintained (None company works)
 - [ ] All model tests pass
 
-### Phase 2: Add Company Relevance Service Logic
+### Phase 2: Add Company Relevance Service Logic [COMPLETED: 7057a8a]
 
 **Description**: Implement company relevance detection in the classification service using the existing NLI pipeline.
 
