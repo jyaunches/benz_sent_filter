@@ -18,8 +18,9 @@ dependencies = [
     "pydantic-settings>=2.1.0",
     "uvicorn[standard]>=0.24.0",
     "typer>=0.9.0",
-    "transformers>=4.35.0",
-    "torch>=2.0.0",
+    "transformers>=4.35.0,<4.36.0",  # Pin to version compatible with torch 2.0
+    "torch>=2.0.0,<2.1.0",  # Pin to version with Intel Mac support
+    "numpy>=1.24.0,<2.0.0",  # Pin to numpy 1.x for torch 2.0 compatibility
 ]
 
 [project.optional-dependencies]
