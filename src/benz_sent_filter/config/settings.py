@@ -9,3 +9,6 @@ MODEL_NAME: str = "typeform/distilbert-base-uncased-mnli"
 
 # Classification threshold for boolean conversion
 CLASSIFICATION_THRESHOLD: float = 0.6
+
+# Company relevance threshold (lower than opinion/news threshold)
+COMPANY_RELEVANCE_THRESHOLD: float = 0.5

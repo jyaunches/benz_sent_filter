@@ -1,13 +1,22 @@
 """Classification service using zero-shot NLI."""
 
+from collections import namedtuple
+
 from transformers import pipeline
 
-from benz_sent_filter.config.settings import CLASSIFICATION_THRESHOLD, MODEL_NAME
+from benz_sent_filter.config.settings import (
+    CLASSIFICATION_THRESHOLD,
+    COMPANY_RELEVANCE_THRESHOLD,
+    MODEL_NAME,
+)
 from benz_sent_filter.models.classification import (
     ClassificationResult,
     ClassificationScores,
     TemporalCategory,
 )
+
+# Named tuple for structured company relevance results
+CompanyRelevance = namedtuple("CompanyRelevance", ["is_relevant", "score"])
 
 
 class ClassificationService:
@@ -26,6 +35,9 @@ class ClassificationService:
         "This is a general topic or analysis",  # index 4 - general
     ]
 
+    # Company relevance hypothesis template
+    COMPANY_HYPOTHESIS_TEMPLATE = "This article is about {company}"
+
     def __init__(self):
         """Initialize the classification service and load the NLI model.
 
@@ -34,11 +46,32 @@ class ClassificationService:
         """
         self._pipeline = pipeline("zero-shot-classification", model=MODEL_NAME)
 
-    def classify_headline(self, headline: str) -> ClassificationResult:
+    def _check_company_relevance(
+        self, headline: str, company: str
+    ) -> CompanyRelevance:
+        """Check if headline is about the specified company.
+
+        Args:
+            headline: Headline text to check
+            company: Company name to check relevance for
+
+        Returns:
+            CompanyRelevance namedtuple with is_relevant (bool) and score (float)
+        """
+        hypothesis = self.COMPANY_HYPOTHESIS_TEMPLATE.format(company=company)
+        result = self._pipeline(headline, candidate_labels=[hypothesis])
+        score = result["scores"][0]
+        is_relevant = score >= COMPANY_RELEVANCE_THRESHOLD
+        return CompanyRelevance(is_relevant=is_relevant, score=score)
+
+    def classify_headline(
+        self, headline: str, company: str | None = None
+    ) -> ClassificationResult:
         """Classify a single headline.
 
         Args:
             headline: Headline text to classify
+            company: Optional company name to check relevance
 
         Returns:
             ClassificationResult with boolean flags, scores, and temporal category
@@ -78,15 +111,31 @@ class ClassificationService:
             general_score=general_score,
         )
 
-        return ClassificationResult(
-            is_opinion=is_opinion,
-            is_straight_news=is_straight_news,
-            temporal_category=temporal_category,
-            scores=classification_scores,
-            headline=headline,
-        )
+        # Check company relevance if company provided
+        if company is not None:
+            relevance = self._check_company_relevance(headline, company)
+            return ClassificationResult(
+                is_opinion=is_opinion,
+                is_straight_news=is_straight_news,
+                temporal_category=temporal_category,
+                scores=classification_scores,
+                headline=headline,
+                is_about_company=relevance.is_relevant,
+                company_score=relevance.score,
+                company=company,
+            )
+        else:
+            return ClassificationResult(
+                is_opinion=is_opinion,
+                is_straight_news=is_straight_news,
+                temporal_category=temporal_category,
+                scores=classification_scores,
+                headline=headline,
+            )
 
-    def classify_batch(self, headlines: list[str]) -> list[ClassificationResult]:
+    def classify_batch(
+        self, headlines: list[str], company: str | None = None
+    ) -> list[ClassificationResult]:
         """Classify multiple headlines.
 
         Uses simple list comprehension for sequential processing.
@@ -94,8 +143,11 @@ class ClassificationService:
 
         Args:
             headlines: List of headline texts to classify
+            company: Optional company name to check relevance for all headlines
 
         Returns:
             List of ClassificationResult objects in same order as input
         """
-        return [self.classify_headline(headline) for headline in headlines]
+        return [
+            self.classify_headline(headline, company=company) for headline in headlines
+        ]
