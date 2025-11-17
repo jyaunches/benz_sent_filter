@@ -170,12 +170,12 @@ The model will return entailment scores indicating likelihood the headline discu
 - Define `CompanyRelevance = namedtuple('CompanyRelevance', ['is_relevant', 'score'])` at module level for structured return value
 - Add class constant: `COMPANY_HYPOTHESIS_TEMPLATE = "This article is about {company}"`
 - Add method: `_check_company_relevance(headline: str, company: str) -> CompanyRelevance`
-- Method calls existing `self._pipeline` with single hypothesis (reuses same pipeline pattern as existing classification)
+- Method calls existing `self._pipeline` with single hypothesis using default parameters (reuses same pipeline pattern as existing classification)
 - Extract score from pipeline result (index 0 of scores list)
 - Apply threshold: `is_relevant = score >= COMPANY_RELEVANCE_THRESHOLD`
-- Return `CompanyRelevance(is_relevant=is_relevant, score=score)` for readable field access
-- Update `classify_headline` to call `_check_company_relevance` when company provided, accessing result via `.is_relevant` and `.score`
-- Update `classify_batch` to handle per-headline company checks
+- Return `CompanyRelevance(is_relevant=is_relevant, score=score)` for readable field access via `.is_relevant` and `.score` attributes
+- Update `classify_headline` to check `if company is not None` before calling `_check_company_relevance`, then unpack namedtuple result: `relevance = self._check_company_relevance(headline, company)` and access via `relevance.is_relevant` and `relevance.score`
+- Update `classify_batch` to handle per-headline company checks with same None guard pattern
 
 **Unit Test Requirements**:
 - Update `tests/test_classifier.py`

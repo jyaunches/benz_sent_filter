@@ -156,6 +156,8 @@ The codebase uses:
 - Mock should return dict with `scores` list matching hypothesis order (identical to existing classification tests)
 - Test both single classification and batch processing
 - Company relevance testing follows exact same patterns as existing `test_classify_headline_*` tests
+- Test namedtuple field access using `.is_relevant` and `.score` attributes
+- Verify None guard pattern: company relevance only called when `company is not None`
 
 **Mocking Pattern:**
 ```python
