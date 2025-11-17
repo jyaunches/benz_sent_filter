@@ -100,11 +100,11 @@ The service uses zero-shot classification with carefully designed candidate labe
 - Classification errors return 500 Internal Server Error with details
 
 ### Configuration Management
-Use simple constants in config module:
+Use simple constants in config module for ML settings only:
 - Model name: `typeform/distilbert-base-uncased-mnli` (constant)
 - Classification threshold: 0.6 (constant)
 - Transformers cache: Use transformers default
-- Server settings: host="0.0.0.0", port=8002 (constants)
+- Server settings: Managed by uvicorn CLI or environment variables (not in config module)
 
 ### Data Flow
 1. Client sends POST request with headline(s)
@@ -126,8 +126,8 @@ Use simple constants in config module:
 
 **Implementation Approach**:
 - Modify `pyproject.toml` to add `transformers>=4.35.0` and `torch>=2.0.0` to dependencies
-- Create `src/benz_sent_filter/config/settings.py` with simple constants
-- Define constants: MODEL_NAME, CLASSIFICATION_THRESHOLD, HOST, PORT
+- Create `src/benz_sent_filter/config/settings.py` with ML configuration constants
+- Define constants: MODEL_NAME, CLASSIFICATION_THRESHOLD
 - Export constants for import by other modules
 
 **Unit Test Requirements**:

@@ -29,12 +29,7 @@ All tests follow these principles:
    - **Expected**: CLASSIFICATION_THRESHOLD equals 0.6
    - **Covers**: Threshold configuration
 
-3. `test_host_and_port_constants`
-   - **Input**: Import settings module
-   - **Expected**: HOST="0.0.0.0", PORT=8002
-   - **Covers**: Server configuration constants
-
-4. `test_model_name_value`
+3. `test_model_name_value`
    - **Input**: Check MODEL_NAME value
    - **Expected**: Equals "typeform/distilbert-base-uncased-mnli"
    - **Covers**: Correct model specified
