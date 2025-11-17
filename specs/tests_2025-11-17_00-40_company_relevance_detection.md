@@ -154,11 +154,12 @@ The codebase uses:
     - **Covers**: No regression in existing functionality
 
 **Test Implementation Notes:**
-- Mock `self._pipeline` to return controlled scores
+- Mock `self._pipeline` to return controlled scores (same mocking pattern as existing opinion/news tests)
 - Use `mock_transformers_pipeline` fixture pattern from existing tests
 - Clear module cache with `sys.modules` deletion before each test
-- Mock should return dict with `scores` list matching hypothesis order
+- Mock should return dict with `scores` list matching hypothesis order (identical to existing classification tests)
 - Test both single classification and batch processing
+- Company relevance testing follows exact same patterns as existing `test_classify_headline_*` tests
 
 **Mocking Pattern:**
 ```python

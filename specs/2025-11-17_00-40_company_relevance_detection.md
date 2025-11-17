@@ -64,6 +64,8 @@ Use the existing zero-shot classification pipeline with company-specific hypothe
 
 The model will return entailment scores indicating likelihood the headline discusses the specified company.
 
+**Pattern Reuse**: Company relevance check follows the same pipeline calling pattern as existing opinion/news and temporal classification - just different candidate labels. Same pipeline instance, same return format, same score extraction logic.
+
 ### API Extension Approach
 
 **Backward Compatible Design**:
