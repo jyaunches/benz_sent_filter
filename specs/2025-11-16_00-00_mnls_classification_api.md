@@ -401,11 +401,6 @@ Use simple constants in config module:
 4. **Memory Usage**: Model requires ~500MB RAM
    - Mitigation: Document requirements, acceptable for dedicated service
 
-### Open Questions
-- What is acceptable latency for single headline? (Target: <2s)
-- Should we cache results for identical headlines?
-- Do we need request rate limiting?
-
 ## 8. Success Metrics
 
 ### Functional Metrics
