@@ -44,21 +44,27 @@ async def health_check():
     )
 
 
-@app.post("/classify", response_model=ClassificationResult)
+@app.post("/classify", response_model=ClassificationResult, response_model_exclude_none=True)
 async def classify_headline(request: ClassifyRequest):
     """Classify a single headline.
 
     Returns boolean flags, temporal category, and all raw scores.
+    Optionally includes company relevance when company parameter provided.
     """
-    result = app.state.classifier.classify_headline(request.headline)
+    result = app.state.classifier.classify_headline(
+        request.headline, company=request.company
+    )
     return result
 
 
-@app.post("/classify/batch", response_model=BatchClassificationResult)
+@app.post("/classify/batch", response_model=BatchClassificationResult, response_model_exclude_none=True)
 async def classify_batch(request: BatchClassifyRequest):
     """Classify multiple headlines.
 
     Returns array of classification results in same order as input.
+    Optionally includes company relevance when company parameter provided.
     """
-    results = app.state.classifier.classify_batch(request.headlines)
+    results = app.state.classifier.classify_batch(
+        request.headlines, company=request.company
+    )
     return BatchClassificationResult(results=results)
