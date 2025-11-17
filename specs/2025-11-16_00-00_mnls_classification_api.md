@@ -190,11 +190,12 @@ Use simple constants in config module:
 - Define `ClassificationService` class with model loading in `__init__`
 - Use transformers `pipeline("zero-shot-classification")` with model from settings
 - Define class-level constants for candidate labels (opinion/news and temporal)
-- Implement `_run_inference(headline)` private method that calls pipeline
-- Implement `_parse_scores(inference_result)` private method to extract scores into ClassificationScores
-- Implement `_apply_threshold(scores)` private method to generate boolean flags
-- Implement `_determine_temporal_category(scores)` private method using argmax logic
-- Implement public `classify_headline(headline)` method that orchestrates the pipeline
+- Implement public `classify_headline(headline)` method that:
+  - Calls transformers pipeline with candidate labels
+  - Extracts scores from pipeline result
+  - Applies 0.6 threshold to generate boolean flags
+  - Determines temporal category from highest score
+  - Returns ClassificationResult
 - Implement public `classify_batch(headlines)` method that loops over headlines
 - Add error handling for model load failures and inference errors
 - Export service from `src/benz_sent_filter/services/__init__.py`
