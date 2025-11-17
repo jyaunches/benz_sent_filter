@@ -183,7 +183,7 @@ Use simple constants in config module for ML settings only:
 - [ ] Models export cleanly from models module
 - [ ] All model tests pass
 
-### Phase 3: Classification Service Core
+### Phase 3: Classification Service Core [COMPLETED: 13d5dca0ce97facafdf50390bd2583a9effe28d2]
 
 **Description**: Implement the classification service that loads the NLI model and performs zero-shot inference on headlines.
 
