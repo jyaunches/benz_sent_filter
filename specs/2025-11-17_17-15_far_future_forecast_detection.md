@@ -151,41 +151,30 @@ is_far_future = (
 **Description**: Implement regex-based pattern detection functions for far-future indicators.
 
 **Core Functionality**:
-- Forecast language detection (forecasts, projects, estimates, etc.)
 - Multi-year timeframe detection (over X years, by 20XX, X-year)
 - Near-term exclusion detection (quarterly, Q1-Q4)
-- Numeric year extraction and future year calculation
+- Boolean far-future decision based on patterns
 
 **Implementation Approach**:
 - Create new module: `src/benz_sent_filter/services/forecast_analyzer.py`
 - Implement pattern matching functions using regex
-- Add configuration constants for patterns and thresholds
-- No integration with ClassificationService yet (standalone module)
+- Focus on simplicity and clarity
 
 **Pattern Detection Functions**:
 - `matches_multi_year_timeframe(text: str) -> tuple[bool, str | None]` (returns match + timeframe)
 - `matches_quarterly_language(text: str) -> bool`
 - `is_far_future(text: str) -> tuple[bool, str | None]` (returns decision + timeframe)
 
-**Unit Test Requirements**:
-- Create `tests/test_forecast_analyzer.py`
-- Test `is_far_future()` with examples from appendix
-- Test multi-year timeframe detection (positive/negative cases)
-- Test quarterly language exclusion
-- Test edge cases: malformed text, ambiguous timeframes
-
-**Example Test Cases**:
-- "Forecasts $1B Revenue Over 5 Years" → True (multi-year, no quarterly)
-- "Q4 Guidance Raised to $100M" → False (quarterly exclusion)
-- "Projects $500M By 2028" → True (multi-year, no quarterly)
-- "Reports Q2 Revenue" → False (no multi-year)
+**Test Requirements**:
+- Test `is_far_future()` behavior through service integration tests
+- Use critical examples from appendix (lines 490-508) as test cases
+- Focus on behavior, not implementation details
 
 **Acceptance Criteria**:
 - Pattern functions implemented with regex
-- Correctly classifies all appendix examples
-- 90%+ accuracy on test suite
+- Correctly classifies critical appendix examples
 - No external dependencies beyond standard library (re module)
-- All tests pass
+- Integration tests pass
 
 ### Phase 2: Data Model Extensions
 
@@ -207,20 +196,15 @@ is_far_future = (
 - `far_future_forecast: bool | None = None` - Whether headline contains far-future forecast patterns
 - `forecast_timeframe: str | None = None` - Extracted timeframe (e.g., "5-year", "by 2028")
 
-**Unit Test Requirements**:
-- Modify `tests/test_models.py`
-- Test ClassificationResult instantiation with new fields
-- Test serialization with new fields present
-- Test serialization with new fields absent (should exclude from JSON)
-- Test backward compatibility (old code can parse new responses)
-- Test field validation (types, constraints)
+**Test Requirements**:
+- Test ClassificationResult with new fields via API tests
+- Verify serialization behavior (present/absent fields)
 
 **Acceptance Criteria**:
 - ClassificationResult accepts new optional fields
 - Fields serialize correctly to JSON
 - None values excluded from JSON output (Pydantic default)
 - Existing tests pass without modification
-- New field documentation clear and accurate
 
 ### Phase 3: Service Integration
 
@@ -249,18 +233,15 @@ is_far_future = (
      - Set forecast_timeframe from returned value
 3. Return ClassificationResult with enriched metadata
 
-**Unit Test Requirements**:
-- Modify `tests/test_classifier.py`
-- Test far-future analysis with FUTURE_EVENT classifications
-- Test no analysis when temporal_category != FUTURE_EVENT
-- Test metadata population accuracy
-- Test backward compatibility (no new fields when not far-future)
+**Test Requirements**:
+- Test classifier behavior with far-future headlines
+- Test FUTURE_EVENT classifications get far-future analysis
+- Test other classifications do not get far-future metadata
 
 **Acceptance Criteria**:
 - Far-future analysis integrated into classify_headline
 - Only runs for FUTURE_EVENT classifications
 - Metadata fields correctly populated
-- No performance degradation (pattern matching is fast)
 - All existing tests pass
 
 ### Phase 4: API Endpoint Updates
@@ -285,19 +266,15 @@ is_far_future = (
 - Document when fields are populated vs absent
 - Update API usage examples
 
-**Unit Test Requirements**:
-- Modify `tests/test_api.py`
-- Test /classify endpoint with far-future headline
-- Test /classify endpoint with near-term forecast
+**Test Requirements**:
+- Test /classify endpoint with far-future and near-term headlines
 - Test /batch-classify with mixed headlines
 - Verify JSON response structure
-- Verify optional fields excluded when not applicable
 
 **Acceptance Criteria**:
 - API returns new fields when far-future detected
 - API excludes fields when not far-future
-- OpenAPI documentation complete and accurate
-- Response examples demonstrate feature
+- OpenAPI documentation updated
 - All API tests pass
 
 ### Phase 5: Integration Testing & Validation
@@ -305,43 +282,23 @@ is_far_future = (
 **Description**: End-to-end testing with real-world headlines and validation against bead requirements.
 
 **Core Functionality**:
-- Integration tests with real model inference
-- Validation against bead examples
-- Performance benchmarking
-- Edge case testing
+- End-to-end validation with real headlines
+- Verification against bead examples
 
 **Implementation Approach**:
 - Create `integration/test_far_future_integration.py`
-- Test with examples from bead (TVGN, etc.)
-- Test edge cases and boundary conditions
-- Measure pattern matching performance
-- Validate accuracy metrics
+- Test with critical examples from appendix
+- Validate bead requirements
 
-**Test Scenarios**:
-- TVGN example: "Forecasts $1B Launch-Year Revenue, Sees $18B–$22B Over 5 Years"
-- Near-term guidance: "Q4 Guidance Raised to $100M"
-- Mixed: "Projects $500M Revenue By 2028"
-- No forecast: "Reports Record Q2 Revenue"
-- Edge cases: Malformed text, ambiguous timeframes
-
-**Performance Requirements**:
-- Pattern matching adds <10ms per classification
-- No regression in existing classification speed
-- Memory footprint unchanged
-
-**Unit Test Requirements**:
-- Create comprehensive integration test suite
-- Test 20+ real-world headlines
-- Test all pattern combinations
-- Test performance benchmarks
-- Test concurrent requests (thread safety)
+**Critical Test Cases**:
+- TVGN example: "Forecasts $1B Launch-Year Revenue, Sees $18B–$22B Over 5 Years" → far_future = True
+- Near-term: "Q4 Guidance Raised to $100M" → far_future = False or None
+- Edge cases from appendix (lines 504-508)
 
 **Acceptance Criteria**:
 - 90%+ accuracy on far-future detection (bead requirement)
 - Near-term guidance does NOT trigger false positives
 - TVGN-type examples correctly flagged
-- Pattern matching performance acceptable
-- All integration tests pass
 - No regression in existing functionality
 
 ### Phase 6: Documentation & Examples
