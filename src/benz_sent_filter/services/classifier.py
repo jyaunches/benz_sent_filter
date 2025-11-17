@@ -14,6 +14,7 @@ from benz_sent_filter.models.classification import (
     ClassificationScores,
     TemporalCategory,
 )
+from benz_sent_filter.services import forecast_analyzer
 
 # Named tuple for structured company relevance results
 CompanyRelevance = namedtuple("CompanyRelevance", ["is_relevant", "score"])
@@ -64,6 +65,33 @@ class ClassificationService:
         is_relevant = score >= COMPANY_RELEVANCE_THRESHOLD
         return CompanyRelevance(is_relevant=is_relevant, score=score)
 
+    def _analyze_far_future(
+        self, headline: str, temporal_category: TemporalCategory
+    ) -> dict:
+        """Analyze if headline contains far-future forecast patterns.
+
+        Only performs analysis for FUTURE_EVENT classifications. Returns
+        dictionary with far_future_forecast and forecast_timeframe keys.
+
+        Args:
+            headline: Headline text to analyze
+            temporal_category: Temporal category from classification
+
+        Returns:
+            Dict with far_future_forecast (bool | None) and forecast_timeframe (str | None)
+        """
+        # Only analyze far-future for FUTURE_EVENT classifications
+        if temporal_category != TemporalCategory.FUTURE_EVENT:
+            return {"far_future_forecast": None, "forecast_timeframe": None}
+
+        # Check for far-future patterns
+        is_far_future, timeframe = forecast_analyzer.is_far_future(headline)
+
+        if is_far_future:
+            return {"far_future_forecast": True, "forecast_timeframe": timeframe}
+        else:
+            return {"far_future_forecast": None, "forecast_timeframe": None}
+
     def classify_headline(
         self, headline: str, company: str | None = None
     ) -> ClassificationResult:
@@ -111,6 +139,9 @@ class ClassificationService:
             general_score=general_score,
         )
 
+        # Analyze far-future patterns
+        far_future_metadata = self._analyze_far_future(headline, temporal_category)
+
         # Check company relevance if company provided
         if company is not None:
             relevance = self._check_company_relevance(headline, company)
@@ -123,6 +154,8 @@ class ClassificationService:
                 is_about_company=relevance.is_relevant,
                 company_score=relevance.score,
                 company=company,
+                far_future_forecast=far_future_metadata["far_future_forecast"],
+                forecast_timeframe=far_future_metadata["forecast_timeframe"],
             )
         else:
             return ClassificationResult(
@@ -131,6 +164,8 @@ class ClassificationService:
                 temporal_category=temporal_category,
                 scores=classification_scores,
                 headline=headline,
+                far_future_forecast=far_future_metadata["far_future_forecast"],
+                forecast_timeframe=far_future_metadata["forecast_timeframe"],
             )
 
     def classify_batch(
