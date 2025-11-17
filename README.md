@@ -4,16 +4,18 @@ MNLS-based sentiment classification service for article title analysis.
 
 ## Overview
 
-Benz Sent Filter provides zero-shot natural language inference capabilities to classify news headlines along two dimensions:
+Benz Sent Filter provides zero-shot natural language inference capabilities to classify news headlines along three dimensions:
 
 1. **Opinion vs News**: Detects whether a headline is opinionated or straight news
 2. **Temporal Category**: Classifies whether content is about past events, future events, or general topics
+3. **Company Relevance**: Detects whether a headline is about a specific company (optional)
 
 The service is designed to:
 - Run on CPU (no GPU required)
 - Use open-source models
 - Require no custom training for v1
 - Process headline-length inputs efficiently
+- Support optional company-specific filtering
 
 ## Quick Start
 
@@ -141,6 +143,68 @@ Response:
 }
 ```
 
+### Company Relevance Detection
+
+Check if a headline is about a specific company by adding the optional `company` parameter:
+
+```bash
+curl -X POST http://localhost:8002/classify \
+  -H "Content-Type: application/json" \
+  -d '{
+    "headline": "Dell Unveils AI Data Platform Updates; Launches First 2U Server With NVIDIA Blackwell GPUs",
+    "company": "Dell"
+  }'
+```
+
+Response (includes company relevance fields):
+```json
+{
+  "is_opinion": false,
+  "is_straight_news": true,
+  "temporal_category": "past_event",
+  "scores": {
+    "opinion_score": 0.20,
+    "news_score": 0.75,
+    "past_score": 0.80,
+    "future_score": 0.10,
+    "general_score": 0.10
+  },
+  "headline": "Dell Unveils AI Data Platform Updates; Launches First 2U Server With NVIDIA Blackwell GPUs",
+  "is_about_company": true,
+  "company_score": 0.92,
+  "company": "Dell"
+}
+```
+
+The company relevance feature:
+- Returns `is_about_company` (boolean) indicating if the headline discusses the specified company
+- Returns `company_score` (0.0 - 1.0) showing confidence level
+- Uses threshold of 0.5 (lower than opinion/news threshold)
+- Works with company name variations: "Dell", "DELL", "Dell Technologies"
+- Handles multi-company headlines: checks relevance to the specified company only
+
+To check a different company with the same headline:
+
+```bash
+# Check NVIDIA relevance (also mentioned in headline)
+curl -X POST http://localhost:8002/classify \
+  -H "Content-Type: application/json" \
+  -d '{
+    "headline": "Dell Unveils AI Data Platform Updates; Launches First 2U Server With NVIDIA Blackwell GPUs",
+    "company": "NVIDIA"
+  }'
+# Returns: is_about_company: true, company_score: 0.88
+
+# Check unrelated company
+curl -X POST http://localhost:8002/classify \
+  -H "Content-Type: application/json" \
+  -d '{
+    "headline": "Dell Unveils AI Data Platform Updates; Launches First 2U Server With NVIDIA Blackwell GPUs",
+    "company": "Tesla"
+  }'
+# Returns: is_about_company: false, company_score: 0.12
+```
+
 ### Batch Classification
 
 Classify multiple headlines in one request:
@@ -190,6 +254,59 @@ Response:
 }
 ```
 
+**Batch with Company Filter**: Add `company` parameter to check all headlines against one company:
+
+```bash
+curl -X POST http://localhost:8002/classify/batch \
+  -H "Content-Type: application/json" \
+  -d '{
+    "headlines": [
+      "Tesla Reports Record Q3 Deliveries",
+      "Apple Announces New iPhone",
+      "Tesla Stock Jumps on Earnings Beat"
+    ],
+    "company": "Tesla"
+  }'
+```
+
+Response includes company relevance for all headlines:
+```json
+{
+  "results": [
+    {
+      "is_opinion": false,
+      "is_straight_news": true,
+      "temporal_category": "past_event",
+      "scores": { "...": "..." },
+      "headline": "Tesla Reports Record Q3 Deliveries",
+      "is_about_company": true,
+      "company_score": 0.95,
+      "company": "Tesla"
+    },
+    {
+      "is_opinion": false,
+      "is_straight_news": true,
+      "temporal_category": "past_event",
+      "scores": { "...": "..." },
+      "headline": "Apple Announces New iPhone",
+      "is_about_company": false,
+      "company_score": 0.08,
+      "company": "Tesla"
+    },
+    {
+      "is_opinion": false,
+      "is_straight_news": true,
+      "temporal_category": "past_event",
+      "scores": { "...": "..." },
+      "headline": "Tesla Stock Jumps on Earnings Beat",
+      "is_about_company": true,
+      "company_score": 0.93,
+      "company": "Tesla"
+    }
+  ]
+}
+```
+
 ## Classification Output
 
 The service returns comprehensive classification data for each headline:
@@ -197,8 +314,9 @@ The service returns comprehensive classification data for each headline:
 ### Boolean Flags
 - **is_opinion**: `true` if opinion score ≥ 0.6 (opinion/editorial content)
 - **is_straight_news**: `true` if news score ≥ 0.6 (factual news reporting)
+- **is_about_company**: `true` if company score ≥ 0.5 (only present when `company` parameter provided)
 
-Both flags can be `false` (uncertain), or both `true` (mixed content).
+Both opinion/news flags can be `false` (uncertain), or both `true` (mixed content).
 
 ### Temporal Category
 One of three values:
@@ -215,6 +333,15 @@ All probability scores (0.0 - 1.0) are exposed for transparency:
 - **past_score**: Probability of past event content
 - **future_score**: Probability of future event content
 - **general_score**: Probability of general topic content
+- **company_score**: Probability headline is about specified company (only when `company` provided)
+
+### Company Relevance Fields
+When the optional `company` parameter is provided, the response includes:
+- **is_about_company**: Boolean flag (score ≥ 0.5)
+- **company_score**: Raw probability score (0.0 - 1.0)
+- **company**: The company name that was checked
+
+These fields are omitted from the response when `company` parameter is not provided (backward compatibility).
 
 ## Integration with Benz Ecosystem
 
@@ -250,14 +377,23 @@ The service uses zero-shot classification with carefully designed candidate labe
 
 All 5 labels are evaluated in a single inference call for efficiency.
 
+**Company Relevance (when `company` parameter provided):**
+- Hypothesis template: "This article is about {company_name}"
+- Evaluated in a separate inference call (only when company specified)
+- Reuses the same MNLI model pipeline
+
 ### Threshold Logic
-- **Boolean conversion**: Score ≥ 0.6 → `true`, Score < 0.6 → `false`
+- **Opinion/News boolean conversion**: Score ≥ 0.6 → `true`, Score < 0.6 → `false`
+- **Company relevance boolean conversion**: Score ≥ 0.5 → `true`, Score < 0.5 → `false`
 - **Temporal category**: Highest-scoring temporal label wins
 - **Edge cases**: Both opinion and news flags can be true/false simultaneously
+- **Why lower threshold for company?**: Company mentions are typically binary (name appears or doesn't). Lower threshold reduces false negatives for edge cases like indirect references.
 
 ### Performance
-- **Single headline**: < 2 seconds on CPU
-- **Batch of 10**: < 10 seconds on CPU
+- **Single headline (no company)**: < 2 seconds on CPU
+- **Single headline (with company)**: < 3 seconds on CPU (adds < 500ms overhead)
+- **Batch of 10 (no company)**: < 10 seconds on CPU
+- **Batch of 10 (with company)**: < 15 seconds on CPU
 - **Startup time**: < 30 seconds (includes model download on first run)
 - **Memory**: < 1GB
 
