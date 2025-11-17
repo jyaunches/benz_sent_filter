@@ -82,8 +82,9 @@ The codebase uses:
 
 **Test Implementation Notes:**
 - Use `model.model_dump()` or `model.model_dump_json()` to check serialization
-- Verify Pydantic's `exclude_none` or `exclude_unset` behavior
+- Verify Pydantic's `exclude_none` behavior configured via `ConfigDict(exclude_none=True)`
 - Test both dict and JSON serialization formats
+- Verify None fields are automatically excluded from serialization due to model_config
 - No mocking required - pure Pydantic model testing
 - Follow same test patterns as existing model tests in lines 25-42 (`test_classify_request_*`) and 90-124 (`test_classification_result_*`)
 

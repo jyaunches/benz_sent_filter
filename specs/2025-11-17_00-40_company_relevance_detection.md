@@ -128,7 +128,8 @@ The model will return entailment scores indicating likelihood the headline discu
 - Modify `src/benz_sent_filter/models/classification.py`
 - Update `ClassifyRequest` to add `company: str | None = None` (follows existing optional field pattern in Pydantic models)
 - Update `ClassificationResult` to add three optional fields with `Field(default=None)` (same pattern as existing `Field(...)` definitions in `ClassificationScores` and `ClassificationResult`)
-- Configure `ClassificationResult` with `model_config = ConfigDict(exclude_none=True)` to automatically exclude None fields from serialization
+- Add import: `from pydantic import ConfigDict`
+- Configure `ClassificationResult` with `model_config = ConfigDict(exclude_none=True)` to automatically exclude None fields from JSON serialization
 - Reference existing models as template - copy-paste-modify pattern from lines 20-24 (`ClassifyRequest`) and 48-58 (`ClassificationResult`)
 - For batch: add `company: str | None = None` to `BatchClassifyRequest` (same pattern as `ClassifyRequest`)
 - Keep all existing field validations unchanged
