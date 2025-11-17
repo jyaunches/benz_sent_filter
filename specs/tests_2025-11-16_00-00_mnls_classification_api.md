@@ -7,11 +7,16 @@
 ## Testing Strategy
 
 All tests follow these principles:
-- Use pytest fixtures from `conftest.py` for sample headlines
+- Use pytest fixtures from `tests/conftest.py` for shared sample headlines (available to all unit tests)
+- Integration-specific fixtures defined in `integration/conftest.py` (module-scoped real classifier)
 - Mock external dependencies (transformers pipeline) in unit tests
 - Test real model only in integration tests (marked with `@pytest.mark.integration`)
 - Verify both happy paths and error conditions
 - Ensure >90% code coverage
+
+**Fixture Organization:**
+- `tests/conftest.py`: Sample headlines, mock pipeline factory (shared across all unit tests)
+- `integration/conftest.py`: Real classifier fixture with module scope (shared across integration tests)
 
 ## Phase 1: Dependencies & Configuration - Test Guide
 
