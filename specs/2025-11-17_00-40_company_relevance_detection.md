@@ -162,13 +162,15 @@ The model will return entailment scores indicating likelihood the headline discu
 - Add `COMPANY_RELEVANCE_THRESHOLD = 0.5` to `src/benz_sent_filter/config/settings.py` (follows existing `CLASSIFICATION_THRESHOLD` pattern)
 - Modify `src/benz_sent_filter/services/classifier.py`
 - Import `COMPANY_RELEVANCE_THRESHOLD` from config.settings
+- Import `namedtuple` from `collections`
+- Define `CompanyRelevance = namedtuple('CompanyRelevance', ['is_relevant', 'score'])` at module level for structured return value
 - Add class constant: `COMPANY_HYPOTHESIS_TEMPLATE = "This article is about {company}"`
-- Add method: `_check_company_relevance(headline: str, company: str) -> tuple[bool, float]`
+- Add method: `_check_company_relevance(headline: str, company: str) -> CompanyRelevance`
 - Method calls existing `self._pipeline` with single hypothesis (reuses same pipeline pattern as existing classification)
 - Extract score from pipeline result (index 0 of scores list)
 - Apply threshold: `is_relevant = score >= COMPANY_RELEVANCE_THRESHOLD`
-- Return `(is_relevant, score)`
-- Update `classify_headline` to call `_check_company_relevance` when company provided
+- Return `CompanyRelevance(is_relevant=is_relevant, score=score)` for readable field access
+- Update `classify_headline` to call `_check_company_relevance` when company provided, accessing result via `.is_relevant` and `.score`
 - Update `classify_batch` to handle per-headline company checks
 
 **Unit Test Requirements**:

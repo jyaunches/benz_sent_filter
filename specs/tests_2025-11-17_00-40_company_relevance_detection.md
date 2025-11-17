@@ -100,22 +100,22 @@ The codebase uses:
 
 1. `test_check_company_relevance_high_score_above_threshold`
    - **Input**: Mock pipeline to return score 0.85 for "This article is about Dell" hypothesis with headline "Dell Unveils AI Platform"
-   - **Expected**: Method returns `(True, 0.85)` - is_relevant=True because 0.85 >= 0.5
-   - **Covers**: Company relevance returns (True, score) when score above threshold
+   - **Expected**: Method returns `CompanyRelevance(is_relevant=True, score=0.85)` - access via `result.is_relevant` and `result.score`
+   - **Covers**: Company relevance returns structured namedtuple when score above threshold
 
 2. `test_check_company_relevance_low_score_below_threshold`
    - **Input**: Mock pipeline to return score 0.15 for "This article is about Tesla" hypothesis with headline "Dell Unveils AI Platform"
-   - **Expected**: Method returns `(False, 0.15)` - is_relevant=False because 0.15 < 0.5
-   - **Covers**: Company relevance returns (False, score) when score below threshold
+   - **Expected**: Method returns `CompanyRelevance(is_relevant=False, score=0.15)` - access via named fields
+   - **Covers**: Company relevance returns structured namedtuple when score below threshold
 
 3. `test_check_company_relevance_threshold_boundary_at_point_five`
    - **Input**: Mock pipeline to return score 0.50 exactly
-   - **Expected**: Method returns `(True, 0.50)` - is_relevant=True because 0.50 >= `COMPANY_RELEVANCE_THRESHOLD` (0.5)
+   - **Expected**: Method returns `CompanyRelevance(is_relevant=True, score=0.50)` - is_relevant=True because 0.50 >= `COMPANY_RELEVANCE_THRESHOLD`
    - **Covers**: Threshold logic correctly generates boolean flag using config constant
 
 4. `test_check_company_relevance_threshold_boundary_below_point_five`
    - **Input**: Mock pipeline to return score 0.49
-   - **Expected**: Method returns `(False, 0.49)` - is_relevant=False because 0.49 < `COMPANY_RELEVANCE_THRESHOLD` (0.5)
+   - **Expected**: Method returns `CompanyRelevance(is_relevant=False, score=0.49)` - is_relevant=False because 0.49 < `COMPANY_RELEVANCE_THRESHOLD`
    - **Covers**: Threshold boundary testing with config constant
 
 5. `test_check_company_relevance_uses_correct_hypothesis_template`
