@@ -267,7 +267,7 @@ The model will return entailment scores indicating likelihood the headline discu
 - [ ] Edge cases handled correctly
 - [ ] Integration tests pass when run with real model
 
-### Phase 5: Documentation & Examples
+### Phase 5: Documentation & Examples [COMPLETED: c5e7228]
 
 **Description**: Update documentation with company relevance API usage, examples, and best practices.
 
