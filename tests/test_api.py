@@ -372,3 +372,226 @@ def test_health_endpoint_unaffected_by_company_feature(client_with_company):
 
     assert data["status"] == "healthy"
     assert data["service"] == "benz_sent_filter"
+
+
+# ============================================================================
+# Far-Future Forecast Detection Tests (Phase 4: API Endpoint Updates)
+# ============================================================================
+
+
+def test_classify_endpoint_with_far_future_pattern(mock_transformers_pipeline):
+    """Test POST /classify returns far-future fields for multi-year forecasts."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.api.app" in sys.modules:
+        del sys.modules["benz_sent_filter.api.app"]
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    # Mock with FUTURE_EVENT scores
+    mock_transformers_pipeline({
+        "This is an opinion piece or editorial": 0.2,
+        "This is a factual news report": 0.75,
+        "This is about a past event that already happened": 0.1,
+        "This is about a future event or forecast": 0.7,
+        "This is a general topic or analysis": 0.2,
+    })
+
+    from benz_sent_filter.api.app import app
+    from fastapi.testclient import TestClient
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/classify",
+            json={"headline": "Projects $500M Revenue By 2028"}
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify far-future fields present
+    assert "far_future_forecast" in data
+    assert data["far_future_forecast"] is True
+    assert "forecast_timeframe" in data
+    assert data["forecast_timeframe"] is not None
+    assert "2028" in data["forecast_timeframe"]
+
+    # Verify temporal category is FUTURE_EVENT
+    assert data["temporal_category"] == "future_event"
+
+
+def test_classify_endpoint_without_far_future_pattern(mock_transformers_pipeline):
+    """Test POST /classify excludes far-future fields for near-term guidance."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.api.app" in sys.modules:
+        del sys.modules["benz_sent_filter.api.app"]
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    # Mock with FUTURE_EVENT scores (headline is future but near-term)
+    mock_transformers_pipeline({
+        "This is an opinion piece or editorial": 0.2,
+        "This is a factual news report": 0.75,
+        "This is about a past event that already happened": 0.1,
+        "This is about a future event or forecast": 0.7,
+        "This is a general topic or analysis": 0.2,
+    })
+
+    from benz_sent_filter.api.app import app
+    from fastapi.testclient import TestClient
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/classify",
+            json={"headline": "Q4 Guidance Raised to $100M"}
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify far-future fields NOT present (excluded by exclude_none=True)
+    assert "far_future_forecast" not in data
+    assert "forecast_timeframe" not in data
+
+
+def test_classify_endpoint_past_event_no_far_future(mock_transformers_pipeline):
+    """Test POST /classify excludes far-future fields for PAST_EVENT."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.api.app" in sys.modules:
+        del sys.modules["benz_sent_filter.api.app"]
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    # Mock with PAST_EVENT scores
+    mock_transformers_pipeline({
+        "This is an opinion piece or editorial": 0.2,
+        "This is a factual news report": 0.75,
+        "This is about a past event that already happened": 0.7,
+        "This is about a future event or forecast": 0.1,
+        "This is a general topic or analysis": 0.2,
+    })
+
+    from benz_sent_filter.api.app import app
+    from fastapi.testclient import TestClient
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/classify",
+            json={"headline": "Reports Q2 Revenue of $1B"}
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify far-future fields NOT present
+    assert "far_future_forecast" not in data
+    assert "forecast_timeframe" not in data
+
+    # Verify temporal category is PAST_EVENT
+    assert data["temporal_category"] == "past_event"
+
+
+def test_classify_endpoint_far_future_with_company(mock_transformers_pipeline):
+    """Test POST /classify returns both far-future and company fields."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.api.app" in sys.modules:
+        del sys.modules["benz_sent_filter.api.app"]
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    # Mock with FUTURE_EVENT scores and company relevance
+    mock_transformers_pipeline({
+        "This is an opinion piece or editorial": 0.2,
+        "This is a factual news report": 0.75,
+        "This is about a past event that already happened": 0.1,
+        "This is about a future event or forecast": 0.7,
+        "This is a general topic or analysis": 0.2,
+        "This article is about Dell": 0.85,
+    })
+
+    from benz_sent_filter.api.app import app
+    from fastapi.testclient import TestClient
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/classify",
+            json={"headline": "Dell Projects $10B Revenue By 2027", "company": "Dell"}
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify far-future fields
+    assert "far_future_forecast" in data
+    assert data["far_future_forecast"] is True
+    assert "forecast_timeframe" in data
+    assert "2027" in data["forecast_timeframe"]
+
+    # Verify company fields
+    assert "is_about_company" in data
+    assert data["is_about_company"] is True
+    assert "company_score" in data
+    assert "company" in data
+    assert data["company"] == "Dell"
+
+
+def test_classify_batch_endpoint_with_far_future_patterns(mock_transformers_pipeline):
+    """Test POST /classify/batch returns far-future fields for applicable headlines."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.api.app" in sys.modules:
+        del sys.modules["benz_sent_filter.api.app"]
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    # Mock with mixed temporal scores (future, future, past)
+    mock_transformers_pipeline({
+        "This is an opinion piece or editorial": 0.2,
+        "This is a factual news report": 0.75,
+        "This is about a past event that already happened": 0.4,
+        "This is about a future event or forecast": 0.7,
+        "This is a general topic or analysis": 0.2,
+    })
+
+    from benz_sent_filter.api.app import app
+    from fastapi.testclient import TestClient
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/classify/batch",
+            json={
+                "headlines": [
+                    "Projects $500M Revenue By 2028",  # far-future
+                    "Q4 Guidance Raised to $100M",      # near-term
+                    "Reports Q2 Revenue of $1B"         # past
+                ]
+            }
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert "results" in data
+    assert len(data["results"]) == 3
+
+    # First result should have far-future fields
+    assert data["results"][0]["far_future_forecast"] is True
+    assert "2028" in data["results"][0]["forecast_timeframe"]
+
+    # Second result should NOT have far-future fields (near-term)
+    assert "far_future_forecast" not in data["results"][1]
+    assert "forecast_timeframe" not in data["results"][1]
+
+    # Third result should NOT have far-future fields (past event)
+    # Note: With current mock scores (past=0.4, future=0.7), third will be FUTURE_EVENT
+    # But it won't match far-future pattern due to "Q2" quarterly language
+    assert "far_future_forecast" not in data["results"][2]
+    assert "forecast_timeframe" not in data["results"][2]
