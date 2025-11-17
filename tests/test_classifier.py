@@ -739,3 +739,146 @@ def test_forecast_analyzer_detects_through_year_pattern():
     assert is_far is True
     assert timeframe is not None
     assert "2027" in timeframe
+
+
+# ============================================================================
+# Far-Future Forecast Detection Tests (Phase 3: Service Integration)
+# ============================================================================
+
+
+def test_classify_headline_future_event_with_far_future_pattern(
+    mock_transformers_pipeline,
+):
+    """Test classify_headline detects far-future patterns in FUTURE_EVENT headlines."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    mock_transformers_pipeline({
+        "This is an opinion piece or editorial": 0.2,
+        "This is a factual news report": 0.75,
+        "This is about a past event that already happened": 0.1,
+        "This is about a future event or forecast": 0.7,
+        "This is a general topic or analysis": 0.2,
+    })
+
+    from benz_sent_filter.services.classifier import ClassificationService
+    from benz_sent_filter.models.classification import TemporalCategory
+
+    service = ClassificationService()
+    result = service.classify_headline("Projects $500M Revenue By 2028")
+
+    # Verify temporal classification is FUTURE_EVENT
+    assert result.temporal_category == TemporalCategory.FUTURE_EVENT
+
+    # Verify far-future fields populated
+    assert result.far_future_forecast is True
+    assert result.forecast_timeframe is not None
+    assert "2028" in result.forecast_timeframe
+
+
+def test_classify_headline_future_event_without_far_future_pattern(
+    mock_transformers_pipeline,
+):
+    """Test classify_headline does NOT flag near-term FUTURE_EVENT as far-future."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    mock_transformers_pipeline({
+        "This is an opinion piece or editorial": 0.2,
+        "This is a factual news report": 0.75,
+        "This is about a past event that already happened": 0.1,
+        "This is about a future event or forecast": 0.7,
+        "This is a general topic or analysis": 0.2,
+    })
+
+    from benz_sent_filter.services.classifier import ClassificationService
+    from benz_sent_filter.models.classification import TemporalCategory
+
+    service = ClassificationService()
+    result = service.classify_headline("Q4 Guidance Raised to $100M")
+
+    # Verify temporal classification is FUTURE_EVENT (guidance is about future)
+    assert result.temporal_category == TemporalCategory.FUTURE_EVENT
+
+    # Verify far-future fields NOT populated (quarterly is near-term)
+    assert result.far_future_forecast is None
+    assert result.forecast_timeframe is None
+
+
+def test_classify_headline_past_event_no_far_future_analysis(
+    mock_transformers_pipeline,
+):
+    """Test classify_headline does NOT analyze far-future for PAST_EVENT headlines."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    mock_transformers_pipeline({
+        "This is an opinion piece or editorial": 0.2,
+        "This is a factual news report": 0.75,
+        "This is about a past event that already happened": 0.7,
+        "This is about a future event or forecast": 0.1,
+        "This is a general topic or analysis": 0.2,
+    })
+
+    from benz_sent_filter.services.classifier import ClassificationService
+    from benz_sent_filter.models.classification import TemporalCategory
+
+    service = ClassificationService()
+    result = service.classify_headline("Reports Q2 Revenue of $1B")
+
+    # Verify temporal classification is PAST_EVENT
+    assert result.temporal_category == TemporalCategory.PAST_EVENT
+
+    # Verify far-future fields NOT populated (only analyzed for FUTURE_EVENT)
+    assert result.far_future_forecast is None
+    assert result.forecast_timeframe is None
+
+
+def test_classify_headline_far_future_with_company_relevance(
+    mock_transformers_pipeline,
+):
+    """Test classify_headline populates both far-future and company fields."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    mock_transformers_pipeline({
+        "This is an opinion piece or editorial": 0.2,
+        "This is a factual news report": 0.75,
+        "This is about a past event that already happened": 0.1,
+        "This is about a future event or forecast": 0.7,
+        "This is a general topic or analysis": 0.2,
+        "This article is about Dell": 0.85,
+    })
+
+    from benz_sent_filter.services.classifier import ClassificationService
+    from benz_sent_filter.models.classification import TemporalCategory
+
+    service = ClassificationService()
+    result = service.classify_headline(
+        "Dell Projects $10B Revenue By 2027", company="Dell"
+    )
+
+    # Verify temporal classification
+    assert result.temporal_category == TemporalCategory.FUTURE_EVENT
+
+    # Verify far-future fields populated
+    assert result.far_future_forecast is True
+    assert result.forecast_timeframe is not None
+    assert "2027" in result.forecast_timeframe
+
+    # Verify company fields also populated
+    assert result.is_about_company is True
+    assert result.company_score == 0.85
+    assert result.company == "Dell"
