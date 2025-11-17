@@ -188,7 +188,7 @@ config/secrets.json
 .claude/settings.local.json
 .claude/commands
 
-# ML models cache
-models/
+# ML models cache (root level only, not src/*/models/)
+/models/
 .cache/
 transformers_cache/
