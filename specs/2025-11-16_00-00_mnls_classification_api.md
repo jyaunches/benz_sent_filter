@@ -202,7 +202,10 @@ Use simple constants in config module for ML settings only:
   - Apply 0.6 threshold to opinion/news scores: is_opinion = (opinion_score >= 0.6), is_straight_news = (news_score >= 0.6)
   - Determine temporal category from highest temporal score using max([(past_score, PAST_EVENT), (future_score, FUTURE_EVENT), (general_score, GENERAL_TOPIC)], key=lambda x: x[0])
   - Return ClassificationResult with all fields populated
-- Implement public `classify_batch(headlines)` method using list comprehension: `return [self.classify_headline(headline) for headline in headlines]`
+- Implement public `classify_batch(headlines)` method using simple list comprehension: `return [self.classify_headline(headline) for headline in headlines]`
+  - No batch optimization - sequential processing is acceptable for CPU-bound inference
+  - Future batch optimization can be added if performance requirements change
+  - Prioritize simplicity and maintainability over premature optimization
 - Add error handling for model load failures and inference errors
 - Export service from `src/benz_sent_filter/services/__init__.py`
 

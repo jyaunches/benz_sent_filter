@@ -158,13 +158,13 @@ All tests follow these principles:
 
 12. `test_classify_batch_multiple_headlines`
     - **Input**: classify_batch(["headline1", "headline2", "headline3"])
-    - **Expected**: Returns 3 ClassificationResult objects (list comprehension implementation)
-    - **Covers**: Batch processing
+    - **Expected**: Returns 3 ClassificationResult objects (simple list comprehension, sequential processing)
+    - **Covers**: Batch processing without optimization
 
 13. `test_classify_batch_maintains_order`
     - **Input**: Batch with distinct headlines
-    - **Expected**: Results match input order (result[i].headline == input[i]) using list comprehension
-    - **Covers**: Batch ordering
+    - **Expected**: Results match input order (result[i].headline == input[i]) due to sequential list comprehension
+    - **Covers**: Batch ordering preservation
 
 14. `test_classify_headline_inference_error`
     - **Input**: Mock pipeline to raise exception during inference
