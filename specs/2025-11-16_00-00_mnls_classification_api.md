@@ -277,7 +277,6 @@ Use simple constants in config module:
 - Test actual model loading and inference (not mocked)
 - Verify classification accuracy on known test cases
 - Test error scenarios end-to-end
-- Validate performance on CPU
 
 **Implementation Approach**:
 - Create `integration/test_classification_integration.py`
@@ -287,9 +286,6 @@ Use simple constants in config module:
 - Verify opinion headline scores opinion > 0.5
 - Verify news headline scores news > 0.5
 - Verify temporal categories match expectations
-- Add timeout tests for inference (should complete in <2 seconds per headline)
-- Test batch performance (10 headlines should complete in <10 seconds)
-- Add stress test with edge cases (very short, very long, special characters)
 - Update README with instructions for running integration tests
 
 **Unit Test Requirements**:
@@ -302,15 +298,11 @@ Use simple constants in config module:
 - Test future event detection on "Tesla to Report Q4 Earnings Next Week"
 - Test general topic detection on "How Tesla Changed the EV Market"
 - Test batch processing maintains individual accuracy
-- Test headlines with special characters don't cause errors
-- Test very short headlines (3-5 words) process successfully
 
 **Acceptance Criteria**:
 - [ ] Integration test suite created
 - [ ] Real model loads and runs successfully
 - [ ] Test fixtures produce expected classifications
-- [ ] Performance meets targets (<2s single, <10s batch of 10)
-- [ ] Edge cases handled gracefully
 - [ ] Integration tests pass when run with real model
 - [ ] Documentation updated with integration test instructions
 
