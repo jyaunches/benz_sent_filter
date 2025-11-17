@@ -148,14 +148,14 @@ Use simple constants in config module:
 - Request models for single and batch classification
 - Response models with scores and boolean fields
 - Temporal category enumeration
-- Input validation (non-empty headlines, reasonable length limits)
+- Input validation (non-empty headlines)
 
 **Implementation Approach**:
 - Create models in `src/benz_sent_filter/models/classification.py`
 - Define `TemporalCategory` enum with values: PAST_EVENT, FUTURE_EVENT, GENERAL_TOPIC
-- Define `ClassifyRequest` with single headline field (str, min_length=1, max_length=500)
-- Define `BatchClassifyRequest` with headlines field (list of str, min_items=1, max_items=100)
-- Define `ClassificationScores` with fields: opinion_score, news_score, past_score, future_score, general_score (all float 0-1)
+- Define `ClassifyRequest` with single headline field (str, min_length=1)
+- Define `BatchClassifyRequest` with headlines field (list of str, min_items=1)
+- Define `ClassificationScores` with fields: opinion_score, news_score, past_score, future_score, general_score (all float)
 - Define `ClassificationResult` with fields: is_opinion, is_straight_news (bool), temporal_category (enum), scores (ClassificationScores), headline (str)
 - Define `BatchClassificationResult` with results field (list of ClassificationResult)
 - Export all models from `src/benz_sent_filter/models/__init__.py`
@@ -165,15 +165,11 @@ Use simple constants in config module:
 - Test valid single request validates successfully
 - Test valid batch request validates successfully
 - Test empty headline is rejected
-- Test headline exceeding max length is rejected
-- Test batch with too many items is rejected
-- Test score values outside 0-1 range are rejected
 - Test temporal category enum has all three values
-- Verify model serialization to JSON works correctly
 
 **Acceptance Criteria**:
 - [ ] All Pydantic models created with proper validation
-- [ ] Models handle edge cases (empty, too long, invalid types)
+- [ ] Models handle empty headline validation
 - [ ] TemporalCategory enum defined with three values
 - [ ] Models export cleanly from models module
 - [ ] All model tests pass
