@@ -91,7 +91,6 @@ The model will return entailment scores indicating likelihood the headline discu
 - Raw score exposed for client-side tuning
 
 **Edge Cases**:
-- Empty company string: treat as None (no relevance check)
 - Company variations: model handles "Tesla", "TSLA", "Tesla Inc" naturally
 - Multiple companies in headline: returns relevance for specified company only
 
@@ -137,7 +136,6 @@ The model will return entailment scores indicating likelihood the headline discu
 - Test `ClassifyRequest` without company parameter (None) validates successfully
 - Test `ClassificationResult` serializes correctly with company fields present
 - Test `ClassificationResult` serializes correctly with company fields absent (None)
-- Test empty string company is treated as None
 - Test batch request with company parameter
 - Verify JSON serialization includes/excludes fields appropriately
 
@@ -158,7 +156,7 @@ The model will return entailment scores indicating likelihood the headline discu
 - Extract entailment score from pipeline output
 - Apply 0.5 threshold to generate boolean flag
 - Return relevance score and boolean
-- Handle None/empty company gracefully (skip relevance check)
+- Handle None company gracefully (skip relevance check)
 
 **Implementation Approach**:
 - Modify `src/benz_sent_filter/services/classifier.py`
