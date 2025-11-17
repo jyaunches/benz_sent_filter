@@ -241,26 +241,17 @@ The model will return entailment scores indicating likelihood the headline discu
 
 **Implementation Approach**:
 - Update `integration/test_classification_integration.py`
-- Add test fixtures for company relevance scenarios
-- Test positive cases: "Dell Unveils AI Data Platform..." + company="Dell" → True
-- Test positive cases: "Dell Unveils AI Data Platform..." + company="NVIDIA" → True
-- Test negative cases: "Dell Unveils AI Data Platform..." + company="Tesla" → False
-- Test variations: "DELL", "Dell Inc", "Dell Technologies"
-- Test multi-company headlines: headline mentions both Dell and NVIDIA
+- Use inline test data (no separate fixtures file)
+- Test positive case: "Dell Unveils AI Data Platform..." + company="Dell" → True
+- Test negative case: "Dell Unveils AI Data Platform..." + company="Tesla" → False
+- Test multi-company case: Same headline + company="NVIDIA" → True
 - Test performance: company check adds minimal latency (<500ms)
 - Mark with `@pytest.mark.integration`
 
 **Unit Test Requirements**:
-- Create fixtures in `integration/conftest.py`:
-  - Company-positive headlines (clearly about specific company)
-  - Company-negative headlines (clearly not about company)
-  - Ambiguous headlines (mentions industry but not company)
-  - Multi-company headlines (Dell/NVIDIA example)
 - Test Dell headline correctly identifies Dell relevance
-- Test Dell headline correctly identifies NVIDIA relevance
 - Test Dell headline correctly rejects Tesla relevance
-- Test company name variations ("DELL" vs "Dell Technologies") both work
-- Test relevance scores fall in expected ranges (>0.7 positive, <0.3 negative)
+- Test Dell headline correctly identifies NVIDIA relevance (multi-company)
 - Test batch processing with company parameter
 - Verify no regression in existing classification dimensions
 
