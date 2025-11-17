@@ -57,7 +57,7 @@ The current sentiment classification system detects `FUTURE_EVENT` classificatio
 
 **Metadata Enhancement**:
 - New optional field: `far_future_forecast: bool`
-- New optional field: `forecast_metadata: dict` with timeframe/pattern details
+- New optional field: `forecast_timeframe: str` with extracted timeframe
 - Backward compatible (optional fields)
 
 **Integration Points**:
@@ -107,7 +107,6 @@ The current sentiment classification system detects `FUTURE_EVENT` classificatio
 **ClassificationResult Enhancement**:
 - Add optional field: `far_future_forecast: bool | None`
 - Add optional field: `forecast_timeframe: str | None` (e.g., "5-year", "by 2028")
-- Add optional field: `forecast_patterns: list[str] | None` (matched patterns)
 
 **Backward Compatibility**:
 - All new fields are optional (None by default)
@@ -200,14 +199,13 @@ is_far_future = (
 
 **Implementation Approach**:
 - Modify `src/benz_sent_filter/models/classification.py`
-- Add three new optional fields to ClassificationResult
+- Add two new optional fields to ClassificationResult
 - Add docstrings explaining when fields are populated
 - Ensure Pydantic serialization excludes None values (existing behavior)
 
 **New Fields**:
 - `far_future_forecast: bool | None = None` - Whether headline contains far-future forecast patterns
 - `forecast_timeframe: str | None = None` - Extracted timeframe (e.g., "5-year", "by 2028")
-- `forecast_patterns: list[str] | None = None` - List of matched pattern types
 
 **Unit Test Requirements**:
 - Modify `tests/test_models.py`
@@ -247,12 +245,11 @@ is_far_future = (
 
 **Analysis Logic Flow**:
 1. Complete existing temporal classification
-2. If temporal_category == FUTURE_EVENT and FAR_FUTURE_ENABLED:
-   - Call forecast_analyzer.calculate_far_future_score(headline)
-   - If score >= FAR_FUTURE_THRESHOLD:
+2. If temporal_category == FUTURE_EVENT:
+   - Call forecast_analyzer.is_far_future(headline)
+   - If True:
      - Set far_future_forecast = True
-     - Extract and set forecast_timeframe
-     - Set forecast_patterns list
+     - Set forecast_timeframe from returned value
 3. Return ClassificationResult with enriched metadata
 
 **Unit Test Requirements**:
