@@ -196,7 +196,7 @@ The model will return entailment scores indicating likelihood the headline discu
 - [ ] Integration with existing classification works
 - [ ] All service tests pass
 
-### Phase 3: Update API Endpoints
+### Phase 3: Update API Endpoints [COMPLETED: f71e9e5]
 
 **Description**: Modify API endpoints to accept company parameter and return company relevance in responses.
 
