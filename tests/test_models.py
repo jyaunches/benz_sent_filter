@@ -322,3 +322,198 @@ def test_batch_classify_request_without_company_defaults_none():
     request = BatchClassifyRequest(headlines=["h1", "h2"])
     assert len(request.headlines) == 2
     assert request.company is None
+
+
+# ============================================================================
+# Far-Future Forecast Detection Tests (Phase 2: Data Model Extensions)
+# ============================================================================
+
+
+def test_classification_result_with_far_future_fields_present():
+    """Test ClassificationResult accepts and serializes far-future forecast fields."""
+    from benz_sent_filter.models.classification import (
+        ClassificationResult,
+        ClassificationScores,
+        TemporalCategory,
+    )
+
+    scores = ClassificationScores(
+        opinion_score=0.2,
+        news_score=0.8,
+        past_score=0.1,
+        future_score=0.7,
+        general_score=0.2,
+    )
+
+    result = ClassificationResult(
+        is_opinion=False,
+        is_straight_news=True,
+        temporal_category=TemporalCategory.FUTURE_EVENT,
+        scores=scores,
+        headline="Projects $500M Revenue By 2028",
+        far_future_forecast=True,
+        forecast_timeframe="by 2028",
+    )
+
+    # Test field access
+    assert result.far_future_forecast is True
+    assert result.forecast_timeframe == "by 2028"
+
+    # Test serialization includes far-future fields
+    result_dict = result.model_dump()
+    assert "far_future_forecast" in result_dict
+    assert "forecast_timeframe" in result_dict
+    assert result_dict["far_future_forecast"] is True
+    assert result_dict["forecast_timeframe"] == "by 2028"
+
+
+def test_classification_result_with_far_future_fields_none():
+    """Test ClassificationResult with far-future fields set to None."""
+    from benz_sent_filter.models.classification import (
+        ClassificationResult,
+        ClassificationScores,
+        TemporalCategory,
+    )
+
+    scores = ClassificationScores(
+        opinion_score=0.2,
+        news_score=0.8,
+        past_score=0.7,
+        future_score=0.1,
+        general_score=0.2,
+    )
+
+    result = ClassificationResult(
+        is_opinion=False,
+        is_straight_news=True,
+        temporal_category=TemporalCategory.PAST_EVENT,
+        scores=scores,
+        headline="Reports Q2 Revenue of $1B",
+        far_future_forecast=None,
+        forecast_timeframe=None,
+    )
+
+    # Test field access
+    assert result.far_future_forecast is None
+    assert result.forecast_timeframe is None
+
+
+def test_classification_result_json_excludes_none_far_future_fields():
+    """Test ClassificationResult JSON serialization excludes None far-future fields."""
+    from benz_sent_filter.models.classification import (
+        ClassificationResult,
+        ClassificationScores,
+        TemporalCategory,
+    )
+
+    scores = ClassificationScores(
+        opinion_score=0.2,
+        news_score=0.8,
+        past_score=0.7,
+        future_score=0.1,
+        general_score=0.2,
+    )
+
+    # Create result without far-future fields (defaults to None)
+    result = ClassificationResult(
+        is_opinion=False,
+        is_straight_news=True,
+        temporal_category=TemporalCategory.PAST_EVENT,
+        scores=scores,
+        headline="Reports Q2 Revenue of $1B",
+    )
+
+    # Test serialization excludes None fields due to exclude_none=True
+    result_dict = result.model_dump(exclude_none=True)
+    assert "far_future_forecast" not in result_dict
+    assert "forecast_timeframe" not in result_dict
+
+    # Verify existing fields still present
+    assert "is_opinion" in result_dict
+    assert "headline" in result_dict
+    assert "temporal_category" in result_dict
+
+
+def test_classification_result_far_future_without_company_fields():
+    """Test ClassificationResult with far-future fields but no company fields."""
+    from benz_sent_filter.models.classification import (
+        ClassificationResult,
+        ClassificationScores,
+        TemporalCategory,
+    )
+
+    scores = ClassificationScores(
+        opinion_score=0.2,
+        news_score=0.8,
+        past_score=0.1,
+        future_score=0.7,
+        general_score=0.2,
+    )
+
+    result = ClassificationResult(
+        is_opinion=False,
+        is_straight_news=True,
+        temporal_category=TemporalCategory.FUTURE_EVENT,
+        scores=scores,
+        headline="Estimates 5-Year Cumulative Sales of $2B",
+        far_future_forecast=True,
+        forecast_timeframe="5-year",
+    )
+
+    # Test far-future fields present
+    assert result.far_future_forecast is True
+    assert result.forecast_timeframe == "5-year"
+
+    # Test company fields default to None
+    assert result.is_about_company is None
+    assert result.company_score is None
+    assert result.company is None
+
+    # Test serialization
+    result_dict = result.model_dump()
+    assert result_dict["far_future_forecast"] is True
+    assert result_dict["forecast_timeframe"] == "5-year"
+
+
+def test_classification_result_all_optional_fields_present():
+    """Test ClassificationResult with all optional fields (company + far-future) present."""
+    from benz_sent_filter.models.classification import (
+        ClassificationResult,
+        ClassificationScores,
+        TemporalCategory,
+    )
+
+    scores = ClassificationScores(
+        opinion_score=0.2,
+        news_score=0.8,
+        past_score=0.1,
+        future_score=0.7,
+        general_score=0.2,
+    )
+
+    result = ClassificationResult(
+        is_opinion=False,
+        is_straight_news=True,
+        temporal_category=TemporalCategory.FUTURE_EVENT,
+        scores=scores,
+        headline="Dell Projects $10B Revenue By 2027",
+        is_about_company=True,
+        company_score=0.90,
+        company="Dell",
+        far_future_forecast=True,
+        forecast_timeframe="by 2027",
+    )
+
+    # Test all optional fields present
+    assert result.is_about_company is True
+    assert result.company_score == 0.90
+    assert result.company == "Dell"
+    assert result.far_future_forecast is True
+    assert result.forecast_timeframe == "by 2027"
+
+    # Test serialization includes all fields
+    result_dict = result.model_dump()
+    assert result_dict["is_about_company"] is True
+    assert result_dict["company"] == "Dell"
+    assert result_dict["far_future_forecast"] is True
+    assert result_dict["forecast_timeframe"] == "by 2027"
