@@ -163,3 +163,162 @@ def test_batch_classification_result_structure():
     assert all(isinstance(r, ClassificationResult) for r in batch_result.results)
     assert batch_result.results[0].headline == "Headline 1"
     assert batch_result.results[1].headline == "Headline 2"
+
+
+# Phase 1: Company Relevance Detection - Request Model Tests
+
+
+def test_classify_request_with_company_parameter():
+    """Test ClassifyRequest validates successfully with company parameter."""
+    from benz_sent_filter.models.classification import ClassifyRequest
+
+    request = ClassifyRequest(headline="Test headline", company="Dell")
+    assert request.headline == "Test headline"
+    assert request.company == "Dell"
+
+
+def test_classify_request_without_company_parameter_defaults_none():
+    """Test ClassifyRequest without company parameter defaults to None."""
+    from benz_sent_filter.models.classification import ClassifyRequest
+
+    request = ClassifyRequest(headline="Test headline")
+    assert request.headline == "Test headline"
+    assert request.company is None
+
+
+def test_classify_request_with_none_company_explicit():
+    """Test ClassifyRequest with explicit None company parameter."""
+    from benz_sent_filter.models.classification import ClassifyRequest
+
+    request = ClassifyRequest(headline="Test headline", company=None)
+    assert request.headline == "Test headline"
+    assert request.company is None
+
+
+def test_classification_result_with_company_fields_present():
+    """Test ClassificationResult serializes correctly with company fields present."""
+    from benz_sent_filter.models.classification import (
+        ClassificationResult,
+        ClassificationScores,
+        TemporalCategory,
+    )
+
+    scores = ClassificationScores(
+        opinion_score=0.8,
+        news_score=0.2,
+        past_score=0.1,
+        future_score=0.7,
+        general_score=0.2,
+    )
+
+    result = ClassificationResult(
+        is_opinion=True,
+        is_straight_news=False,
+        temporal_category=TemporalCategory.FUTURE_EVENT,
+        scores=scores,
+        headline="Dell Unveils AI Platform",
+        is_about_company=True,
+        company_score=0.85,
+        company="Dell",
+    )
+
+    # Test field access
+    assert result.is_about_company is True
+    assert result.company_score == 0.85
+    assert result.company == "Dell"
+
+    # Test serialization includes company fields
+    result_dict = result.model_dump()
+    assert "is_about_company" in result_dict
+    assert "company_score" in result_dict
+    assert "company" in result_dict
+    assert result_dict["is_about_company"] is True
+    assert result_dict["company_score"] == 0.85
+    assert result_dict["company"] == "Dell"
+
+
+def test_classification_result_with_company_fields_none():
+    """Test ClassificationResult with company fields set to None."""
+    from benz_sent_filter.models.classification import (
+        ClassificationResult,
+        ClassificationScores,
+        TemporalCategory,
+    )
+
+    scores = ClassificationScores(
+        opinion_score=0.8,
+        news_score=0.2,
+        past_score=0.1,
+        future_score=0.7,
+        general_score=0.2,
+    )
+
+    result = ClassificationResult(
+        is_opinion=True,
+        is_straight_news=False,
+        temporal_category=TemporalCategory.FUTURE_EVENT,
+        scores=scores,
+        headline="Test headline",
+        is_about_company=None,
+        company_score=None,
+        company=None,
+    )
+
+    # Test field access
+    assert result.is_about_company is None
+    assert result.company_score is None
+    assert result.company is None
+
+
+def test_classification_result_json_excludes_none_company_fields():
+    """Test ClassificationResult JSON serialization excludes None company fields."""
+    from benz_sent_filter.models.classification import (
+        ClassificationResult,
+        ClassificationScores,
+        TemporalCategory,
+    )
+
+    scores = ClassificationScores(
+        opinion_score=0.8,
+        news_score=0.2,
+        past_score=0.1,
+        future_score=0.7,
+        general_score=0.2,
+    )
+
+    # Create result without company fields (defaults to None)
+    result = ClassificationResult(
+        is_opinion=True,
+        is_straight_news=False,
+        temporal_category=TemporalCategory.FUTURE_EVENT,
+        scores=scores,
+        headline="Test headline",
+    )
+
+    # Test serialization excludes None fields due to exclude_none=True
+    result_dict = result.model_dump(exclude_none=True)
+    assert "is_about_company" not in result_dict
+    assert "company_score" not in result_dict
+    assert "company" not in result_dict
+
+    # Verify existing fields still present
+    assert "is_opinion" in result_dict
+    assert "headline" in result_dict
+
+
+def test_batch_classify_request_with_company_parameter():
+    """Test BatchClassifyRequest with company parameter."""
+    from benz_sent_filter.models.classification import BatchClassifyRequest
+
+    request = BatchClassifyRequest(headlines=["h1", "h2"], company="Tesla")
+    assert len(request.headlines) == 2
+    assert request.company == "Tesla"
+
+
+def test_batch_classify_request_without_company_defaults_none():
+    """Test BatchClassifyRequest without company defaults to None."""
+    from benz_sent_filter.models.classification import BatchClassifyRequest
+
+    request = BatchClassifyRequest(headlines=["h1", "h2"])
+    assert len(request.headlines) == 2
+    assert request.company is None
