@@ -159,12 +159,14 @@ The model will return entailment scores indicating likelihood the headline discu
 - Handle None company gracefully (skip relevance check)
 
 **Implementation Approach**:
+- Add `COMPANY_RELEVANCE_THRESHOLD = 0.5` to `src/benz_sent_filter/config/settings.py` (follows existing `CLASSIFICATION_THRESHOLD` pattern)
 - Modify `src/benz_sent_filter/services/classifier.py`
+- Import `COMPANY_RELEVANCE_THRESHOLD` from config.settings
 - Add class constant: `COMPANY_HYPOTHESIS_TEMPLATE = "This article is about {company}"`
 - Add method: `_check_company_relevance(headline: str, company: str) -> tuple[bool, float]`
-- Method calls existing `self._pipeline` with single hypothesis
+- Method calls existing `self._pipeline` with single hypothesis (reuses same pipeline pattern as existing classification)
 - Extract score from pipeline result (index 0 of scores list)
-- Apply threshold: `is_relevant = score >= 0.5`
+- Apply threshold: `is_relevant = score >= COMPANY_RELEVANCE_THRESHOLD`
 - Return `(is_relevant, score)`
 - Update `classify_headline` to call `_check_company_relevance` when company provided
 - Update `classify_batch` to handle per-headline company checks
@@ -315,11 +317,12 @@ curl -X POST http://localhost:8002/classify \
 - Easier to maintain (one codebase path)
 
 ### Threshold: 0.5
-**Decision**: Use 0.5 for company relevance (lower than 0.6 for opinion/news)
+**Decision**: Use 0.5 for company relevance (lower than 0.6 for opinion/news), configured as `COMPANY_RELEVANCE_THRESHOLD` in settings
 **Rationale**:
+- Centralized configuration following existing `CLASSIFICATION_THRESHOLD` pattern
 - Company mentions tend to be binary (name appears or doesn't)
 - False negatives costlier than false positives for news filtering
-- Can tune threshold client-side using raw score
+- Can tune threshold client-side using raw score, or adjust constant for global tuning
 - Lower threshold captures edge cases (indirect references)
 
 ### Per-Headline vs. Batch-Level Company

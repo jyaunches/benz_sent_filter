@@ -110,13 +110,13 @@ The codebase uses:
 
 3. `test_check_company_relevance_threshold_boundary_at_point_five`
    - **Input**: Mock pipeline to return score 0.50 exactly
-   - **Expected**: Method returns `(True, 0.50)` - is_relevant=True because 0.50 >= 0.5
-   - **Covers**: Threshold logic correctly generates boolean flag
+   - **Expected**: Method returns `(True, 0.50)` - is_relevant=True because 0.50 >= `COMPANY_RELEVANCE_THRESHOLD` (0.5)
+   - **Covers**: Threshold logic correctly generates boolean flag using config constant
 
 4. `test_check_company_relevance_threshold_boundary_below_point_five`
    - **Input**: Mock pipeline to return score 0.49
-   - **Expected**: Method returns `(False, 0.49)` - is_relevant=False because 0.49 < 0.5
-   - **Covers**: Threshold boundary testing
+   - **Expected**: Method returns `(False, 0.49)` - is_relevant=False because 0.49 < `COMPANY_RELEVANCE_THRESHOLD` (0.5)
+   - **Covers**: Threshold boundary testing with config constant
 
 5. `test_check_company_relevance_uses_correct_hypothesis_template`
    - **Input**: Mock pipeline, call with company="NVIDIA"
