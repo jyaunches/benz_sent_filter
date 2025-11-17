@@ -274,40 +274,21 @@ The model will return entailment scores indicating likelihood the headline discu
 **Implementation Approach**:
 - Update README.md with company relevance section
 - Add example request/response showing company parameter
-- Include curl command examples:
-  - Check Dell relevance: `POST /classify` with company="Dell"
-  - Check NVIDIA relevance: same headline with company="NVIDIA"
-  - Multi-company scenario showing headline mentions both
+- Include curl command example (to check different companies, change the company field value)
 - Document threshold (0.5) and when to adjust it
 - Explain how to handle company name variations
 - Note limitations (headline-only, no body text, single company per request)
 - Add FAQ section for company detection
 - Update OpenAPI schema descriptions in code docstrings
 
-Example curl commands to include:
+Example curl command to include:
 ```bash
-# Check if headline is about Dell
+# Check if headline is about a company (Dell, NVIDIA, Tesla, etc.)
 curl -X POST http://localhost:8002/classify \
   -H "Content-Type: application/json" \
   -d '{
     "headline": "Dell Unveils AI Data Platform Updates; Launches First 2U Server With NVIDIA Blackwell GPUs",
     "company": "Dell"
-  }'
-
-# Check if same headline is about NVIDIA
-curl -X POST http://localhost:8002/classify \
-  -H "Content-Type: application/json" \
-  -d '{
-    "headline": "Dell Unveils AI Data Platform Updates; Launches First 2U Server With NVIDIA Blackwell GPUs",
-    "company": "NVIDIA"
-  }'
-
-# Check if same headline is about Tesla (should be false)
-curl -X POST http://localhost:8002/classify \
-  -H "Content-Type: application/json" \
-  -d '{
-    "headline": "Dell Unveils AI Data Platform Updates; Launches First 2U Server With NVIDIA Blackwell GPUs",
-    "company": "Tesla"
   }'
 ```
 
