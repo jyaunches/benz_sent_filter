@@ -174,18 +174,34 @@ All tests follow these principles:
 - Tests verify correct splitting of scores into two dimensions
 - Verify candidate labels match specification (all 5 labels in one list)
 
-**Required Mocks:**
+**Required Mocks (centralized in tests/conftest.py):**
 ```python
 @pytest.fixture
-def mock_pipeline(monkeypatch):
-    """Mock transformers pipeline with configurable scores."""
-    def _mock_pipeline(task, model):
-        def pipeline_fn(text, candidate_labels):
-            # Return configurable mock scores
-            return {"labels": candidate_labels, "scores": [0.7, 0.3, ...]}
-        return pipeline_fn
-    monkeypatch.setattr("transformers.pipeline", _mock_pipeline)
+def mock_transformers_pipeline(monkeypatch):
+    """Factory fixture for creating mocked pipeline with configurable scores.
+
+    Usage:
+        def test_example(mock_transformers_pipeline):
+            # Create mock with specific scores for each label
+            mock_transformers_pipeline({
+                "This is an opinion piece or editorial": 0.75,
+                "This is a factual news report": 0.25,
+                "This is about a past event that already happened": 0.1,
+                "This is about a future event or forecast": 0.1,
+                "This is a general topic or analysis": 0.2
+            })
+    """
+    def _create_mock(score_dict: dict[str, float]):
+        def _mock_pipeline(task, model):
+            def pipeline_fn(text, candidate_labels):
+                scores = [score_dict.get(label, 0.2) for label in candidate_labels]
+                return {"labels": candidate_labels, "scores": scores}
+            return pipeline_fn
+        monkeypatch.setattr("transformers.pipeline", _mock_pipeline)
+    return _create_mock
 ```
+
+This centralized fixture should be used across all Phase 3 and Phase 4 tests to avoid duplication.
 
 ## Phase 4: API Endpoints - Test Guide
 
@@ -254,21 +270,7 @@ def mock_pipeline(monkeypatch):
 - Verify exact response schema matches Pydantic models
 - Test both successful and error responses
 - Check HTTP status codes match specification
-
-**Required Mocks:**
-```python
-@pytest.fixture
-def client_with_mocked_service(monkeypatch):
-    """Create test client with mocked classification service."""
-    mock_service = Mock(spec=ClassificationService)
-    mock_service.classify_headline.return_value = ClassificationResult(...)
-
-    def mock_init(self):
-        self.classifier = mock_service
-
-    monkeypatch.setattr("benz_sent_filter.api.app.startup_event", mock_init)
-    return TestClient(app)
-```
+- Reuse `mock_transformers_pipeline` fixture from conftest.py for service mocking
 
 ## Phase 5: Integration Testing & Error Handling - Test Guide
 
