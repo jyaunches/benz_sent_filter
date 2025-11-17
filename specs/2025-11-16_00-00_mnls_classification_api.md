@@ -313,35 +313,23 @@ Use simple constants in config module:
 **Core Functionality**:
 - Document API endpoints with request/response examples
 - Provide curl command examples
-- Explain classification logic and thresholds
-- Document environment variables and configuration
-- Add troubleshooting guide
+- Explain classification logic
 
 **Implementation Approach**:
-- Update README.md with comprehensive usage section
+- Update README.md with basic usage section
 - Add API endpoint documentation with JSON examples
 - Include example curl commands for /classify and /classify/batch
-- Document environment variables (MODEL_NAME, CLASSIFICATION_THRESHOLD, CACHE_DIR)
 - Add section explaining candidate labels and scoring logic
 - Include example responses showing all fields
-- Document how to adjust threshold for different use cases
-- Add deployment notes for CPU-only inference
-- Create troubleshooting section for common issues (model download, memory, performance)
-- Add diagram or description of data flow from request to response
 
 **Unit Test Requirements**:
 - No new tests required for documentation phase
-- Verify all code examples in documentation are valid JSON
-- Run example curl commands against running service to ensure accuracy
 
 **Acceptance Criteria**:
-- [ ] README updated with complete API documentation
+- [ ] README updated with basic API documentation
 - [ ] Example requests/responses included
-- [ ] Curl commands provided and tested
-- [ ] Configuration documented
+- [ ] Curl commands provided
 - [ ] Classification logic explained
-- [ ] Troubleshooting guide added
-- [ ] Documentation is clear and comprehensive
 
 ## 5. Technical Decisions & Rationale
 
