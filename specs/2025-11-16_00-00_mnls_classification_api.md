@@ -243,7 +243,7 @@ Use simple constants in config module for ML settings only:
 - [ ] All service tests pass with mocked pipeline
 - [ ] Error handling prevents crashes on failures
 
-### Phase 4: API Endpoints
+### Phase 4: API Endpoints [COMPLETED: 4c6a327bb4eca0e99fdca3ed30f4d9b652b2c5b9]
 
 **Description**: Create FastAPI endpoints for single and batch classification, integrating the classification service.
 
