@@ -251,7 +251,8 @@ Use simple constants in config module for ML settings only:
 - Create startup event handler that initializes service (eager loading)
 - Define POST /classify route that accepts ClassifyRequest and returns ClassificationResult
 - Define POST /classify/batch route that accepts BatchClassifyRequest and returns BatchClassificationResult
-- Add exception handlers for model failures (503), validation errors (422), and runtime errors (500)
+- Add exception handlers for model failures (503) and runtime errors (500)
+- Use FastAPI default Pydantic validation error responses (422) - no custom validation handler needed
 - Keep existing health endpoint unchanged
 - Update `src/benz_sent_filter/api/__init__.py` to export app
 

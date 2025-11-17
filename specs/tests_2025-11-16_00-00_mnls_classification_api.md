@@ -236,13 +236,13 @@ This centralized fixture should be used across all Phase 3 and Phase 4 tests to 
 
 4. `test_classify_endpoint_empty_headline_validation_error`
    - **Input**: POST /classify with {"headline": ""}
-   - **Expected**: 422 status, validation error details
-   - **Covers**: Empty headline validation
+   - **Expected**: 422 status, FastAPI default Pydantic validation error format
+   - **Covers**: Empty headline validation (automatic from Pydantic min_length)
 
 5. `test_classify_endpoint_missing_headline_field`
    - **Input**: POST /classify with {}
-   - **Expected**: 422 status, missing field error
-   - **Covers**: Required field validation
+   - **Expected**: 422 status, FastAPI default missing field error
+   - **Covers**: Required field validation (automatic from Pydantic)
 
 6. `test_classify_batch_endpoint_multiple_headlines`
    - **Input**: POST /classify/batch with {"headlines": ["headline1", "headline2"]}
@@ -251,8 +251,8 @@ This centralized fixture should be used across all Phase 3 and Phase 4 tests to 
 
 7. `test_classify_batch_endpoint_empty_list_validation_error`
    - **Input**: POST /classify/batch with {"headlines": []}
-   - **Expected**: 422 status, min_items validation error
-   - **Covers**: Batch validation
+   - **Expected**: 422 status, FastAPI default Pydantic min_items validation error
+   - **Covers**: Batch validation (automatic from Pydantic)
 
 8. `test_classify_batch_endpoint_response_structure`
    - **Input**: POST /classify/batch with valid headlines
@@ -275,6 +275,7 @@ This centralized fixture should be used across all Phase 3 and Phase 4 tests to 
 - Verify exact response schema matches Pydantic models
 - Test both successful and error responses
 - Check HTTP status codes match specification
+- Validation error tests should verify FastAPI's default Pydantic error format (no custom error handling)
 - Reuse `mock_transformers_pipeline` fixture from conftest.py for service mocking
 
 ## Phase 5: Integration Testing & Error Handling - Test Guide
