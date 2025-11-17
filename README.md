@@ -97,41 +97,124 @@ make test-cov
 
 ## API Endpoints
 
-_(To be implemented)_
-
 ### Health Check
+
+Check service health status:
+
+```bash
+curl http://localhost:8002/health
 ```
-GET /health
+
+Response:
+```json
+{
+  "status": "healthy",
+  "service": "benz_sent_filter",
+  "timestamp": "2025-11-16T22:00:00.000Z"
+}
 ```
 
 ### Single Headline Classification
-```
-POST /classify
+
+Classify a single headline:
+
+```bash
+curl -X POST http://localhost:8002/classify \
+  -H "Content-Type: application/json" \
+  -d '{"headline": "Why the Fed Is Wrong About Inflation"}'
 ```
 
-### Batch Classification
-```
-POST /classify/batch
-```
-
-## Classification Output
-
-The service returns both boolean classifications and raw scores:
-
+Response:
 ```json
 {
   "is_opinion": true,
   "is_straight_news": false,
-  "temporal_category": "FUTURE_EVENT",
+  "temporal_category": "general_topic",
   "scores": {
-    "opinion": 0.85,
-    "news": 0.15,
-    "past": 0.10,
-    "future": 0.80,
-    "general": 0.10
-  }
+    "opinion_score": 0.85,
+    "news_score": 0.15,
+    "past_score": 0.10,
+    "future_score": 0.15,
+    "general_score": 0.75
+  },
+  "headline": "Why the Fed Is Wrong About Inflation"
 }
 ```
+
+### Batch Classification
+
+Classify multiple headlines in one request:
+
+```bash
+curl -X POST http://localhost:8002/classify/batch \
+  -H "Content-Type: application/json" \
+  -d '{
+    "headlines": [
+      "Fed Raises Interest Rates by 25 Basis Points",
+      "Tesla to Report Q4 Earnings Next Week"
+    ]
+  }'
+```
+
+Response:
+```json
+{
+  "results": [
+    {
+      "is_opinion": false,
+      "is_straight_news": true,
+      "temporal_category": "past_event",
+      "scores": {
+        "opinion_score": 0.15,
+        "news_score": 0.85,
+        "past_score": 0.70,
+        "future_score": 0.10,
+        "general_score": 0.20
+      },
+      "headline": "Fed Raises Interest Rates by 25 Basis Points"
+    },
+    {
+      "is_opinion": false,
+      "is_straight_news": false,
+      "temporal_category": "future_event",
+      "scores": {
+        "opinion_score": 0.20,
+        "news_score": 0.55,
+        "past_score": 0.10,
+        "future_score": 0.80,
+        "general_score": 0.10
+      },
+      "headline": "Tesla to Report Q4 Earnings Next Week"
+    }
+  ]
+}
+```
+
+## Classification Output
+
+The service returns comprehensive classification data for each headline:
+
+### Boolean Flags
+- **is_opinion**: `true` if opinion score ≥ 0.6 (opinion/editorial content)
+- **is_straight_news**: `true` if news score ≥ 0.6 (factual news reporting)
+
+Both flags can be `false` (uncertain), or both `true` (mixed content).
+
+### Temporal Category
+One of three values:
+- **past_event**: Content about events that already happened
+- **future_event**: Content about upcoming events or forecasts
+- **general_topic**: Content about general analysis or timeless topics
+
+Determined by the highest-scoring temporal label.
+
+### Raw Scores
+All probability scores (0.0 - 1.0) are exposed for transparency:
+- **opinion_score**: Probability of opinion/editorial content
+- **news_score**: Probability of factual news content
+- **past_score**: Probability of past event content
+- **future_score**: Probability of future event content
+- **general_score**: Probability of general topic content
 
 ## Integration with Benz Ecosystem
 
@@ -147,14 +230,40 @@ This service is part of the benz ecosystem of financial data analysis microservi
 
 ## ML Model Details
 
-_(To be configured during implementation)_
+### Model
+- **Name**: `typeform/distilbert-base-uncased-mnli`
+- **Type**: DistilBERT fine-tuned for Multi-Genre Natural Language Inference
+- **Size**: ~66M parameters (~250MB download)
+- **Runtime**: CPU-only (no GPU required)
 
-Default model: `facebook/bart-large-mnli`
+### Classification Method
+The service uses zero-shot classification with carefully designed candidate labels:
 
-The service uses a zero-shot classification pipeline:
-- Input: News headline text
-- Output: Probabilities for each classification label
-- Method: Natural Language Inference (NLI)
+**Opinion vs News:**
+- "This is an opinion piece or editorial"
+- "This is a factual news report"
+
+**Temporal Classification:**
+- "This is about a past event that already happened"
+- "This is about a future event or forecast"
+- "This is a general topic or analysis"
+
+All 5 labels are evaluated in a single inference call for efficiency.
+
+### Threshold Logic
+- **Boolean conversion**: Score ≥ 0.6 → `true`, Score < 0.6 → `false`
+- **Temporal category**: Highest-scoring temporal label wins
+- **Edge cases**: Both opinion and news flags can be true/false simultaneously
+
+### Performance
+- **Single headline**: < 2 seconds on CPU
+- **Batch of 10**: < 10 seconds on CPU
+- **Startup time**: < 30 seconds (includes model download on first run)
+- **Memory**: < 1GB
+
+### Model Caching
+The model is downloaded once and cached locally in `~/.cache/huggingface/transformers/`.
+Subsequent startups use the cached model (fast startup).
 
 ## License
 
