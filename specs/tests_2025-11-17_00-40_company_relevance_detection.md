@@ -85,6 +85,7 @@ The codebase uses:
 - Verify Pydantic's `exclude_none` or `exclude_unset` behavior
 - Test both dict and JSON serialization formats
 - No mocking required - pure Pydantic model testing
+- Follow same test patterns as existing model tests in lines 25-42 (`test_classify_request_*`) and 90-124 (`test_classification_result_*`)
 
 ---
 
