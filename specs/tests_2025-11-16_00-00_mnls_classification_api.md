@@ -180,10 +180,16 @@ All tests follow these principles:
 - Verify CANDIDATE_LABELS constant maintains correct order as specified in implementation
 
 **Required Mocks (centralized in tests/conftest.py):**
+
+All unit tests (Phase 3 and Phase 4) must use this centralized mock fixture to avoid duplication:
+
 ```python
 @pytest.fixture
 def mock_transformers_pipeline(monkeypatch):
     """Factory fixture for creating mocked pipeline with configurable scores.
+
+    This fixture provides a reusable way to mock transformers.pipeline across all unit tests.
+    Use this instead of creating inline mocks to ensure consistency and reduce duplication.
 
     Usage:
         def test_example(mock_transformers_pipeline):
@@ -195,6 +201,9 @@ def mock_transformers_pipeline(monkeypatch):
                 "This is about a future event or forecast": 0.1,
                 "This is a general topic or analysis": 0.2
             })
+            # Now create ClassificationService - it will use the mocked pipeline
+            service = ClassificationService()
+            result = service.classify_headline("test headline")
     """
     def _create_mock(score_dict: dict[str, float]):
         def _mock_pipeline(task, model):
@@ -206,7 +215,12 @@ def mock_transformers_pipeline(monkeypatch):
     return _create_mock
 ```
 
-This centralized fixture should be used across all Phase 3 and Phase 4 tests to avoid duplication.
+**Fixture Benefits:**
+- Single source of truth for pipeline mocking (DRY principle)
+- Consistent mock behavior across 14+ unit tests
+- Easy to update if mock format changes
+- Clear usage pattern with score dictionary
+- Reduces test code duplication significantly
 
 ## Phase 4: API Endpoints - Test Guide
 
