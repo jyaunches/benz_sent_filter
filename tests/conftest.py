@@ -54,15 +54,24 @@ def mock_transformers_pipeline(monkeypatch):
             service = ClassificationService()
             result = service.classify_headline("test headline")
     """
+    # Store score dict in mutable container so nested function can update it
+    score_dict_container = [{}]
+
+    def _mock_pipeline(task, model):
+        def pipeline_fn(text, candidate_labels):
+            # Use the current score dict from the container
+            scores = [
+                score_dict_container[0].get(label, 0.2) for label in candidate_labels
+            ]
+            return {"labels": candidate_labels, "scores": scores}
+
+        return pipeline_fn
+
+    # Apply the mock once (before any imports)
+    monkeypatch.setattr("transformers.pipeline", _mock_pipeline)
 
     def _create_mock(score_dict: dict[str, float]):
-        def _mock_pipeline(task, model):
-            def pipeline_fn(text, candidate_labels):
-                scores = [score_dict.get(label, 0.2) for label in candidate_labels]
-                return {"labels": candidate_labels, "scores": scores}
-
-            return pipeline_fn
-
-        monkeypatch.setattr("transformers.pipeline", _mock_pipeline)
+        # Update the score dict in the container
+        score_dict_container[0] = score_dict
 
     return _create_mock
