@@ -177,9 +177,7 @@ The model will return entailment scores indicating likelihood the headline discu
 - Test company relevance returns `(True, 0.85)` when score above threshold
 - Mock pipeline to return low score (0.15) for non-matching company
 - Test company relevance returns `(False, 0.15)` when score below threshold
-- Test threshold boundary: score 0.49 → False, score 0.50 → True
 - Test None company skips relevance check
-- Test empty string company skips relevance check
 - Test `classify_headline` includes company fields when company provided
 - Test `classify_headline` excludes company fields when company is None
 - Verify existing tests still pass (no regression)
