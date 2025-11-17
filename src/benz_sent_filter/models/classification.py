@@ -2,7 +2,7 @@
 
 from enum import Enum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class TemporalCategory(str, Enum):
@@ -21,6 +21,9 @@ class ClassifyRequest(BaseModel):
     """Request model for single headline classification."""
 
     headline: str = Field(..., min_length=1, description="Headline text to classify")
+    company: str | None = Field(
+        default=None, description="Optional company name to check relevance"
+    )
 
 
 class BatchClassifyRequest(BaseModel):
@@ -28,6 +31,9 @@ class BatchClassifyRequest(BaseModel):
 
     headlines: list[str] = Field(
         ..., min_length=1, description="List of headlines to classify"
+    )
+    company: str | None = Field(
+        default=None, description="Optional company name to check relevance for all headlines"
     )
 
 
@@ -48,6 +54,8 @@ class ClassificationScores(BaseModel):
 class ClassificationResult(BaseModel):
     """Classification result for a single headline."""
 
+    model_config = ConfigDict(exclude_none=True)
+
     is_opinion: bool = Field(..., description="Whether headline is opinion/editorial")
     is_straight_news: bool = Field(..., description="Whether headline is factual news")
     temporal_category: TemporalCategory = Field(
@@ -55,6 +63,15 @@ class ClassificationResult(BaseModel):
     )
     scores: ClassificationScores = Field(..., description="Raw classification scores")
     headline: str = Field(..., description="Original headline text")
+    is_about_company: bool | None = Field(
+        default=None, description="Whether headline is about specified company"
+    )
+    company_score: float | None = Field(
+        default=None, description="Relevance score for company (0.0 to 1.0)"
+    )
+    company: str | None = Field(
+        default=None, description="Company name that was checked"
+    )
 
 
 class BatchClassificationResult(BaseModel):
