@@ -36,11 +36,14 @@ benz-sent-filter = "benz_sent_filter.__main__:main"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-testpaths = ["tests"]
+testpaths = ["tests", "integration"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
 pythonpath = ["src"]
 addopts = "--cov=src --cov-report=html --cov-report=term-missing"
+markers = [
+    "integration: marks tests as integration tests that load real models (deselect with '-m \"not integration\"')",
+]
 
 [tool.coverage.run]
 source = ["src/benz_sent_filter"]
