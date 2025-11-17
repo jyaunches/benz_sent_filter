@@ -377,16 +377,35 @@ def mock_transformers_pipeline(monkeypatch):
 - Document expected first-run model download in test docstrings
 
 **Required Setup:**
+
+Create `integration/conftest.py` with module-scoped fixture (loads model once per test file):
+
 ```python
 # integration/conftest.py
 import pytest
 
 @pytest.fixture(scope="module")
 def real_classifier():
-    """Create real classification service (shared across integration tests)."""
+    """Create real classification service shared across all tests in this module.
+
+    Module scope ensures the model loads only once per test file, significantly
+    improving test execution speed while maintaining sufficient isolation.
+
+    The ClassificationService is stateless, so sharing the instance across tests
+    is safe and reflects realistic usage (service persists across requests).
+
+    Returns:
+        ClassificationService: Real service with loaded DistilBERT-MNLI model
+    """
     from benz_sent_filter.services.classifier import ClassificationService
     return ClassificationService()
 ```
+
+**Fixture Rationale:**
+- `scope="module"` balances speed and isolation (model loads once per test file)
+- Function scope would load model 10+ times (very slow, unrealistic)
+- Session scope would share state across all integration test files (too much coupling)
+- Module scope is optimal for stateless services
 
 ## Phase 6: Documentation & Examples - Test Guide
 
