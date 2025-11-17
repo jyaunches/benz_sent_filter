@@ -230,18 +230,15 @@ is_far_future = (
 - Add far-future analysis to classify_headline method
 - Only analyze when temporal_category == FUTURE_EVENT
 - Populate new metadata fields when far-future detected
-- Respect feature flag (FAR_FUTURE_ENABLED)
 
 **Implementation Approach**:
 - Modify `src/benz_sent_filter/services/classifier.py`
 - Add private method `_analyze_far_future(headline: str) -> dict`
 - Call from `classify_headline()` after temporal classification
 - Conditionally populate new fields in ClassificationResult
-- Add configuration to `src/benz_sent_filter/config/settings.py`
 
 **Configuration Settings**:
-- `FAR_FUTURE_THRESHOLD = 3` - Minimum score to flag as far-future
-- `FAR_FUTURE_ENABLED = True` - Feature flag to enable/disable analysis
+- No additional configuration needed
 
 **Analysis Logic Flow**:
 1. Complete existing temporal classification
@@ -256,15 +253,12 @@ is_far_future = (
 - Modify `tests/test_classifier.py`
 - Test far-future analysis with FUTURE_EVENT classifications
 - Test no analysis when temporal_category != FUTURE_EVENT
-- Test feature flag (enabled/disabled behavior)
-- Test threshold boundary conditions
 - Test metadata population accuracy
 - Test backward compatibility (no new fields when not far-future)
 
 **Acceptance Criteria**:
 - Far-future analysis integrated into classify_headline
 - Only runs for FUTURE_EVENT classifications
-- Feature flag controls behavior
 - Metadata fields correctly populated
 - No performance degradation (pattern matching is fast)
 - All existing tests pass
@@ -363,13 +357,11 @@ is_far_future = (
 **Implementation Approach**:
 - Update README.md with feature section
 - Add examples to API documentation
-- Document configuration options
 - Add troubleshooting guide
 
 **Documentation Sections**:
 - Feature overview and use cases
 - API request/response examples
-- Configuration options (threshold, feature flag)
 - Pattern matching behavior
 - Common patterns detected
 - Integration with benz_evaluator
@@ -382,7 +374,6 @@ is_far_future = (
 **Acceptance Criteria**:
 - README includes far-future forecast section
 - API documentation complete with examples
-- Configuration options documented
 - Integration examples provided
 - User-facing documentation clear and accurate
 
@@ -395,7 +386,6 @@ is_far_future = (
 
 ### Reliability
 - Graceful degradation if pattern matching fails
-- Feature flag allows disabling if issues arise
 - No impact on existing classifications
 
 ### Maintainability
