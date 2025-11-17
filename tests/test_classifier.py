@@ -634,3 +634,108 @@ def test_classify_batch_with_none_company_no_relevance_checks(
         assert result.is_about_company is None
         assert result.company_score is None
         assert result.company is None
+
+
+# ============================================================================
+# Far-Future Forecast Detection Tests (Phase 1)
+# ============================================================================
+
+
+def test_forecast_analyzer_detects_multi_year_forecast():
+    """Test that multi-year forecasts are detected correctly."""
+    from benz_sent_filter.services.forecast_analyzer import is_far_future
+
+    # Should detect: "Over 5 Years"
+    headline = "Forecasts $1B Launch-Year Revenue, Sees $18B-$22B Over 5 Years"
+    is_far, timeframe = is_far_future(headline)
+
+    assert is_far is True
+    assert timeframe is not None
+    assert "5" in timeframe.lower() or "year" in timeframe.lower()
+
+
+def test_forecast_analyzer_detects_by_year_pattern():
+    """Test that 'by YYYY' patterns are detected as far-future."""
+    from benz_sent_filter.services.forecast_analyzer import is_far_future
+
+    # Should detect: "By 2028"
+    headline = "Projects $500M Revenue By 2028"
+    is_far, timeframe = is_far_future(headline)
+
+    assert is_far is True
+    assert timeframe is not None
+    assert "2028" in timeframe
+
+
+def test_forecast_analyzer_detects_x_year_pattern():
+    """Test that 'X-year' patterns are detected as far-future."""
+    from benz_sent_filter.services.forecast_analyzer import is_far_future
+
+    # Should detect: "5-Year"
+    headline = "Estimates 5-Year Cumulative Sales of $2B"
+    is_far, timeframe = is_far_future(headline)
+
+    assert is_far is True
+    assert timeframe is not None
+    assert "5" in timeframe and "year" in timeframe.lower()
+
+
+def test_forecast_analyzer_excludes_quarterly_guidance():
+    """Test that quarterly guidance is NOT flagged as far-future."""
+    from benz_sent_filter.services.forecast_analyzer import is_far_future
+
+    # Should NOT detect: "Q4 Guidance"
+    headline = "Q4 Guidance Raised to $100M"
+    is_far, timeframe = is_far_future(headline)
+
+    assert is_far is False
+    assert timeframe is None
+
+
+def test_forecast_analyzer_excludes_quarterly_results():
+    """Test that quarterly results are NOT flagged as far-future."""
+    from benz_sent_filter.services.forecast_analyzer import is_far_future
+
+    # Should NOT detect: "Q2 Revenue"
+    headline = "Reports Q2 Revenue of $1B"
+    is_far, timeframe = is_far_future(headline)
+
+    assert is_far is False
+    assert timeframe is None
+
+
+def test_forecast_analyzer_excludes_immediate_contracts():
+    """Test that immediate contract wins are NOT flagged as far-future."""
+    from benz_sent_filter.services.forecast_analyzer import is_far_future
+
+    # Should NOT detect: No timeframe indicators
+    headline = "Announces $500M Contract Win"
+    is_far, timeframe = is_far_future(headline)
+
+    assert is_far is False
+    assert timeframe is None
+
+
+def test_forecast_analyzer_excludes_fiscal_year_guidance():
+    """Test that fiscal year guidance is NOT flagged as far-future."""
+    from benz_sent_filter.services.forecast_analyzer import is_far_future
+
+    # Should NOT detect: "Fiscal 2025" (near-term)
+    headline = "Fiscal 2025 Guidance: $2B Revenue"
+    is_far, timeframe = is_far_future(headline)
+
+    assert is_far is False
+    assert timeframe is None
+
+
+def test_forecast_analyzer_detects_through_year_pattern():
+    """Test that 'through YYYY' patterns are detected as far-future."""
+    from benz_sent_filter.services.forecast_analyzer import is_far_future
+
+    # Should detect: "Through 2027"
+    headline = "Guidance: Expects $100M Revenue Through 2027"
+    is_far, timeframe = is_far_future(headline)
+
+    assert is_far is True
+    assert timeframe is not None
+    assert "2027" in timeframe
