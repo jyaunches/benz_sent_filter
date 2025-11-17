@@ -46,9 +46,9 @@ All tests follow these principles:
 ### tests/test_models.py
 
 1. `test_temporal_category_enum_values`
-   - **Input**: Access TemporalCategory enum
-   - **Expected**: Has PAST_EVENT, FUTURE_EVENT, GENERAL_TOPIC values
-   - **Covers**: Temporal category enumeration
+   - **Input**: Access TemporalCategory enum (from stdlib enum.Enum)
+   - **Expected**: Has PAST_EVENT = "past_event", FUTURE_EVENT = "future_event", GENERAL_TOPIC = "general_topic" values
+   - **Covers**: Temporal category enumeration with string values
 
 2. `test_classify_request_valid_headline`
    - **Input**: ClassifyRequest(headline="Valid headline text")

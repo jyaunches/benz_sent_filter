@@ -152,7 +152,7 @@ Use simple constants in config module for ML settings only:
 
 **Implementation Approach**:
 - Create models in `src/benz_sent_filter/models/classification.py`
-- Define `TemporalCategory` enum with values: PAST_EVENT, FUTURE_EVENT, GENERAL_TOPIC
+- Define `TemporalCategory` using Python's stdlib `enum.Enum` as `class TemporalCategory(str, Enum)` with values: PAST_EVENT = "past_event", FUTURE_EVENT = "future_event", GENERAL_TOPIC = "general_topic"
 - Define `ClassifyRequest` with single headline field (str, min_length=1)
 - Define `BatchClassifyRequest` with headlines field (list of str, min_items=1)
 - Define `ClassificationScores` with fields: opinion_score, news_score, past_score, future_score, general_score (all float)
