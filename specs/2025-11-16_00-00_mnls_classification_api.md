@@ -126,9 +126,12 @@ Use simple constants in config module for ML settings only:
 
 **Implementation Approach**:
 - Modify `pyproject.toml` to add `transformers>=4.35.0` and `torch>=2.0.0` to dependencies
-- Create `src/benz_sent_filter/config/settings.py` with ML configuration constants
-- Define constants: MODEL_NAME, CLASSIFICATION_THRESHOLD
-- Export constants for import by other modules
+- Create `src/benz_sent_filter/config/settings.py` with simple module-level constants (no Settings class)
+- Define module-level constants using standard Python constant naming:
+  - `MODEL_NAME: str = "typeform/distilbert-base-uncased-mnli"`
+  - `CLASSIFICATION_THRESHOLD: float = 0.6`
+- Export constants directly from module (no Settings class instantiation needed)
+- Import pattern: `from benz_sent_filter.config.settings import MODEL_NAME, CLASSIFICATION_THRESHOLD`
 
 **Unit Test Requirements**:
 - Create `tests/test_config.py`

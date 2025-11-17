@@ -25,24 +25,26 @@ All tests follow these principles:
 ### tests/test_config.py
 
 1. `test_model_name_constant_exists`
-   - **Input**: Import settings module
-   - **Expected**: MODEL_NAME constant is accessible and is a string
-   - **Covers**: Configuration constants defined
+   - **Input**: `from benz_sent_filter.config.settings import MODEL_NAME`
+   - **Expected**: MODEL_NAME is accessible, is a string, equals "typeform/distilbert-base-uncased-mnli"
+   - **Covers**: Module-level MODEL_NAME constant
 
 2. `test_classification_threshold_constant`
-   - **Input**: Import settings module
-   - **Expected**: CLASSIFICATION_THRESHOLD equals 0.6
-   - **Covers**: Threshold configuration
+   - **Input**: `from benz_sent_filter.config.settings import CLASSIFICATION_THRESHOLD`
+   - **Expected**: CLASSIFICATION_THRESHOLD is accessible, is a float, equals 0.6
+   - **Covers**: Module-level CLASSIFICATION_THRESHOLD constant
 
-3. `test_model_name_value`
-   - **Input**: Check MODEL_NAME value
-   - **Expected**: Equals "typeform/distilbert-base-uncased-mnli"
-   - **Covers**: Correct model specified
+3. `test_constants_are_module_level`
+   - **Input**: Import settings module and inspect
+   - **Expected**: Constants are module-level (not class attributes), directly importable
+   - **Covers**: Simple constant pattern (no Settings class)
 
 **Test Implementation Notes:**
-- No mocks needed - simple constant access tests
-- Verify types (str, float, int) match expectations
+- No mocks needed - simple module-level constant access tests
+- Use direct imports: `from benz_sent_filter.config.settings import MODEL_NAME, CLASSIFICATION_THRESHOLD`
+- Verify types (str for MODEL_NAME, float for CLASSIFICATION_THRESHOLD)
 - Check exact values match specification
+- No class instantiation should be required
 
 ## Phase 2: Data Models - Test Guide
 
