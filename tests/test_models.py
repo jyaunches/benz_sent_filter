@@ -517,3 +517,210 @@ def test_classification_result_all_optional_fields_present():
     assert result_dict["company"] == "Dell"
     assert result_dict["far_future_forecast"] is True
     assert result_dict["forecast_timeframe"] == "by 2027"
+
+
+# ============================================================================
+# Phase 2: Multi-Ticker Response Models
+# ============================================================================
+
+
+def test_core_classification_model_all_required_fields():
+    """Test CoreClassification model has all required core classification fields."""
+    from benz_sent_filter.models.classification import CoreClassification
+
+    core = CoreClassification(
+        is_opinion=False,
+        is_straight_news=True,
+        temporal_category="past_event",
+        scores={
+            "opinion_score": 0.2,
+            "news_score": 0.85,
+            "past_score": 0.7,
+            "future_score": 0.1,
+            "general_score": 0.2,
+        },
+    )
+
+    assert core.is_opinion is False
+    assert core.is_straight_news is True
+    assert core.temporal_category == "past_event"
+    assert core.scores["opinion_score"] == 0.2
+    assert core.scores["news_score"] == 0.85
+
+
+def test_routine_operation_result_model_structure():
+    """Test RoutineOperationResult model has all required routine operation fields."""
+    from benz_sent_filter.models.classification import RoutineOperationResult
+
+    routine = RoutineOperationResult(
+        routine_operation=True,
+        routine_confidence=0.87,
+        routine_metadata={
+            "routine_score": 0.87,
+            "detected_patterns": ["mnls_classification"],
+            "process_stage": "completed",
+            "transaction_value": None,
+        },
+    )
+
+    assert routine.routine_operation is True
+    assert routine.routine_confidence == 0.87
+    assert "routine_score" in routine.routine_metadata
+    assert "detected_patterns" in routine.routine_metadata
+    assert routine.routine_metadata["process_stage"] == "completed"
+
+
+def test_multi_ticker_routine_response_basic_structure():
+    """Test MultiTickerRoutineResponse with headline and per-ticker results."""
+    from benz_sent_filter.models.classification import (
+        CoreClassification,
+        MultiTickerRoutineResponse,
+        RoutineOperationResult,
+    )
+
+    core = CoreClassification(
+        is_opinion=False,
+        is_straight_news=True,
+        temporal_category="general_topic",
+        scores={
+            "opinion_score": 0.2,
+            "news_score": 0.85,
+            "past_score": 0.3,
+            "future_score": 0.3,
+            "general_score": 0.4,
+        },
+    )
+
+    bac_routine = RoutineOperationResult(
+        routine_operation=True,
+        routine_confidence=0.87,
+        routine_metadata={
+            "routine_score": 0.87,
+            "detected_patterns": ["mnls_classification"],
+            "process_stage": "completed",
+        },
+    )
+
+    jpm_routine = RoutineOperationResult(
+        routine_operation=True,
+        routine_confidence=0.65,
+        routine_metadata={
+            "routine_score": 0.65,
+            "detected_patterns": ["mnls_classification"],
+            "process_stage": "completed",
+        },
+    )
+
+    response = MultiTickerRoutineResponse(
+        headline="Bank announces quarterly dividend payment",
+        core_classification=core,
+        routine_operations_by_ticker={"BAC": bac_routine, "JPM": jpm_routine},
+    )
+
+    assert response.headline == "Bank announces quarterly dividend payment"
+    assert response.core_classification.is_straight_news is True
+    assert len(response.routine_operations_by_ticker) == 2
+    assert "BAC" in response.routine_operations_by_ticker
+    assert "JPM" in response.routine_operations_by_ticker
+    assert response.routine_operations_by_ticker["BAC"].routine_operation is True
+
+
+def test_multi_ticker_routine_response_json_serialization():
+    """Test MultiTickerRoutineResponse serializes correctly to JSON."""
+    from benz_sent_filter.models.classification import (
+        CoreClassification,
+        MultiTickerRoutineResponse,
+        RoutineOperationResult,
+    )
+
+    core = CoreClassification(
+        is_opinion=False,
+        is_straight_news=True,
+        temporal_category="general_topic",
+        scores={
+            "opinion_score": 0.2,
+            "news_score": 0.85,
+            "past_score": 0.3,
+            "future_score": 0.3,
+            "general_score": 0.4,
+        },
+    )
+
+    bac_routine = RoutineOperationResult(
+        routine_operation=True,
+        routine_confidence=0.87,
+        routine_metadata={"routine_score": 0.87},
+    )
+
+    response = MultiTickerRoutineResponse(
+        headline="Test headline",
+        core_classification=core,
+        routine_operations_by_ticker={"BAC": bac_routine},
+    )
+
+    # Test JSON serialization
+    response_dict = response.model_dump()
+    assert "headline" in response_dict
+    assert "core_classification" in response_dict
+    assert "routine_operations_by_ticker" in response_dict
+    assert response_dict["headline"] == "Test headline"
+    assert response_dict["core_classification"]["is_straight_news"] is True
+    assert "BAC" in response_dict["routine_operations_by_ticker"]
+
+
+def test_multi_ticker_routine_response_empty_ticker_dict():
+    """Test MultiTickerRoutineResponse with empty ticker dictionary."""
+    from benz_sent_filter.models.classification import (
+        CoreClassification,
+        MultiTickerRoutineResponse,
+    )
+
+    core = CoreClassification(
+        is_opinion=False,
+        is_straight_news=True,
+        temporal_category="general_topic",
+        scores={
+            "opinion_score": 0.2,
+            "news_score": 0.85,
+            "past_score": 0.3,
+            "future_score": 0.3,
+            "general_score": 0.4,
+        },
+    )
+
+    response = MultiTickerRoutineResponse(
+        headline="Test headline",
+        core_classification=core,
+        routine_operations_by_ticker={},
+    )
+
+    assert response.headline == "Test headline"
+    assert len(response.routine_operations_by_ticker) == 0
+
+
+def test_multi_ticker_routine_request_model_validation():
+    """Test MultiTickerRoutineRequest validates headline and ticker_symbols."""
+    from benz_sent_filter.models.classification import MultiTickerRoutineRequest
+
+    request = MultiTickerRoutineRequest(
+        headline="Bank announces dividend",
+        ticker_symbols=["BAC", "JPM", "C"],
+    )
+
+    assert request.headline == "Bank announces dividend"
+    assert len(request.ticker_symbols) == 3
+    assert "BAC" in request.ticker_symbols
+
+
+def test_multi_ticker_routine_request_empty_headline_rejected():
+    """Test MultiTickerRoutineRequest rejects empty headline."""
+    from benz_sent_filter.models.classification import MultiTickerRoutineRequest
+
+    with pytest.raises(ValidationError) as exc_info:
+        MultiTickerRoutineRequest(
+            headline="",
+            ticker_symbols=["BAC"],
+        )
+
+    errors = exc_info.value.errors()
+    assert any("headline" in str(error["loc"]) for error in errors)
