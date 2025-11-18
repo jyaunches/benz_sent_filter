@@ -217,6 +217,93 @@ class ClassificationService:
                 routine_metadata=routine_metadata["routine_metadata"],
             )
 
+    def classify_headline_multi_ticker(
+        self, headline: str, ticker_symbols: list[str]
+    ) -> dict:
+        """Classify a headline once, then analyze routine operations for multiple tickers.
+
+        This method optimizes multi-ticker routine operations queries by:
+        - Running core MNLS classification once
+        - Analyzing routine operations separately for each ticker
+        - Avoiding redundant model inference
+
+        Args:
+            headline: Headline text to classify
+            ticker_symbols: List of ticker symbols to analyze routine operations for
+
+        Returns:
+            Dict with structure:
+            {
+                "core_classification": {
+                    "is_opinion": bool,
+                    "is_straight_news": bool,
+                    "temporal_category": str,
+                    "scores": {
+                        "opinion_score": float,
+                        "news_score": float,
+                        "past_score": float,
+                        "future_score": float,
+                        "general_score": float
+                    }
+                },
+                "routine_operations_by_ticker": {
+                    "SYMBOL1": {
+                        "routine_operation": bool,
+                        "routine_confidence": float,
+                        "routine_metadata": dict
+                    },
+                    ...
+                }
+            }
+        """
+        # Perform core classification once
+        result = self._pipeline(headline, candidate_labels=self.CANDIDATE_LABELS)
+
+        # Extract scores by index
+        scores = result["scores"]
+        opinion_score = scores[0]
+        news_score = scores[1]
+        past_score = scores[2]
+        future_score = scores[3]
+        general_score = scores[4]
+
+        # Apply threshold to opinion/news scores
+        is_opinion = opinion_score >= CLASSIFICATION_THRESHOLD
+        is_straight_news = news_score >= CLASSIFICATION_THRESHOLD
+
+        # Determine temporal category from highest temporal score
+        temporal_scores = [
+            (past_score, TemporalCategory.PAST_EVENT),
+            (future_score, TemporalCategory.FUTURE_EVENT),
+            (general_score, TemporalCategory.GENERAL_TOPIC),
+        ]
+        _, temporal_category = max(temporal_scores, key=lambda x: x[0])
+
+        # Build core classification dict
+        core_classification = {
+            "is_opinion": is_opinion,
+            "is_straight_news": is_straight_news,
+            "temporal_category": temporal_category.value,
+            "scores": {
+                "opinion_score": opinion_score,
+                "news_score": news_score,
+                "past_score": past_score,
+                "future_score": future_score,
+                "general_score": general_score,
+            },
+        }
+
+        # Analyze routine operations for each ticker
+        routine_operations_by_ticker = {}
+        for ticker in ticker_symbols:
+            routine_result = self._analyze_routine_operation(headline, company_symbol=ticker)
+            routine_operations_by_ticker[ticker] = routine_result
+
+        return {
+            "core_classification": core_classification,
+            "routine_operations_by_ticker": routine_operations_by_ticker,
+        }
+
     def classify_batch(
         self, headlines: list[str], company: str | None = None, company_symbol: str | None = None
     ) -> list[ClassificationResult]:

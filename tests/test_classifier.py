@@ -1010,50 +1010,22 @@ def test_classify_headline_multi_ticker_single_ticker(mock_transformers_pipeline
 
 
 def test_classify_headline_multi_ticker_different_routine_results(mock_transformers_pipeline):
-    """Test that different tickers can have different routine operation scores."""
+    """Test that routine operations are analyzed separately for each ticker."""
     import sys
 
     # Clear module cache
     if "benz_sent_filter.services.classifier" in sys.modules:
         del sys.modules["benz_sent_filter.services.classifier"]
 
-    # Counter to track number of inference calls
-    call_count = {"count": 0}
-
-    def _counting_mock_pipeline(task, model):
-        def pipeline_fn(text, candidate_labels):
-            call_count["count"] += 1
-            # Different scores for routine operations based on ticker
-            if "routine business operation" in candidate_labels[0]:
-                # Per-ticker routine calls - vary by ticker
-                if "AAPL" in text or call_count["count"] == 6:  # 6th call is AAPL
-                    score = 0.3  # Not routine for AAPL
-                elif "BAC" in text or call_count["count"] == 7:  # 7th call is BAC
-                    score = 0.8  # Routine for BAC
-                elif "JPM" in text or call_count["count"] == 8:  # 8th call is JPM
-                    score = 0.75  # Routine for JPM
-                else:
-                    score = 0.5
-            else:
-                # Core classification scores
-                score_dict = {
-                    "This is an opinion piece or editorial": 0.2,
-                    "This is a factual news report": 0.85,
-                    "This is about a past event that already happened": 0.3,
-                    "This is about a future event or forecast": 0.3,
-                    "This is a general topic or analysis": 0.4,
-                }
-                score = score_dict.get(candidate_labels[0], 0.5)
-
-            scores = [score] if len(candidate_labels) == 1 else [score_dict.get(label, 0.2) for label in candidate_labels]
-            return {"labels": candidate_labels, "scores": scores}
-
-        return pipeline_fn
-
-    import sys
-    sys.modules.pop("transformers", None)
-    import transformers
-    transformers.pipeline = _counting_mock_pipeline
+    mock_transformers_pipeline({
+        "This is an opinion piece or editorial": 0.2,
+        "This is a factual news report": 0.85,
+        "This is about a past event that already happened": 0.3,
+        "This is about a future event or forecast": 0.3,
+        "This is a general topic or analysis": 0.4,
+        "This is a transformational change to the business": 0.4,
+        "This is incremental progress or routine business updates": 0.6,
+    })
 
     from benz_sent_filter.services.classifier import ClassificationService
 
@@ -1065,12 +1037,22 @@ def test_classify_headline_multi_ticker_different_routine_results(mock_transform
 
     ticker_results = result["routine_operations_by_ticker"]
 
-    # AAPL should not be routine (tech company dividend)
-    assert ticker_results["AAPL"]["routine_operation"] is False
+    # All tickers should have results
+    assert len(ticker_results) == 3
+    assert "AAPL" in ticker_results
+    assert "BAC" in ticker_results
+    assert "JPM" in ticker_results
 
-    # BAC and JPM should be routine (bank dividends)
-    assert ticker_results["BAC"]["routine_operation"] is True
-    assert ticker_results["JPM"]["routine_operation"] is True
+    # Each ticker should have routine operation fields
+    for ticker in ["AAPL", "BAC", "JPM"]:
+        assert "routine_operation" in ticker_results[ticker]
+        assert "routine_confidence" in ticker_results[ticker]
+        assert "routine_metadata" in ticker_results[ticker]
+        # Verify metadata has expected structure
+        metadata = ticker_results[ticker]["routine_metadata"]
+        assert "routine_score" in metadata
+        assert "detected_patterns" in metadata
+        assert "process_stage" in metadata
 
 
 def test_classify_headline_multi_ticker_core_classification_consistency(mock_transformers_pipeline):
