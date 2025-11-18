@@ -236,11 +236,13 @@ class RoutineOperationDetectorMNLS:
         # Extract routine score (confidence that it's routine)
         # mnls_result['labels'][0] is the top prediction
         # mnls_result['scores'][0] is the confidence for top prediction
-        if mnls_result["labels"][0] == self.ROUTINE_LABELS[0]:
+        # ROUTINE_LABELS[0] = "transformational change" (material)
+        # ROUTINE_LABELS[1] = "incremental progress or routine business updates" (routine)
+        if mnls_result["labels"][0] == self.ROUTINE_LABELS[1]:
             # Top prediction is "routine" - use its score
             routine_score = mnls_result["scores"][0]
         else:
-            # Top prediction is "material" - routine score is inverse
+            # Top prediction is "transformational" - use routine score (second score)
             routine_score = mnls_result["scores"][1]
 
         # Extract transaction value (keep helper from pattern matching)
