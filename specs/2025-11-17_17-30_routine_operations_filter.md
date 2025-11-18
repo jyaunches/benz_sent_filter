@@ -194,6 +194,7 @@ Factors that increase confidence:
 
 Factors that decrease confidence:
 - Conflicting signals (superlatives + routine patterns): -0.3
+  - Superlative detection via simple keyword list with regex: `\b(record|largest|unprecedented|historic|biggest|highest|never before)\b` (case-insensitive)
 
 Final confidence clamped to [0.0, 1.0]
 
@@ -206,7 +207,7 @@ if materiality_score <= -2:
     confidence += 0.2
 if company_context_available:
     confidence += 0.15
-if has_conflicting_signals:
+if has_superlative(headline):  # Simple keyword regex match
     confidence -= 0.3
 confidence = max(0.0, min(1.0, confidence))
 ```

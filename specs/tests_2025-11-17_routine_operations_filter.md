@@ -246,9 +246,9 @@ None - this is a new service class.
 - **Covers**: -0.3 penalty for conflicting signals
 
 **`test_confidence_calculation_superlative_detection`**
-- **Input**: Headlines with "largest ever", "unprecedented", "record"
-- **Expected**: Superlative detected, confidence reduced
-- **Covers**: Superlative detection logic
+- **Input**: Headlines with "largest ever", "unprecedented", "record", "biggest", "historic", "never before"
+- **Expected**: Superlative detected via keyword regex match, confidence reduced by 0.3
+- **Covers**: Superlative detection logic using simple keyword list pattern
 
 **`test_confidence_calculation_clamped_to_range`**
 - **Input**: Edge cases that would produce values outside [0.0, 1.0]
