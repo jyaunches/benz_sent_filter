@@ -248,6 +248,7 @@ Multi-dimensional response structure with independent confidence per dimension:
 - `routine_operation.metadata.routine_score`: int (0-4) pattern match score
 - `routine_operation.metadata.materiality_score`: int (-2 to 0) materiality assessment
 - `routine_operation.metadata.process_stage`: string ("early", "ongoing", "completed", "unknown")
+  - Determined via simple keyword mapping: "begins"/"starts"/"initiates" → "early", "continues"/"ongoing" → "ongoing", "completes"/"closes"/"announces completion" → "completed"
 - `routine_operation.metadata.transaction_value`: float or null (extracted dollar amount)
 - `routine_operation.metadata.materiality_ratio`: float or null (transaction / company metric)
 - `routine_operation.metadata.detected_patterns`: list of matched pattern types
