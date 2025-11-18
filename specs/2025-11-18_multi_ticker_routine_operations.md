@@ -178,7 +178,7 @@ Mock the MNLS pipeline to control timing and verify number of inference calls.
 - [ ] Existing tests for `classify_headline()` pass unchanged
 - [ ] No changes to existing API endpoints
 
-## Phase 2: Response Models for Multi-Ticker Results
+## Phase 2: Response Models for Multi-Ticker Results [COMPLETED: 37f483e]
 
 ### Description
 
