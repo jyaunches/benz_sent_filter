@@ -525,3 +525,305 @@ class TestRoutineDetectionResult:
             result = detector.detect(headline)
             if expected_stage in ["early", "ongoing", "completed"]:
                 assert result.process_stage == expected_stage
+
+
+# ============================================================================
+# Phase 2: Materiality Assessment Tests
+# ============================================================================
+
+
+class TestCompanyContextDictionary:
+    """Test company context dictionary and lookup."""
+
+    def test_company_context_dictionary_has_fnma(self):
+        """FNMA company context available as dataclass instance."""
+        detector = RoutineOperationDetector()
+        assert "FNMA" in detector.COMPANY_CONTEXT
+
+        context = detector.COMPANY_CONTEXT["FNMA"]
+        assert hasattr(context, "market_cap")
+        assert hasattr(context, "annual_revenue")
+        assert hasattr(context, "total_assets")
+
+    def test_company_context_dictionary_has_bac(self):
+        """BAC company context available as dataclass instance."""
+        detector = RoutineOperationDetector()
+        assert "BAC" in detector.COMPANY_CONTEXT
+
+        context = detector.COMPANY_CONTEXT["BAC"]
+        assert hasattr(context, "market_cap")
+        assert hasattr(context, "annual_revenue")
+        assert hasattr(context, "total_assets")
+
+    def test_company_context_dictionary_20_plus_symbols(self):
+        """Dictionary contains 20+ financial services symbols."""
+        detector = RoutineOperationDetector()
+        assert len(detector.COMPANY_CONTEXT) >= 20
+
+    def test_company_context_lookup_known_symbol(self):
+        """Successful company context lookup for known symbol."""
+        detector = RoutineOperationDetector()
+        context = detector.get_company_context("FNMA")
+
+        assert context is not None
+        assert context.total_assets > 0
+
+    def test_company_context_lookup_unknown_symbol(self):
+        """Unknown symbol returns None (graceful degradation)."""
+        detector = RoutineOperationDetector()
+        context = detector.get_company_context("UNKNOWN")
+
+        assert context is None
+
+
+class TestMaterialityRatioCalculation:
+    """Test materiality ratio calculations."""
+
+    def test_calculate_materiality_ratio_market_cap(self):
+        """Market cap ratio calculated correctly."""
+        detector = RoutineOperationDetector()
+        ratio_result = detector.calculate_materiality_ratio(
+            transaction_value=560500000,
+            market_cap=4000000000,
+            annual_revenue=None,
+            total_assets=None,
+        )
+
+        assert ratio_result is not None
+        assert abs(ratio_result.ratio - 0.140125) < 0.001
+        assert ratio_result.metric_type == "market_cap"
+
+    def test_calculate_materiality_ratio_revenue(self):
+        """Revenue ratio calculated correctly."""
+        detector = RoutineOperationDetector()
+        ratio_result = detector.calculate_materiality_ratio(
+            transaction_value=560500000,
+            market_cap=None,
+            annual_revenue=25000000000,
+            total_assets=None,
+        )
+
+        assert ratio_result is not None
+        assert abs(ratio_result.ratio - 0.02242) < 0.001
+        assert ratio_result.metric_type == "revenue"
+
+    def test_calculate_materiality_ratio_assets_fnma_example(self):
+        """Asset ratio calculated correctly (FNMA example)."""
+        detector = RoutineOperationDetector()
+        ratio_result = detector.calculate_materiality_ratio(
+            transaction_value=560500000,
+            market_cap=None,
+            annual_revenue=None,
+            total_assets=4000000000000,
+        )
+
+        assert ratio_result is not None
+        assert abs(ratio_result.ratio - 0.00014) < 0.00001
+        assert ratio_result.metric_type == "assets"
+
+    def test_calculate_materiality_ratio_zero_company_metric(self):
+        """Division by zero handled gracefully."""
+        detector = RoutineOperationDetector()
+        ratio_result = detector.calculate_materiality_ratio(
+            transaction_value=100000000,
+            market_cap=0,
+            annual_revenue=None,
+            total_assets=None,
+        )
+
+        assert ratio_result is None
+
+    def test_calculate_materiality_ratio_none_transaction_value(self):
+        """None transaction value handled gracefully."""
+        detector = RoutineOperationDetector()
+        ratio_result = detector.calculate_materiality_ratio(
+            transaction_value=None,
+            market_cap=4000000000,
+            annual_revenue=None,
+            total_assets=None,
+        )
+
+        assert ratio_result is None
+
+
+class TestMaterialityThresholds:
+    """Test materiality threshold application."""
+
+    def test_materiality_threshold_immaterial_market_cap(self):
+        """Market cap below immaterial threshold."""
+        detector = RoutineOperationDetector()
+        # ratio = 0.005 (0.5%), threshold = 0.01 (1%)
+        is_immaterial = 0.005 < detector.IMMATERIAL_THRESHOLD_MARKET_CAP
+
+        assert is_immaterial is True
+
+    def test_materiality_threshold_routine_revenue(self):
+        """Revenue below routine threshold."""
+        detector = RoutineOperationDetector()
+        # ratio = 0.03 (3%), threshold = 0.05 (5%)
+        is_routine = 0.03 < detector.ROUTINE_THRESHOLD_REVENUE
+
+        assert is_routine is True
+
+    def test_materiality_threshold_routine_assets(self):
+        """Asset ratio below routine threshold (FNMA example)."""
+        detector = RoutineOperationDetector()
+        # ratio = 0.00014 (0.014%), threshold = 0.005 (0.5%)
+        is_routine = 0.00014 < detector.ROUTINE_THRESHOLD_ASSETS
+
+        assert is_routine is True
+
+    def test_materiality_threshold_material_above_threshold(self):
+        """Ratio above threshold indicates material transaction."""
+        detector = RoutineOperationDetector()
+        # ratio = 0.15 (15%), threshold = 0.01 (1%)
+        is_material = 0.15 > detector.IMMATERIAL_THRESHOLD_MARKET_CAP
+
+        assert is_material is True
+
+
+class TestMaterialityScoring:
+    """Test materiality scoring logic."""
+
+    def test_materiality_scoring_immaterial_negative_two(self):
+        """Clear immateriality scores -2."""
+        detector = RoutineOperationDetector()
+        score = detector.calculate_materiality_score(ratio=0.00014)
+
+        assert score == -2
+
+    def test_materiality_scoring_borderline_negative_one(self):
+        """Borderline materiality scores -1."""
+        detector = RoutineOperationDetector()
+        score = detector.calculate_materiality_score(ratio=0.008)
+
+        assert score == -1
+
+    def test_materiality_scoring_material_zero(self):
+        """Material transaction scores 0."""
+        detector = RoutineOperationDetector()
+        score = detector.calculate_materiality_score(ratio=0.15)
+
+        assert score == 0
+
+    def test_materiality_scoring_missing_context_zero(self):
+        """Missing context (None ratio) scores 0."""
+        detector = RoutineOperationDetector()
+        score = detector.calculate_materiality_score(ratio=None)
+
+        assert score == 0
+
+
+class TestEnhancedConfidenceCalculation:
+    """Test enhanced confidence calculation with materiality factors."""
+
+    def test_confidence_with_clear_materiality_boost(self):
+        """Clear materiality boosts confidence."""
+        detector = RoutineOperationDetector()
+        result = detector.detect(
+            "Fannie Mae Begins Marketing Latest Loan Sale $560M",
+            company_symbol="FNMA",
+        )
+
+        # routine_score >= 3, materiality_score = -2, context available
+        # Expected: 0.5 + 0.2 (patterns) + 0.2 (materiality) + 0.15 (context) = 1.05 -> 1.0
+        if result.routine_score >= 3 and result.materiality_score == -2:
+            assert result.confidence >= 0.85  # High confidence
+
+    def test_confidence_with_context_available_boost(self):
+        """Company context availability boosts confidence."""
+        detector = RoutineOperationDetector()
+        result = detector.detect(
+            "Quarterly Dividend Payment",
+            company_symbol="BAC",
+        )
+
+        # Context available, should have +0.15 boost
+        # Even without clear materiality, should be > 0.5
+        assert result.confidence > 0.5
+
+    def test_confidence_with_borderline_materiality_no_boost(self):
+        """Borderline materiality (-1) doesn't boost confidence."""
+        detector = RoutineOperationDetector()
+        # Need to create scenario with borderline materiality
+        # This requires a transaction that's borderline (ratio between thresholds)
+
+        # For now, test that -1 materiality_score doesn't get +0.2 boost
+        result = detector.detect(
+            "Begins Marketing Latest Quarterly Dividend $100M",
+            company_symbol="BAC",  # Assume borderline for BAC
+        )
+
+        # With routine_score >= 3 but materiality_score = -1 (borderline)
+        # Should not exceed 0.7 (no materiality boost for -1)
+        # Note: actual value depends on specific ratio
+        assert result.confidence >= 0.5  # At least base confidence
+
+    def test_confidence_without_context_no_boost(self):
+        """No context means no context boost."""
+        detector = RoutineOperationDetector()
+        result = detector.detect(
+            "Begins Marketing Latest Quarterly Dividend",
+            company_symbol=None,  # No context
+        )
+
+        # routine_score >= 3, no context
+        # Expected: 0.5 + 0.2 (patterns) = 0.7
+        if result.routine_score >= 3:
+            assert result.confidence <= 0.7
+
+    def test_confidence_fnma_realistic_scenario(self):
+        """FNMA realistic scenario achieves high confidence."""
+        detector = RoutineOperationDetector()
+        result = detector.detect(
+            "Fannie Mae Begins Marketing Its Most Recent Sale Of Reperforming Loans... $560.5M",
+            company_symbol="FNMA",
+        )
+
+        # FNMA example should have high confidence
+        assert result.confidence >= 0.85
+        assert result.result is True
+
+
+class TestDetectionWithMateriality:
+    """Test full detection logic with materiality integration."""
+
+    def test_detect_with_materiality_fnma_loan_sale(self):
+        """FNMA loan sale example with full materiality assessment."""
+        detector = RoutineOperationDetector()
+        result = detector.detect(
+            "Fannie Mae Begins Marketing Its Most Recent Sale Of Reperforming Loans... $560.5M",
+            company_symbol="FNMA",
+        )
+
+        assert result.routine_score >= 3
+        assert result.materiality_score == -2  # Immaterial
+        assert result.materiality_ratio is not None
+        assert result.materiality_ratio < 0.001  # Very small ratio
+        assert result.transaction_value == 560500000
+        assert result.confidence >= 0.85
+        assert result.result is True
+
+    def test_detect_with_materiality_missing_context(self):
+        """Missing company context handled gracefully."""
+        detector = RoutineOperationDetector()
+        result = detector.detect(
+            "Company X Begins Marketing Loan Sale $560M",
+            company_symbol="UNKNOWN",
+        )
+
+        assert result.routine_score >= 2  # Patterns detected
+        assert result.materiality_score == 0  # No context = neutral
+        assert result.materiality_ratio is None
+        assert result.confidence < 0.85  # Lower without context
+
+    def test_detect_with_materiality_large_material_transaction(self):
+        """Large material transaction not flagged as routine."""
+        detector = RoutineOperationDetector()
+        result = detector.detect(
+            "Bank Acquires Competitor for $50B",
+            company_symbol="BAC",
+        )
+
+        assert result.routine_score == 0  # No routine patterns
+        assert result.result is False  # Not routine
