@@ -342,12 +342,12 @@ Fields:
 
 **Implementation Approach**:
 - Create `RoutineOperationDetector` service class in `src/benz_sent_filter/services/`
-- Define pattern dictionaries as class constants
+- Define pattern dictionaries as **compiled regex patterns stored as class constants** (following PATTERNS.md)
 - Implement pattern matching methods with regex-based detection
 - Build scoring logic that aggregates pattern matches
 - Add dollar amount extraction utility with support for common formats ($XXM, $XXB, etc.)
 - Implement confidence calculation using formula from architecture design
-- Return structured result with routine_score, detected_patterns, transaction_value, confidence
+- Return structured result using **Pydantic model** for type safety and validation
 
 **Unit Test Requirements**:
 - Test each pattern category independently (process, transaction type, frequency)
@@ -380,12 +380,13 @@ Fields:
 - Enhanced confidence calculation with materiality factors
 
 **Implementation Approach**:
-- Add static company context dictionary to `RoutineOperationDetector` class
+- Add static company context using **dataclass** to represent company financial data (following PATTERNS.md)
 - Implement materiality calculation methods in detector
 - Define materiality thresholds as class constants
 - Integrate materiality_score into confidence calculation
-- Extend detection result to include materiality metadata (ratio, threshold used)
+- Extend detection result **Pydantic model** to include materiality metadata (ratio, threshold used)
 - Update confidence formula to include materiality_score and company_context_available factors
+- Use **NamedTuple** for intermediate calculation results (e.g., materiality ratios, threshold comparisons)
 
 **Unit Test Requirements**:
 - Test materiality ratio calculations with known values

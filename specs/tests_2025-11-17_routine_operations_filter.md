@@ -35,13 +35,13 @@ None - this is a new service class.
 
 **`test_routine_detector_initialization_success`**
 - **Input**: None (default initialization)
-- **Expected**: RoutineOperationDetector instance created, pattern dictionaries loaded as class constants
+- **Expected**: RoutineOperationDetector instance created, **compiled regex patterns loaded as class constants**
 - **Covers**: Basic service initialization, pattern dictionary availability
 
 **`test_routine_detector_has_process_language_patterns`**
 - **Input**: Check detector.PROCESS_LANGUAGE_PATTERNS
-- **Expected**: Dictionary with keys: "initiation", "marketing", "planning", "evaluation"
-- **Covers**: Process language pattern dictionary structure
+- **Expected**: Dictionary with keys: "initiation", "marketing", "planning", "evaluation" - each value is a **compiled regex pattern (re.Pattern)**
+- **Covers**: Process language pattern dictionary structure, compiled patterns
 
 **`test_routine_detector_has_transaction_type_patterns`**
 - **Input**: Check detector.FINANCIAL_SERVICES_PATTERNS
@@ -303,13 +303,13 @@ None - this is a new service class.
 
 **`test_company_context_dictionary_has_fnma`**
 - **Input**: Check detector.COMPANY_CONTEXT["FNMA"]
-- **Expected**: Dict with market_cap, annual_revenue, total_assets keys
-- **Covers**: FNMA company context availability
+- **Expected**: **CompanyContext dataclass instance** with market_cap, annual_revenue, total_assets attributes
+- **Covers**: FNMA company context availability, dataclass structure
 
 **`test_company_context_dictionary_has_bac`**
 - **Input**: Check detector.COMPANY_CONTEXT["BAC"]
-- **Expected**: Dict with required financial metrics
-- **Covers**: BAC company context availability
+- **Expected**: **CompanyContext dataclass instance** with required financial metrics
+- **Covers**: BAC company context availability, dataclass structure
 
 **`test_company_context_dictionary_20_plus_symbols`**
 - **Input**: len(detector.COMPANY_CONTEXT)
@@ -330,8 +330,8 @@ None - this is a new service class.
 
 **`test_calculate_materiality_ratio_market_cap`**
 - **Input**: transaction_value=560500000, market_cap=4000000000
-- **Expected**: ratio = 0.140125 (transaction / market_cap)
-- **Covers**: Market cap ratio calculation
+- **Expected**: **MaterialityRatio NamedTuple** with ratio = 0.140125 (transaction / market_cap), metric_type = "market_cap"
+- **Covers**: Market cap ratio calculation, NamedTuple structure
 
 **`test_calculate_materiality_ratio_revenue`**
 - **Input**: transaction_value=560500000, annual_revenue=25000000000
@@ -483,9 +483,9 @@ None - this is a new service class.
 #### 1. Response Model Tests
 
 **`test_classification_response_per_dimension_structure`**
-- **Input**: Create ClassificationResponse with opinion, temporal, routine_operation dimensions
-- **Expected**: JSON serialization matches per-dimension format from spec
-- **Covers**: Response model structure validation
+- **Input**: Create ClassificationResponse **Pydantic model** with opinion, temporal, routine_operation dimensions
+- **Expected**: JSON serialization matches per-dimension format from spec, Pydantic validation passes
+- **Covers**: Response model structure validation, Pydantic model usage
 
 **`test_opinion_classification_dimension`**
 - **Input**: Opinion classification data
