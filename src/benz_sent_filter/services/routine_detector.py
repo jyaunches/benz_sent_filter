@@ -1,8 +1,8 @@
-"""Routine business operations detector using pattern matching.
+"""Routine business operations detector using MNLS zero-shot classification.
 
 This module provides the RoutineOperationDetector service class that identifies
-routine business operations (loan sales, buybacks, dividends, refinancing) using
-regex pattern matching, scoring algorithms, and materiality assessment.
+routine business operations using zero-shot NLI classification combined with
+materiality assessment for financial context.
 """
 
 import re
@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from typing import NamedTuple, Optional
 
 from pydantic import BaseModel
+from transformers import pipeline
 
 
 @dataclass

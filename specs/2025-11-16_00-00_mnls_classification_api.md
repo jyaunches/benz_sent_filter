@@ -441,3 +441,21 @@ Use simple constants in config module for ML settings only:
 ---
 
 **End of Specification**
+
+curl -X POST http://localhost:8002/classify \
+    -H "Content-Type: application/json" \
+    -d '{ "headline": "Dell Unveils AI Data Platform Updates; Launches First 2U Server With NVIDIA Blackwell GPUs", "company": "Dell" }'
+
+
+
+curl -X POST http://localhost:8002/classify \
+    -H "Content-Type: application/json" \
+    -d '{ "headline": "Infosys Forms JV With CompanyX To Propel AI-Enabled Cloud And Digital Solutions For Australian Businesses", "company": "CompanyX" }'
+
+echo "Testing ESPN..." && \
+curl -s -X POST http://localhost:8002/classify -H "Content-Type: application/json" -d '{"headline": "New ESPN App to Feature Heavy Betting Integration"}' | jq -r '"Result: \(.routine_operation.result), Confidence: \(.routine_operation.confidence)"' && 
+echo -e "\nTesting Genius..." && 
+curl -s -X POST http://localhost:8002/classify -H "Content-Type: application/json" -d '{"headline": "Genius Group CEO Posts Legal Update About Market Manipulation Case"}' | jq -r '"Result: \(.routine_operation.result), Confidence: \(.routine_operation.confidence)"' && 
+echo -e "\nTesting DraftKings..." &&
+curl -s -X POST http://localhost:8002/classify -H "Content-Type: application/json" -d '{"headline": "DraftKings Announce It Has Secured Direct Mobile Sports Betting License"}' | jq -r '"Result: \(.routine_operation.result), Confidence: \(.routine_operation.confidence)"'
+

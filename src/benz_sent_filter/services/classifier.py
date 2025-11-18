@@ -15,7 +15,7 @@ from benz_sent_filter.models.classification import (
     TemporalCategory,
 )
 from benz_sent_filter.services import forecast_analyzer
-from benz_sent_filter.services.routine_detector import RoutineOperationDetector
+from benz_sent_filter.services.routine_detector_mnls import RoutineOperationDetectorMNLS
 
 # Named tuple for structured company relevance results
 CompanyRelevance = namedtuple("CompanyRelevance", ["is_relevant", "score"])
@@ -47,7 +47,7 @@ class ClassificationService:
             RuntimeError: If model fails to load
         """
         self._pipeline = pipeline("zero-shot-classification", model=MODEL_NAME)
-        self._routine_detector = RoutineOperationDetector()
+        self._routine_detector = RoutineOperationDetectorMNLS()
 
     def _check_company_relevance(
         self, headline: str, company: str
