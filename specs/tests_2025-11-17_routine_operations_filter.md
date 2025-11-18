@@ -543,8 +543,8 @@ None - this is a new service class.
 
 **`test_classification_service_invokes_routine_detector`**
 - **Input**: Headline with routine patterns
-- **Expected**: RoutineOperationDetector.detect() called
-- **Covers**: Service integration (routine detector invoked)
+- **Expected**: RoutineOperationDetector.detect() called via composition (detector is instance attribute of ClassificationService)
+- **Covers**: Service integration (routine detector invoked), composition pattern
 
 **`test_classification_service_parallel_execution`**
 - **Input**: Headline (measure execution time with/without routine detection)

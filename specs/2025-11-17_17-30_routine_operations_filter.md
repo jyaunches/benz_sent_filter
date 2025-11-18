@@ -280,10 +280,11 @@ Fields:
 
 **Service Architecture**:
 
-1. **RoutineOperationDetector** service class
+1. **RoutineOperationDetector** service class (separate module)
    - Encapsulates all detection logic
    - Stateless, thread-safe design
    - Pattern dictionaries loaded at initialization
+   - Follows existing pattern: separate service like `forecast_analyzer` module
 
 2. **Company Context Dictionary**
    - Static dictionary mapping ticker symbols to company metrics
@@ -291,9 +292,11 @@ Fields:
    - Future: integration with external API (FMP, etc.)
 
 3. **Classification Pipeline Extension**
+   - **Composition approach**: `ClassificationService` instantiates and calls `RoutineOperationDetector`
    - Routine detection runs in parallel with existing MNLS classification
    - Results merged into unified response with per-dimension confidence
    - No impact on existing classification logic
+   - Clean separation of concerns: MNLS logic in ClassificationService, rule-based logic in RoutineOperationDetector
 
 ### Edge Cases & Handling
 
