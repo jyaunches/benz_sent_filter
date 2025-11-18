@@ -109,3 +109,73 @@ class BatchClassificationResult(BaseModel):
     results: list[ClassificationResult] = Field(
         ..., description="List of classification results"
     )
+
+
+# Multi-Ticker Routine Operations Models
+
+
+class CoreClassification(BaseModel):
+    """Core classification results without company or routine operation analysis.
+
+    Contains only the base MNLS classification outputs that are run once
+    per headline in multi-ticker scenarios.
+    """
+
+    model_config = ConfigDict(exclude_none=True)
+
+    is_opinion: bool = Field(..., description="Whether headline is opinion/editorial")
+    is_straight_news: bool = Field(..., description="Whether headline is factual news")
+    temporal_category: str = Field(
+        ..., description="Temporal category (past_event/future_event/general_topic)"
+    )
+    scores: dict = Field(..., description="Raw classification scores dictionary")
+
+
+class RoutineOperationResult(BaseModel):
+    """Routine operation detection result for a single ticker symbol.
+
+    Contains routine operations analysis fields that are computed per-ticker
+    in multi-ticker scenarios.
+    """
+
+    model_config = ConfigDict(exclude_none=True)
+
+    routine_operation: bool = Field(
+        ...,
+        description="Whether headline describes a routine business operation",
+    )
+    routine_confidence: float = Field(
+        ...,
+        description="Confidence in routine operation classification (0.0 to 1.0)",
+    )
+    routine_metadata: dict = Field(
+        ...,
+        description="Detailed routine operation detection metadata",
+    )
+
+
+class MultiTickerRoutineRequest(BaseModel):
+    """Request model for multi-ticker routine operations endpoint."""
+
+    headline: str = Field(..., min_length=1, description="Headline text to classify")
+    ticker_symbols: list[str] = Field(
+        ..., description="List of ticker symbols to analyze routine operations for"
+    )
+
+
+class MultiTickerRoutineResponse(BaseModel):
+    """Response model for multi-ticker routine operations classification.
+
+    Contains core classification (run once) and per-ticker routine operations
+    analysis (run for each ticker symbol).
+    """
+
+    model_config = ConfigDict(exclude_none=True)
+
+    headline: str = Field(..., description="Original headline text")
+    core_classification: CoreClassification = Field(
+        ..., description="Core classification results (opinion, news, temporal)"
+    )
+    routine_operations_by_ticker: dict[str, RoutineOperationResult] = Field(
+        ..., description="Routine operations results keyed by ticker symbol"
+    )
