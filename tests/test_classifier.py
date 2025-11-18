@@ -882,3 +882,283 @@ def test_classify_headline_far_future_with_company_relevance(
     assert result.is_about_company is True
     assert result.company_score == 0.85
     assert result.company == "Dell"
+
+
+# Phase 1: Multi-Ticker Classification Tests
+
+
+def test_classify_headline_multi_ticker_basic(mock_transformers_pipeline):
+    """Test multi-ticker classification with 3 tickers."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    mock_transformers_pipeline({
+        "This is an opinion piece or editorial": 0.2,
+        "This is a factual news report": 0.85,
+        "This is about a past event that already happened": 0.3,
+        "This is about a future event or forecast": 0.3,
+        "This is a general topic or analysis": 0.4,
+        "This article describes a routine business operation like quarterly dividends, regular loan portfolio sales, scheduled buybacks, or normal refinancing": 0.75,
+    })
+
+    from benz_sent_filter.services.classifier import ClassificationService
+
+    service = ClassificationService()
+    result = service.classify_headline_multi_ticker(
+        "Bank announces quarterly dividend payment",
+        ticker_symbols=["BAC", "JPM", "C"]
+    )
+
+    # Verify core classification exists
+    assert "core_classification" in result
+    core = result["core_classification"]
+    assert core["is_opinion"] is False
+    assert core["is_straight_news"] is True
+
+    # Verify per-ticker routine operations
+    assert "routine_operations_by_ticker" in result
+    ticker_results = result["routine_operations_by_ticker"]
+    assert len(ticker_results) == 3
+    assert "BAC" in ticker_results
+    assert "JPM" in ticker_results
+    assert "C" in ticker_results
+
+    # Each ticker should have routine operation result
+    for ticker in ["BAC", "JPM", "C"]:
+        assert "routine_operation" in ticker_results[ticker]
+        assert "routine_confidence" in ticker_results[ticker]
+        assert "routine_metadata" in ticker_results[ticker]
+
+
+def test_classify_headline_multi_ticker_empty_list(mock_transformers_pipeline):
+    """Test multi-ticker classification with empty ticker list."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    mock_transformers_pipeline({
+        "This is an opinion piece or editorial": 0.2,
+        "This is a factual news report": 0.85,
+        "This is about a past event that already happened": 0.3,
+        "This is about a future event or forecast": 0.3,
+        "This is a general topic or analysis": 0.4,
+    })
+
+    from benz_sent_filter.services.classifier import ClassificationService
+
+    service = ClassificationService()
+    result = service.classify_headline_multi_ticker(
+        "Bank announces quarterly dividend payment",
+        ticker_symbols=[]
+    )
+
+    # Core classification should still exist
+    assert "core_classification" in result
+    assert result["core_classification"]["is_straight_news"] is True
+
+    # Routine operations dict should be empty
+    assert "routine_operations_by_ticker" in result
+    assert len(result["routine_operations_by_ticker"]) == 0
+
+
+def test_classify_headline_multi_ticker_single_ticker(mock_transformers_pipeline):
+    """Test multi-ticker with single ticker matches single-ticker behavior."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    mock_transformers_pipeline({
+        "This is an opinion piece or editorial": 0.2,
+        "This is a factual news report": 0.85,
+        "This is about a past event that already happened": 0.3,
+        "This is about a future event or forecast": 0.3,
+        "This is a general topic or analysis": 0.4,
+        "This article describes a routine business operation like quarterly dividends, regular loan portfolio sales, scheduled buybacks, or normal refinancing": 0.65,
+    })
+
+    from benz_sent_filter.services.classifier import ClassificationService
+
+    service = ClassificationService()
+
+    # Multi-ticker call with one ticker
+    multi_result = service.classify_headline_multi_ticker(
+        "Bank announces dividend",
+        ticker_symbols=["BAC"]
+    )
+
+    # Single-ticker call
+    single_result = service.classify_headline(
+        "Bank announces dividend",
+        company_symbol="BAC"
+    )
+
+    # Core classification should match
+    assert multi_result["core_classification"]["is_straight_news"] == single_result.is_straight_news
+    assert multi_result["core_classification"]["temporal_category"] == single_result.temporal_category.value
+
+    # Routine operation result should match
+    multi_routine = multi_result["routine_operations_by_ticker"]["BAC"]
+    assert multi_routine["routine_operation"] == single_result.routine_operation
+    assert multi_routine["routine_confidence"] == single_result.routine_confidence
+
+
+def test_classify_headline_multi_ticker_different_routine_results(mock_transformers_pipeline):
+    """Test that different tickers can have different routine operation scores."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    # Counter to track number of inference calls
+    call_count = {"count": 0}
+
+    def _counting_mock_pipeline(task, model):
+        def pipeline_fn(text, candidate_labels):
+            call_count["count"] += 1
+            # Different scores for routine operations based on ticker
+            if "routine business operation" in candidate_labels[0]:
+                # Per-ticker routine calls - vary by ticker
+                if "AAPL" in text or call_count["count"] == 6:  # 6th call is AAPL
+                    score = 0.3  # Not routine for AAPL
+                elif "BAC" in text or call_count["count"] == 7:  # 7th call is BAC
+                    score = 0.8  # Routine for BAC
+                elif "JPM" in text or call_count["count"] == 8:  # 8th call is JPM
+                    score = 0.75  # Routine for JPM
+                else:
+                    score = 0.5
+            else:
+                # Core classification scores
+                score_dict = {
+                    "This is an opinion piece or editorial": 0.2,
+                    "This is a factual news report": 0.85,
+                    "This is about a past event that already happened": 0.3,
+                    "This is about a future event or forecast": 0.3,
+                    "This is a general topic or analysis": 0.4,
+                }
+                score = score_dict.get(candidate_labels[0], 0.5)
+
+            scores = [score] if len(candidate_labels) == 1 else [score_dict.get(label, 0.2) for label in candidate_labels]
+            return {"labels": candidate_labels, "scores": scores}
+
+        return pipeline_fn
+
+    import sys
+    sys.modules.pop("transformers", None)
+    import transformers
+    transformers.pipeline = _counting_mock_pipeline
+
+    from benz_sent_filter.services.classifier import ClassificationService
+
+    service = ClassificationService()
+    result = service.classify_headline_multi_ticker(
+        "Company announces quarterly dividend",
+        ticker_symbols=["AAPL", "BAC", "JPM"]
+    )
+
+    ticker_results = result["routine_operations_by_ticker"]
+
+    # AAPL should not be routine (tech company dividend)
+    assert ticker_results["AAPL"]["routine_operation"] is False
+
+    # BAC and JPM should be routine (bank dividends)
+    assert ticker_results["BAC"]["routine_operation"] is True
+    assert ticker_results["JPM"]["routine_operation"] is True
+
+
+def test_classify_headline_multi_ticker_core_classification_consistency(mock_transformers_pipeline):
+    """Test that core classification is identical to single-headline results."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    mock_transformers_pipeline({
+        "This is an opinion piece or editorial": 0.15,
+        "This is a factual news report": 0.88,
+        "This is about a past event that already happened": 0.65,
+        "This is about a future event or forecast": 0.2,
+        "This is a general topic or analysis": 0.15,
+        "This article describes a routine business operation like quarterly dividends, regular loan portfolio sales, scheduled buybacks, or normal refinancing": 0.45,
+    })
+
+    from benz_sent_filter.services.classifier import ClassificationService
+
+    service = ClassificationService()
+
+    headline = "Fed Raised Interest Rates Yesterday"
+
+    # Get multi-ticker result
+    multi_result = service.classify_headline_multi_ticker(
+        headline,
+        ticker_symbols=["BAC", "JPM"]
+    )
+
+    # Get single classification result (no company)
+    single_result = service.classify_headline(headline)
+
+    # Core classification fields should match exactly
+    core = multi_result["core_classification"]
+    assert core["is_opinion"] == single_result.is_opinion
+    assert core["is_straight_news"] == single_result.is_straight_news
+    assert core["temporal_category"] == single_result.temporal_category.value
+    assert core["scores"]["opinion_score"] == single_result.scores.opinion_score
+    assert core["scores"]["news_score"] == single_result.scores.news_score
+    assert core["scores"]["past_score"] == single_result.scores.past_score
+    assert core["scores"]["future_score"] == single_result.scores.future_score
+    assert core["scores"]["general_score"] == single_result.scores.general_score
+
+
+def test_classify_headline_multi_ticker_performance_validation(monkeypatch):
+    """Test multi-ticker is faster than N sequential calls by counting inference calls."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    # Counter to track pipeline calls
+    call_count = {"count": 0}
+
+    def _counting_mock_pipeline(task, model):
+        def pipeline_fn(text, candidate_labels):
+            call_count["count"] += 1
+            scores = [0.5 for _ in candidate_labels]
+            return {"labels": candidate_labels, "scores": scores}
+        return pipeline_fn
+
+    monkeypatch.setattr("transformers.pipeline", _counting_mock_pipeline)
+
+    from benz_sent_filter.services.classifier import ClassificationService
+
+    service = ClassificationService()
+
+    # Multi-ticker call with 3 tickers
+    call_count["count"] = 0
+    service.classify_headline_multi_ticker(
+        "Bank announces dividend",
+        ticker_symbols=["BAC", "JPM", "C"]
+    )
+    multi_ticker_calls = call_count["count"]
+
+    # Sequential single-ticker calls (3 times)
+    call_count["count"] = 0
+    for ticker in ["BAC", "JPM", "C"]:
+        service.classify_headline("Bank announces dividend", company_symbol=ticker)
+    sequential_calls = call_count["count"]
+
+    # Multi-ticker should make fewer calls than sequential
+    # Expected: Multi-ticker = 1 core + 3 routine = ~4-5 calls
+    # Sequential = (1 core + 1 routine) × 3 = ~6 calls
+    assert multi_ticker_calls < sequential_calls, (
+        f"Multi-ticker ({multi_ticker_calls} calls) should be faster than "
+        f"sequential ({sequential_calls} calls)"
+    )
