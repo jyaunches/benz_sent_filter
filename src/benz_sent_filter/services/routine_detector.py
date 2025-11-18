@@ -6,9 +6,37 @@ regex pattern matching, scoring algorithms, and materiality assessment.
 """
 
 import re
-from typing import Optional
+from dataclasses import dataclass
+from typing import NamedTuple, Optional
 
 from pydantic import BaseModel
+
+
+@dataclass
+class CompanyContext:
+    """Company financial context for materiality assessment.
+
+    Attributes:
+        market_cap: Market capitalization in USD
+        annual_revenue: Annual revenue in USD
+        total_assets: Total assets in USD
+    """
+
+    market_cap: float
+    annual_revenue: float
+    total_assets: float
+
+
+class MaterialityRatio(NamedTuple):
+    """Materiality ratio calculation result.
+
+    Attributes:
+        ratio: Calculated ratio (transaction / company metric)
+        metric_type: Type of metric used ("market_cap", "revenue", "assets")
+    """
+
+    ratio: float
+    metric_type: str
 
 
 class RoutineDetectionResult(BaseModel):
@@ -49,7 +77,123 @@ class RoutineOperationDetector:
 
     Scoring algorithm combines pattern matches and applies explicit overrides
     for exceptional events (superlatives, completions, special events).
+
+    Phase 2 adds company context and materiality assessment.
     """
+
+    # Materiality thresholds (Phase 2)
+    IMMATERIAL_THRESHOLD_MARKET_CAP = 0.01  # 1% of market cap
+    ROUTINE_THRESHOLD_REVENUE = 0.05  # 5% of revenue
+    ROUTINE_THRESHOLD_ASSETS = 0.005  # 0.5% of assets (for financials)
+
+    # Company context dictionary (Phase 2)
+    COMPANY_CONTEXT = {
+        "FNMA": CompanyContext(
+            market_cap=4_000_000_000,
+            annual_revenue=25_000_000_000,
+            total_assets=4_000_000_000_000,
+        ),
+        "BAC": CompanyContext(
+            market_cap=300_000_000_000,
+            annual_revenue=100_000_000_000,
+            total_assets=3_000_000_000_000,
+        ),
+        "JPM": CompanyContext(
+            market_cap=450_000_000_000,
+            annual_revenue=150_000_000_000,
+            total_assets=3_800_000_000_000,
+        ),
+        "WFC": CompanyContext(
+            market_cap=180_000_000_000,
+            annual_revenue=85_000_000_000,
+            total_assets=1_900_000_000_000,
+        ),
+        "C": CompanyContext(
+            market_cap=100_000_000_000,
+            annual_revenue=75_000_000_000,
+            total_assets=2_400_000_000_000,
+        ),
+        "GS": CompanyContext(
+            market_cap=110_000_000_000,
+            annual_revenue=48_000_000_000,
+            total_assets=1_600_000_000_000,
+        ),
+        "MS": CompanyContext(
+            market_cap=150_000_000_000,
+            annual_revenue=54_000_000_000,
+            total_assets=1_200_000_000_000,
+        ),
+        "USB": CompanyContext(
+            market_cap=75_000_000_000,
+            annual_revenue=24_000_000_000,
+            total_assets=650_000_000_000,
+        ),
+        "PNC": CompanyContext(
+            market_cap=65_000_000_000,
+            annual_revenue=20_000_000_000,
+            total_assets=560_000_000_000,
+        ),
+        "TFC": CompanyContext(
+            market_cap=55_000_000_000,
+            annual_revenue=18_000_000_000,
+            total_assets=530_000_000_000,
+        ),
+        "BK": CompanyContext(
+            market_cap=45_000_000_000,
+            annual_revenue=16_000_000_000,
+            total_assets=430_000_000_000,
+        ),
+        "STT": CompanyContext(
+            market_cap=28_000_000_000,
+            annual_revenue=12_000_000_000,
+            total_assets=300_000_000_000,
+        ),
+        "COF": CompanyContext(
+            market_cap=55_000_000_000,
+            annual_revenue=32_000_000_000,
+            total_assets=470_000_000_000,
+        ),
+        "AXP": CompanyContext(
+            market_cap=150_000_000_000,
+            annual_revenue=52_000_000_000,
+            total_assets=240_000_000_000,
+        ),
+        "SCHW": CompanyContext(
+            market_cap=120_000_000_000,
+            annual_revenue=20_000_000_000,
+            total_assets=460_000_000_000,
+        ),
+        "BLK": CompanyContext(
+            market_cap=130_000_000_000,
+            annual_revenue=19_000_000_000,
+            total_assets=180_000_000_000,
+        ),
+        "FHLMC": CompanyContext(
+            market_cap=3_500_000_000,
+            annual_revenue=22_000_000_000,
+            total_assets=3_200_000_000_000,
+        ),
+        "AIG": CompanyContext(
+            market_cap=48_000_000_000,
+            annual_revenue=50_000_000_000,
+            total_assets=580_000_000_000,
+        ),
+        "PRU": CompanyContext(
+            market_cap=38_000_000_000,
+            annual_revenue=58_000_000_000,
+            total_assets=900_000_000_000,
+        ),
+        "MET": CompanyContext(
+            market_cap=50_000_000_000,
+            annual_revenue=68_000_000_000,
+            total_assets=750_000_000_000,
+        ),
+        "ALL": CompanyContext(
+            market_cap=40_000_000_000,
+            annual_revenue=52_000_000_000,
+            total_assets=130_000_000_000,
+        ),
+    }
 
     # Process language patterns (compiled regex)
     PROCESS_LANGUAGE_PATTERNS = {
@@ -139,11 +283,14 @@ class RoutineOperationDetector:
         re.IGNORECASE,
     )
 
-    def detect(self, headline: Optional[str]) -> RoutineDetectionResult:
+    def detect(
+        self, headline: Optional[str], company_symbol: Optional[str] = None
+    ) -> RoutineDetectionResult:
         """Detect routine business operations in a headline.
 
         Args:
             headline: News article headline to analyze
+            company_symbol: Optional company ticker symbol for materiality assessment (Phase 2)
 
         Returns:
             RoutineDetectionResult with scores, patterns, and final classification
@@ -186,11 +333,37 @@ class RoutineOperationDetector:
         # Detect process stage
         process_stage = self._detect_process_stage(headline)
 
-        # Calculate confidence
-        confidence = self._calculate_confidence(routine_score, headline)
+        # Phase 2: Materiality assessment
+        materiality_score = 0
+        materiality_ratio = None
+        company_context_available = False
 
-        # Final decision with explicit overrides
-        result = self._make_final_decision(routine_score, headline)
+        if company_symbol:
+            company_context = self.get_company_context(company_symbol)
+            if company_context:
+                company_context_available = True
+                if transaction_value:
+                    ratio_result = self.calculate_materiality_ratio(
+                        transaction_value=transaction_value,
+                        market_cap=company_context.market_cap,
+                        annual_revenue=company_context.annual_revenue,
+                        total_assets=company_context.total_assets,
+                    )
+                    if ratio_result:
+                        materiality_ratio = ratio_result.ratio
+                        materiality_score = self.calculate_materiality_score(
+                            materiality_ratio
+                        )
+
+        # Calculate confidence (Phase 2: enhanced with materiality factors)
+        confidence = self._calculate_confidence(
+            routine_score, headline, materiality_score, company_context_available
+        )
+
+        # Final decision with explicit overrides (Phase 2: uses materiality_score)
+        result = self._make_final_decision(
+            routine_score, headline, materiality_score
+        )
 
         return RoutineDetectionResult(
             routine_score=routine_score,
@@ -199,6 +372,8 @@ class RoutineOperationDetector:
             transaction_value=transaction_value,
             process_stage=process_stage,
             result=result,
+            materiality_score=materiality_score if company_symbol else None,
+            materiality_ratio=materiality_ratio,
         )
 
     def _detect_process_language(self, text: str) -> int:
@@ -323,7 +498,11 @@ class RoutineOperationDetector:
         return "unknown"
 
     def _calculate_confidence(
-        self, routine_score: int, headline: str
+        self,
+        routine_score: int,
+        headline: str,
+        materiality_score: int = 0,
+        company_context_available: bool = False,
     ) -> float:
         """Calculate confidence in routine operation detection.
 
@@ -346,6 +525,13 @@ class RoutineOperationDetector:
         if routine_score >= 3:
             confidence += 0.2
 
+        # Phase 2: Materiality boosts
+        if materiality_score <= -2:
+            confidence += 0.2
+
+        if company_context_available:
+            confidence += 0.15
+
         # Conflicting signals penalty
         if self.SUPERLATIVE_PATTERN.search(headline):
             confidence -= 0.3
@@ -354,7 +540,7 @@ class RoutineOperationDetector:
         return max(0.0, min(1.0, confidence))
 
     def _make_final_decision(
-        self, routine_score: int, headline: str
+        self, routine_score: int, headline: str, materiality_score: int = 0
     ) -> bool:
         """Make final routine operation classification decision.
 
@@ -369,6 +555,7 @@ class RoutineOperationDetector:
         Args:
             routine_score: Aggregated pattern match score
             headline: Headline text for override checks
+            materiality_score: Materiality assessment score (Phase 2)
 
         Returns:
             True if routine operation, False otherwise
@@ -383,10 +570,108 @@ class RoutineOperationDetector:
         if self.SPECIAL_KEYWORD_PATTERN.search(headline):
             return False
 
-        # Base threshold rule (Phase 1 without materiality)
-        # In Phase 1, we only have routine_score
-        # Phase 2 will add materiality_score condition
+        # Base threshold rule (Phase 2: includes materiality)
+        # routine_score >= 2 AND (materiality_score <= -1 OR no materiality assessment)
         if routine_score >= 2:
-            return True
+            if materiality_score == 0:
+                # No materiality assessment - use pattern-based decision only
+                return True
+            elif materiality_score <= -1:
+                # Immaterial or borderline - flag as routine
+                return True
 
         return False
+
+    def get_company_context(self, symbol: str) -> Optional[CompanyContext]:
+        """Get company context for a given ticker symbol.
+
+        Args:
+            symbol: Company ticker symbol (e.g., "FNMA", "BAC")
+
+        Returns:
+            CompanyContext if found, None otherwise
+        """
+        return self.COMPANY_CONTEXT.get(symbol)
+
+    def calculate_materiality_ratio(
+        self,
+        transaction_value: Optional[float],
+        market_cap: Optional[float],
+        annual_revenue: Optional[float],
+        total_assets: Optional[float],
+    ) -> Optional[MaterialityRatio]:
+        """Calculate materiality ratio using available company metrics.
+
+        Priority order:
+        1. Total assets (for financial institutions)
+        2. Annual revenue
+        3. Market cap
+
+        Args:
+            transaction_value: Transaction amount in USD
+            market_cap: Company market capitalization in USD
+            annual_revenue: Company annual revenue in USD
+            total_assets: Company total assets in USD
+
+        Returns:
+            MaterialityRatio with ratio and metric type, or None if calculation not possible
+        """
+        if transaction_value is None or transaction_value == 0:
+            return None
+
+        # Priority 1: Total assets (for financials)
+        if total_assets and total_assets > 0:
+            return MaterialityRatio(
+                ratio=transaction_value / total_assets,
+                metric_type="assets",
+            )
+
+        # Priority 2: Annual revenue
+        if annual_revenue and annual_revenue > 0:
+            return MaterialityRatio(
+                ratio=transaction_value / annual_revenue,
+                metric_type="revenue",
+            )
+
+        # Priority 3: Market cap
+        if market_cap and market_cap > 0:
+            return MaterialityRatio(
+                ratio=transaction_value / market_cap,
+                metric_type="market_cap",
+            )
+
+        return None
+
+    def calculate_materiality_score(
+        self, ratio: Optional[float]
+    ) -> int:
+        """Calculate materiality score based on ratio.
+
+        Scoring:
+        - ratio < immaterial threshold: -2 (clearly immaterial)
+        - ratio < routine threshold: -1 (borderline)
+        - ratio >= routine threshold: 0 (material)
+        - None ratio: 0 (neutral, no assessment)
+
+        Args:
+            ratio: Materiality ratio from calculate_materiality_ratio
+
+        Returns:
+            Materiality score (-2, -1, or 0)
+        """
+        if ratio is None:
+            return 0
+
+        # Check against thresholds (use strictest threshold)
+        immaterial_threshold = min(
+            self.IMMATERIAL_THRESHOLD_MARKET_CAP,
+            self.ROUTINE_THRESHOLD_ASSETS,
+        )
+        routine_threshold = self.ROUTINE_THRESHOLD_REVENUE
+
+        if ratio < immaterial_threshold:
+            return -2  # Clearly immaterial
+        elif ratio < routine_threshold:
+            return -1  # Borderline
+        else:
+            return 0  # Material
