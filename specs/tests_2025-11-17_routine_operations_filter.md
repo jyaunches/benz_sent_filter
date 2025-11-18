@@ -215,13 +215,33 @@ None - this is a new service class.
 
 **`test_scoring_algorithm_no_patterns`**
 - **Input**: "Bank Reports Q2 Earnings"
-- **Expected**: routine_score = 0, detected_patterns = []
+- **Expected**: routine_score = 0, detected_patterns = [], result = False
 - **Covers**: Zero score for non-routine headlines
 
 **`test_scoring_algorithm_consistent_reproducible`**
 - **Input**: Same headline tested multiple times
 - **Expected**: Identical routine_score and patterns each time
 - **Covers**: Reproducibility requirement
+
+**`test_final_decision_threshold_based`**
+- **Input**: routine_score = 2, materiality_score = -1 (meets threshold)
+- **Expected**: result = True (base threshold rule)
+- **Covers**: Base threshold logic for final result
+
+**`test_final_decision_superlative_override`**
+- **Input**: routine_score = 3, materiality_score = -2, headline contains "record"
+- **Expected**: result = False (superlative overrides routine detection)
+- **Covers**: Explicit override for superlatives
+
+**`test_final_decision_completion_keyword_override`**
+- **Input**: routine_score = 3, headline contains "completes"
+- **Expected**: result = False (completion keywords override)
+- **Covers**: Explicit override for completed transactions
+
+**`test_final_decision_special_keyword_override`**
+- **Input**: routine_score = 2, headline contains "special dividend"
+- **Expected**: result = False (special keyword overrides)
+- **Covers**: Explicit override for special events
 
 #### 7. Confidence Calculation Tests (Phase 1 - Base Confidence)
 

@@ -170,10 +170,22 @@ if transaction_value AND company_context:
     elif ratio < ROUTINE_THRESHOLD:
         materiality_score = -1
 
-# Final decision
+# Final decision with explicit overrides
+result = False  # default
+
+# Base threshold rule
 if routine_score >= 2 AND materiality_score <= -1:
-    flag = "routine_operation_immaterial"
-    confidence_adjustment = 0.3  # Reduce confidence in materiality
+    result = True
+
+# Explicit overrides (priority order)
+if has_superlative(headline):
+    result = False  # Superlatives override routine detection
+if has_completion_keyword(headline):  # "completes", "announces completion", "closes"
+    result = False  # Completed transactions are material events
+if has_special_keyword(headline):  # "special dividend"
+    result = False  # Special events are not routine
+
+# Return result with confidence
 ```
 
 **Per-Dimension Confidence Scores**:
