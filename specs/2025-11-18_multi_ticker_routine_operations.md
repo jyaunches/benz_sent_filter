@@ -309,7 +309,7 @@ Mock the classification service to control responses and test error paths.
 
 ### Description
 
-Create comprehensive integration tests that validate the end-to-end functionality and measure the actual performance improvement of the multi-ticker endpoint against sequential single-ticker requests.
+Create comprehensive integration tests that validate the end-to-end functionality, measure the actual performance improvement of the multi-ticker endpoint against sequential single-ticker requests, and extend the filter activation report to analyze multi-ticker scenarios.
 
 ### Core Functionality
 
@@ -319,61 +319,8 @@ Integration tests should:
 - Compare multi-ticker endpoint vs N sequential `/classify` calls
 - Validate performance improvement meets success metrics (40-50% reduction)
 - Test edge cases with production-like data
-
-Tests verify both correctness and performance characteristics.
-
-### Implementation Approach
-
-**Create**: `integration/test_multi_ticker_routine.py`
-
-New integration test file with:
-1. **End-to-end multi-ticker test**: Real API call with 3 tickers, verify results
-2. **Performance comparison**: Time multi-ticker vs 3 sequential calls, assert improvement
-3. **Consistency validation**: Verify multi-ticker core classification matches single call
-4. **Per-ticker accuracy**: Verify routine operations results match individual calls
-5. **Real financial headlines**: Test with actual bank dividend/earnings headlines
-6. **Mixed routine results**: Headlines that are routine for some tickers, not others
-7. **Load testing**: Multiple concurrent multi-ticker requests
-
-Use actual test data from `2025-08-14_to_2025-08-18_classified_subset.json` if applicable.
-
-### Unit Test Requirements
-
-**Update**: `integration/README.md`
-
-Document:
-- Purpose of multi-ticker integration tests
-- Expected performance characteristics
-- How to interpret performance test results
-- When to run integration tests (not in CI, requires model download)
-
-Integration tests should be runnable with `pytest integration/test_multi_ticker_routine.py`.
-
-### Acceptance Criteria
-
-- [ ] Integration test file exists with comprehensive coverage
-- [ ] Performance test validates 40-50% time reduction for 3-ticker queries
-- [ ] Consistency test confirms core classification matches single-ticker results
-- [ ] Accuracy test confirms per-ticker routine results are correct
-- [ ] Real headline test uses production-like financial news data
-- [ ] All integration tests pass with real MNLS model
-- [ ] Integration test documentation updated
-- [ ] Performance results logged for benchmark tracking
-
-## Phase 5: Integration Test Updates
-
-### Description
-
-Update existing integration tests to validate that the new multi-ticker endpoint works correctly with real model inference, and extend the filter activation report to analyze multi-ticker scenarios. This phase ensures comprehensive test coverage using production data.
-
-### Core Functionality
-
-Integration test updates should:
-- Add multi-ticker tests to filter activation report
-- Validate multi-ticker endpoint with real MNLS model
-- Test performance improvements with actual timing measurements
+- Add multi-ticker analysis to filter activation report
 - Verify backward compatibility - existing tests still pass
-- Analyze filter behavior across multiple tickers for same headline
 
 ### Implementation Approach
 
@@ -438,15 +385,16 @@ Add analysis section to existing `test_filter_activation_report()`:
   - Average savings per multi-ticker headline: 5.6s
   ```
 
-**Create**: `integration/test_multi_ticker_routine.py` (from Phase 4)
+**Create**: `integration/test_multi_ticker_routine.py`
 
 Add comprehensive multi-ticker integration tests:
-1. **Multi-ticker consistency test**: Verify core classification identical across calls
-2. **Per-ticker accuracy test**: Verify routine results match individual calls
-3. **Performance benchmark test**: Measure actual time savings vs sequential calls
-4. **Real financial headlines test**: Test with production-like data
-5. **Mixed routine results test**: Headlines routine for some tickers, not others
-6. **Edge case tests**: Empty ticker list, duplicate tickers, invalid ticker formats
+1. **End-to-end multi-ticker test**: Real API call with 3 tickers, verify results
+2. **Performance comparison**: Time multi-ticker vs 3 sequential calls, assert improvement
+3. **Consistency validation**: Verify multi-ticker core classification matches single call
+4. **Per-ticker accuracy**: Verify routine operations results match individual calls
+5. **Real financial headlines**: Test with actual bank dividend/earnings headlines
+6. **Mixed routine results**: Headlines that are routine for some tickers, not others
+7. **Edge case tests**: Empty ticker list, duplicate tickers, invalid ticker formats
 
 **Update**: `integration/test_classification_integration.py`
 
@@ -463,12 +411,22 @@ Verify no regression when routine operations filter is active:
 - Performance overhead should not increase
 - Results should be consistent with/without routine operations filter
 
+**Update**: `integration/README.md`
+
+Document:
+- Purpose of multi-ticker integration tests
+- Expected performance characteristics
+- How to interpret performance test results
+- When to run integration tests (not in CI, requires model download)
+
 ### Unit Test Requirements
 
 No new unit tests required for integration test phase. Validation involves:
 - Running all existing integration tests to verify no regression
 - Running new multi-ticker integration tests with real model
 - Manual review of filter activation report output
+
+Integration tests should be runnable with `pytest integration/test_multi_ticker_routine.py`.
 
 ### Acceptance Criteria
 
@@ -482,8 +440,10 @@ No new unit tests required for integration test phase. Validation involves:
 - [ ] Existing integration tests in `test_filter_activation_report.py` pass unchanged
 - [ ] No performance regression in existing single-ticker endpoint tests
 - [ ] Multi-ticker report shows time savings vs sequential single-ticker calls
+- [ ] Integration test documentation updated
+- [ ] Performance results logged for benchmark tracking
 
-## Phase 6: Documentation and API Examples
+## Phase 5: Documentation and API Examples
 
 ### Description
 
