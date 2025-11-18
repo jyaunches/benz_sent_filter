@@ -385,7 +385,7 @@ Fields:
 - Confidence increases appropriately with strong pattern matches
 - All unit tests pass with 100% coverage on core detection logic
 
-### Phase 2: Materiality Assessment
+### Phase 2: Materiality Assessment [COMPLETED: b0b20f0]
 
 **Description**: Add company context integration and relative materiality calculations to filter immaterial transactions based on company scale.
 
