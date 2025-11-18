@@ -283,6 +283,7 @@ None - this is a new service class.
 - **Mocks**: No external dependencies in Phase 1 (no MNLS model, no API calls)
 - **Coverage Target**: 100% coverage on core detection logic
 - **Test Organization**: Group by pattern category (process, transaction, frequency) for clarity
+- **Model Structure**: `RoutineDetectionResult` Pydantic model with required Phase 1 fields (routine_score, confidence, detected_patterns, transaction_value, process_stage) and optional Phase 2 fields (materiality_score, materiality_ratio). Test that Phase 1 returns None for Phase 2 fields.
 
 ---
 

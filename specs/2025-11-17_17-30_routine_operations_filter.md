@@ -348,7 +348,7 @@ Fields:
 - Build scoring logic that aggregates pattern matches
 - Add dollar amount extraction utility with support for common formats ($XXM, $XXB, etc.)
 - Implement confidence calculation using formula from architecture design
-- Return structured result using **Pydantic model** for type safety and validation
+- Return structured result using **single Pydantic model (`RoutineDetectionResult`) with required Phase 1 fields and optional Phase 2 fields** (follows existing `ClassificationResult` pattern with optional company fields)
 
 **Unit Test Requirements**:
 - Test each pattern category independently (process, transaction type, frequency)
