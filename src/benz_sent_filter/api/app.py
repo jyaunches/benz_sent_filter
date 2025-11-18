@@ -50,9 +50,10 @@ async def classify_headline(request: ClassifyRequest):
 
     Returns boolean flags, temporal category, and all raw scores.
     Optionally includes company relevance when company parameter provided.
+    Optionally includes routine operation detection when company_symbol parameter provided.
     """
     result = app.state.classifier.classify_headline(
-        request.headline, company=request.company
+        request.headline, company=request.company, company_symbol=request.company_symbol
     )
     return result
 
@@ -63,8 +64,9 @@ async def classify_batch(request: BatchClassifyRequest):
 
     Returns array of classification results in same order as input.
     Optionally includes company relevance when company parameter provided.
+    Optionally includes routine operation detection when company_symbol parameter provided.
     """
     results = app.state.classifier.classify_batch(
-        request.headlines, company=request.company
+        request.headlines, company=request.company, company_symbol=request.company_symbol
     )
     return BatchClassificationResult(results=results)

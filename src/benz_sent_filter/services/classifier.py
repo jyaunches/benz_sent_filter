@@ -15,6 +15,7 @@ from benz_sent_filter.models.classification import (
     TemporalCategory,
 )
 from benz_sent_filter.services import forecast_analyzer
+from benz_sent_filter.services.routine_detector import RoutineOperationDetector
 
 # Named tuple for structured company relevance results
 CompanyRelevance = namedtuple("CompanyRelevance", ["is_relevant", "score"])
@@ -46,6 +47,7 @@ class ClassificationService:
             RuntimeError: If model fails to load
         """
         self._pipeline = pipeline("zero-shot-classification", model=MODEL_NAME)
+        self._routine_detector = RoutineOperationDetector()
 
     def _check_company_relevance(
         self, headline: str, company: str
@@ -92,17 +94,55 @@ class ClassificationService:
         else:
             return {"far_future_forecast": None, "forecast_timeframe": None}
 
+    def _analyze_routine_operation(
+        self, headline: str, company_symbol: str | None = None
+    ) -> dict:
+        """Analyze if headline describes a routine business operation.
+
+        Args:
+            headline: Headline text to analyze
+            company_symbol: Optional company ticker symbol for materiality assessment
+
+        Returns:
+            Dict with routine_operation, routine_confidence, and routine_metadata keys
+        """
+        # Detect routine operations
+        detection_result = self._routine_detector.detect(
+            headline, company_symbol=company_symbol
+        )
+
+        # Build metadata dict from detection result
+        metadata = {
+            "routine_score": detection_result.routine_score,
+            "detected_patterns": detection_result.detected_patterns,
+            "transaction_value": detection_result.transaction_value,
+            "process_stage": detection_result.process_stage,
+        }
+
+        # Add materiality fields if available
+        if detection_result.materiality_score is not None:
+            metadata["materiality_score"] = detection_result.materiality_score
+        if detection_result.materiality_ratio is not None:
+            metadata["materiality_ratio"] = detection_result.materiality_ratio
+
+        return {
+            "routine_operation": detection_result.result,
+            "routine_confidence": detection_result.confidence,
+            "routine_metadata": metadata,
+        }
+
     def classify_headline(
-        self, headline: str, company: str | None = None
+        self, headline: str, company: str | None = None, company_symbol: str | None = None
     ) -> ClassificationResult:
         """Classify a single headline.
 
         Args:
             headline: Headline text to classify
             company: Optional company name to check relevance
+            company_symbol: Optional company ticker symbol for materiality assessment
 
         Returns:
-            ClassificationResult with boolean flags, scores, and temporal category
+            ClassificationResult with boolean flags, scores, temporal category, and routine operation detection
 
         Raises:
             RuntimeError: If inference fails
@@ -142,6 +182,9 @@ class ClassificationService:
         # Analyze far-future patterns
         far_future_metadata = self._analyze_far_future(headline, temporal_category)
 
+        # Analyze routine operations
+        routine_metadata = self._analyze_routine_operation(headline, company_symbol)
+
         # Check company relevance if company provided
         if company is not None:
             relevance = self._check_company_relevance(headline, company)
@@ -156,6 +199,9 @@ class ClassificationService:
                 company=company,
                 far_future_forecast=far_future_metadata["far_future_forecast"],
                 forecast_timeframe=far_future_metadata["forecast_timeframe"],
+                routine_operation=routine_metadata["routine_operation"],
+                routine_confidence=routine_metadata["routine_confidence"],
+                routine_metadata=routine_metadata["routine_metadata"],
             )
         else:
             return ClassificationResult(
@@ -166,10 +212,13 @@ class ClassificationService:
                 headline=headline,
                 far_future_forecast=far_future_metadata["far_future_forecast"],
                 forecast_timeframe=far_future_metadata["forecast_timeframe"],
+                routine_operation=routine_metadata["routine_operation"],
+                routine_confidence=routine_metadata["routine_confidence"],
+                routine_metadata=routine_metadata["routine_metadata"],
             )
 
     def classify_batch(
-        self, headlines: list[str], company: str | None = None
+        self, headlines: list[str], company: str | None = None, company_symbol: str | None = None
     ) -> list[ClassificationResult]:
         """Classify multiple headlines.
 
@@ -179,10 +228,11 @@ class ClassificationService:
         Args:
             headlines: List of headline texts to classify
             company: Optional company name to check relevance for all headlines
+            company_symbol: Optional company ticker symbol for materiality assessment
 
         Returns:
             List of ClassificationResult objects in same order as input
         """
         return [
-            self.classify_headline(headline, company=company) for headline in headlines
+            self.classify_headline(headline, company=company, company_symbol=company_symbol) for headline in headlines
         ]
