@@ -2,7 +2,7 @@
 
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class TemporalCategory(str, Enum):
@@ -155,12 +155,38 @@ class RoutineOperationResult(BaseModel):
 
 
 class MultiTickerRoutineRequest(BaseModel):
-    """Request model for multi-ticker routine operations endpoint."""
+    """Request model for multi-ticker routine operations endpoint.
+
+    Accepts either:
+    - ticker_symbols: list[str] for multi-ticker queries
+    - company_symbol: str for single-ticker queries (backward compatibility)
+    """
 
     headline: str = Field(..., min_length=1, description="Headline text to classify")
-    ticker_symbols: list[str] = Field(
-        ..., description="List of ticker symbols to analyze routine operations for"
+    ticker_symbols: list[str] | None = Field(
+        default=None, description="List of ticker symbols to analyze routine operations for"
     )
+    company_symbol: str | None = Field(
+        default=None, description="Single ticker symbol (converted to ticker_symbols internally)"
+    )
+
+    @model_validator(mode='after')
+    def validate_ticker_input(self):
+        """Ensure either ticker_symbols or company_symbol is provided.
+
+        If company_symbol is provided, convert it to ticker_symbols.
+        """
+        if self.ticker_symbols is None and self.company_symbol is None:
+            raise ValueError("Either ticker_symbols or company_symbol must be provided")
+
+        if self.company_symbol is not None and self.ticker_symbols is None:
+            # Convert single company_symbol to ticker_symbols array
+            self.ticker_symbols = [self.company_symbol]
+
+        if self.ticker_symbols is not None and len(self.ticker_symbols) == 0:
+            raise ValueError("ticker_symbols cannot be empty")
+
+        return self
 
 
 class MultiTickerRoutineResponse(BaseModel):
