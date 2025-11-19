@@ -1,0 +1,3392 @@
+[
+  {
+    "eval_id": "benzinga_47123528_FLO",
+    "prompt_context": {
+      "title": "A Look Ahead: Flowers Foods&#39;s Earnings Forecast",
+      "published_time": "2025-08-14T14:00:24+00:00",
+      "ticker_symbols": [
+        "FLO"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [
+        "BZI-EP"
+      ],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 0.97,
+      "minutes_to_peak": 324,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 16.47,
+      "peak_price": 16.63,
+      "bottom_price": null,
+      "baseline_volume": 3189500,
+      "peak_volume": null,
+      "average_volume": 3189500,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -0.8,
+      "move_after_article_pct": 1,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:29:14.388011+00:00",
+      "cassette_available": false,
+      "tags": [
+        "BZI-EP"
+      ],
+      "channels": [
+        "Earnings"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "FLO",
+        "gt_actual_movement": "NEUTRAL",
+        "predicted_sentiment": "NEGATIVE",
+        "confusion_category": "False Negative",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47123967_XOS",
+    "prompt_context": {
+      "title": "Xos Files For Offering Of Up To $5.4M Common Stock",
+      "published_time": "2025-08-14T14:07:55+00:00",
+      "ticker_symbols": [
+        "XOS"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -31.29,
+      "minutes_to_peak": 292,
+      "pattern_type": "gradual_decline",
+      "baseline_price": 4.57,
+      "peak_price": 3.14,
+      "bottom_price": null,
+      "baseline_volume": 23666809,
+      "peak_volume": null,
+      "average_volume": 23666809,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40208333333333335
+      },
+      "move_before_article_pct": 11.7,
+      "move_after_article_pct": -31.3,
+      "peak_was_before_article": false,
+      "article_timing_category": "during_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:28:32.896352+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News",
+        "Offerings"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "XOS",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "NEGATIVE",
+        "confusion_category": "True Negative",
+        "is_correct": true,
+        "timing_category": "during_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47124646_BMRA",
+    "prompt_context": {
+      "title": "Reported Earlier: Biomerica&#39;s 10-Minute H. Pylori Home Test Approved In UAE",
+      "published_time": "2025-08-14T14:19:00+00:00",
+      "ticker_symbols": [
+        "BMRA"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 16.84,
+      "minutes_to_peak": 32,
+      "pattern_type": "moderate_delay_fade",
+      "baseline_price": 3.8,
+      "peak_price": 4.44,
+      "bottom_price": null,
+      "baseline_volume": 39637736,
+      "peak_volume": null,
+      "average_volume": 39637736,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40208333333333335
+      },
+      "move_before_article_pct": -9.5,
+      "move_after_article_pct": 16.8,
+      "peak_was_before_article": false,
+      "article_timing_category": "during_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:28:20.943266+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "Biotech",
+        "News",
+        "Global",
+        "General"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "BMRA",
+        "gt_actual_movement": "GAINER",
+        "predicted_sentiment": "POSITIVE",
+        "confusion_category": "True Positive",
+        "is_correct": true,
+        "timing_category": "during_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47124661_TGT",
+    "prompt_context": {
+      "title": "Target And Ulta Beauty Shares Fall Following Termination Of Retail Partnership: What Investors Need To Know",
+      "published_time": "2025-08-14T14:19:35+00:00",
+      "ticker_symbols": [
+        "TGT",
+        "ULTA"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 1.57,
+      "minutes_to_peak": 339,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 102.7,
+      "peak_price": 104.31,
+      "bottom_price": null,
+      "baseline_volume": 4985800,
+      "peak_volume": null,
+      "average_volume": 4985800,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -1.1,
+      "move_after_article_pct": 1.6,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:28:18.795990+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "TGT",
+        "gt_actual_movement": "GAINER",
+        "predicted_sentiment": "NEGATIVE",
+        "confusion_category": "False Negative",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47124718_DE",
+    "prompt_context": {
+      "title": "During Conf Call, Deere Exec Reportedly Says Tariff Costs During Q3 Were About $200M; Forecast For Pre Tariff Impact Of Tariff In 2025 Is Now Nearly $600M",
+      "published_time": "2025-08-14T14:20:57+00:00",
+      "ticker_symbols": [
+        "DE"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -2.1,
+      "minutes_to_peak": 74,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 480.57,
+      "peak_price": 470.48,
+      "bottom_price": null,
+      "baseline_volume": 5100701,
+      "peak_volume": null,
+      "average_volume": 5100701,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -0.9,
+      "move_after_article_pct": -2.1,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:28:12.221545+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News",
+        "Guidance",
+        "Politics",
+        "General"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "DE",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "NEGATIVE",
+        "confusion_category": "True Negative",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47124908_AI",
+    "prompt_context": {
+      "title": "As A Dire Revenue Warning Roils C3.ai Stock, The Company&#39;s Search For New Leadership Captures Investor Attention",
+      "published_time": "2025-08-14T14:24:59+00:00",
+      "ticker_symbols": [
+        "AI"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -1.67,
+      "minutes_to_peak": 109,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 17.96,
+      "peak_price": 17.66,
+      "bottom_price": null,
+      "baseline_volume": 12387200,
+      "peak_volume": null,
+      "average_volume": 12387200,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -1.3,
+      "move_after_article_pct": -1.7,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:28:08.498680+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "AI",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "NEGATIVE",
+        "confusion_category": "True Negative",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47125049_DE",
+    "prompt_context": {
+      "title": "During Conference Call, Deere Exec Reportedly Says More Uncertainty In North American Agricultural Market Now; Will Continue To Run Factories Lean",
+      "published_time": "2025-08-14T14:29:05+00:00",
+      "ticker_symbols": [
+        "DE"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 1.49,
+      "minutes_to_peak": 232,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 475.26,
+      "peak_price": 482.34,
+      "bottom_price": null,
+      "baseline_volume": 5100701,
+      "peak_volume": null,
+      "average_volume": 5100701,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -2,
+      "move_after_article_pct": 1.5,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:28:04.565593+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News",
+        "General"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "DE",
+        "gt_actual_movement": "GAINER",
+        "predicted_sentiment": "NEGATIVE",
+        "confusion_category": "False Negative",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47127893_NU",
+    "prompt_context": {
+      "title": "Public Investment Fund Dissolves Share Stake In Nu Holdings",
+      "published_time": "2025-08-14T15:24:50+00:00",
+      "ticker_symbols": [
+        "NU"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -2.22,
+      "minutes_to_peak": 260,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 12.16,
+      "peak_price": 11.89,
+      "bottom_price": null,
+      "baseline_volume": 62405900,
+      "peak_volume": null,
+      "average_volume": 62405900,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -0.9,
+      "move_after_article_pct": -2.2,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:26:34.183969+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "NU",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "NEGATIVE",
+        "confusion_category": "True Negative",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47127919_PINS",
+    "prompt_context": {
+      "title": "Public Investment Fund Cuts Share Stake In Pinterest Inc By 94.9% To 209,992 Class A Shares",
+      "published_time": "2025-08-14T15:26:02+00:00",
+      "ticker_symbols": [
+        "PINS"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 2.3,
+      "minutes_to_peak": 272,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 35.58,
+      "peak_price": 36.4,
+      "bottom_price": null,
+      "baseline_volume": 10089500,
+      "peak_volume": null,
+      "average_volume": 10089500,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 0.4,
+      "move_after_article_pct": 2.3,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:26:32.820450+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "PINS",
+        "gt_actual_movement": "GAINER",
+        "predicted_sentiment": "NEGATIVE",
+        "confusion_category": "False Negative",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47128136_SHOP",
+    "prompt_context": {
+      "title": "Public Investment Fund Dissolves Share Stake In Shopify Inc",
+      "published_time": "2025-08-14T15:31:14+00:00",
+      "ticker_symbols": [
+        "SHOP"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 1.45,
+      "minutes_to_peak": 145,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 143.66,
+      "peak_price": 145.75,
+      "bottom_price": null,
+      "baseline_volume": 9499700,
+      "peak_volume": null,
+      "average_volume": 9499700,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -3.2,
+      "move_after_article_pct": 1.5,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:26:21.984492+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "SHOP",
+        "gt_actual_movement": "GAINER",
+        "predicted_sentiment": "NEGATIVE",
+        "confusion_category": "False Negative",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47128628_DASH",
+    "prompt_context": {
+      "title": "Public Investment Fund Dissolves Share Stake In DoorDash; Dissolves Share Stake In Zoetis",
+      "published_time": "2025-08-14T15:44:05+00:00",
+      "ticker_symbols": [
+        "DASH",
+        "ZTS"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -1.1,
+      "minutes_to_peak": 253,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 249.92,
+      "peak_price": 247.16,
+      "bottom_price": null,
+      "baseline_volume": 3433600,
+      "peak_volume": null,
+      "average_volume": 3433600,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -1.5,
+      "move_after_article_pct": -1.1,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:26:10.598632+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "DASH",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "NEGATIVE",
+        "confusion_category": "True Negative",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47128628_ZTS",
+    "prompt_context": {
+      "title": "Public Investment Fund Dissolves Share Stake In DoorDash; Dissolves Share Stake In Zoetis",
+      "published_time": "2025-08-14T15:44:05+00:00",
+      "ticker_symbols": [
+        "DASH",
+        "ZTS"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -0.88,
+      "minutes_to_peak": 101,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 152.75,
+      "peak_price": 151.41,
+      "bottom_price": null,
+      "baseline_volume": 2565197,
+      "peak_volume": null,
+      "average_volume": 2565197,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 0.8,
+      "move_after_article_pct": -0.9,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:26:12.136439+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "DASH",
+        "gt_actual_movement": "NEUTRAL",
+        "predicted_sentiment": "NEGATIVE",
+        "confusion_category": "False Negative",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47129237_ATNF",
+    "prompt_context": {
+      "title": "180 Life Sciences Enters $500M At-the-Market Sales Agreement With Clear Street",
+      "published_time": "2025-08-14T15:58:30+00:00",
+      "ticker_symbols": [
+        "ATNF"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 9.93,
+      "minutes_to_peak": 237,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 7.05,
+      "peak_price": 7.75,
+      "bottom_price": null,
+      "baseline_volume": 26736500,
+      "peak_volume": null,
+      "average_volume": 26736500,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -11.8,
+      "move_after_article_pct": 9.9,
+      "peak_was_before_article": false,
+      "article_timing_category": "during_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:25:46.062344+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News",
+        "Offerings"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "ATNF",
+        "gt_actual_movement": "GAINER",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "False Neutral",
+        "is_correct": true,
+        "timing_category": "during_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47129579_MSFT",
+    "prompt_context": {
+      "title": "&#39;Microsoft Is Getting Ready To Return To The Office; Most Microsoft Employees Are Going To Have To Return At Least Three Days A Week&#39; - The Verge",
+      "published_time": "2025-08-14T16:06:14+00:00",
+      "ticker_symbols": [
+        "MSFT"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -0.59,
+      "minutes_to_peak": 169,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 523.21,
+      "peak_price": 520.14,
+      "bottom_price": null,
+      "baseline_volume": 20269100,
+      "peak_volume": null,
+      "average_volume": 20269100,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 0.1,
+      "move_after_article_pct": -0.6,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:25:34.994532+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News",
+        "Management"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "MSFT",
+        "gt_actual_movement": "NEUTRAL",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "True Neutral",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47133435_AZN",
+    "prompt_context": {
+      "title": "White House Eyes Up to 250% Drug Tariffs In Bid To Reclaim US Pharma Supply Chain",
+      "published_time": "2025-08-14T17:50:18+00:00",
+      "ticker_symbols": [
+        "AZN"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [
+        "Stories That Matter",
+        "tariffs"
+      ],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 0.4,
+      "minutes_to_peak": 125,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 78.27,
+      "peak_price": 78.58,
+      "bottom_price": null,
+      "baseline_volume": 5718232,
+      "peak_volume": null,
+      "average_volume": 5718232,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 0.6,
+      "move_after_article_pct": 0.4,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:22:41.693015+00:00",
+      "cassette_available": false,
+      "tags": [
+        "Stories That Matter",
+        "tariffs"
+      ],
+      "channels": [
+        "Biotech",
+        "Government",
+        "Large Cap",
+        "News",
+        "Health Care",
+        "Politics",
+        "General"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "AZN",
+        "gt_actual_movement": "NEUTRAL",
+        "predicted_sentiment": "NEGATIVE",
+        "confusion_category": "False Negative",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47134698_BULL",
+    "prompt_context": {
+      "title": "Tiger Global Management Takes Stake In Webull Corp Of 11,724,137, Takes Stake In eToro Group Ltd Of 80,000",
+      "published_time": "2025-08-14T18:33:16+00:00",
+      "ticker_symbols": [
+        "BULL",
+        "TORO"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 3.8,
+      "minutes_to_peak": 34,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 15.26,
+      "peak_price": 15.84,
+      "bottom_price": null,
+      "baseline_volume": 10043845,
+      "peak_volume": null,
+      "average_volume": 10043845,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 2.9,
+      "move_after_article_pct": 3.8,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:21:47.907937+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News",
+        "Hedge Funds",
+        "General"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "BULL",
+        "gt_actual_movement": "GAINER",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "False Neutral",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47135442_AMD",
+    "prompt_context": {
+      "title": "Kevin O&#39;Leary Says Nvidia, AMD Still Win Under Trump China Plan Despite 15% &#39;Form Of Blackmail&#39; Levy",
+      "published_time": "2025-08-14T19:01:00+00:00",
+      "ticker_symbols": [
+        "AMD",
+        "NVDA"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [
+        "China",
+        "Donald Trump",
+        "Huawei",
+        "Kevin O'Leary",
+        "Peter Schiff",
+        "semiconductors"
+      ],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 0.5,
+      "minutes_to_peak": 47,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 180.62,
+      "peak_price": 181.52,
+      "bottom_price": null,
+      "baseline_volume": 66308821,
+      "peak_volume": null,
+      "average_volume": 66308821,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 0.4,
+      "move_after_article_pct": 0.5,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:21:19.224887+00:00",
+      "cassette_available": false,
+      "tags": [
+        "China",
+        "Donald Trump",
+        "Huawei",
+        "Kevin O'Leary",
+        "Peter Schiff",
+        "semiconductors"
+      ],
+      "channels": [
+        "Asia",
+        "Government",
+        "Global",
+        "Tech"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "AMD",
+        "gt_actual_movement": "NEUTRAL",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "True Neutral",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47135442_NVDA",
+    "prompt_context": {
+      "title": "Kevin O&#39;Leary Says Nvidia, AMD Still Win Under Trump China Plan Despite 15% &#39;Form Of Blackmail&#39; Levy",
+      "published_time": "2025-08-14T19:01:00+00:00",
+      "ticker_symbols": [
+        "AMD",
+        "NVDA"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [
+        "China",
+        "Donald Trump",
+        "Huawei",
+        "Kevin O'Leary",
+        "Peter Schiff",
+        "semiconductors"
+      ],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -0.16,
+      "minutes_to_peak": 12,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 181.99,
+      "peak_price": 181.7,
+      "bottom_price": null,
+      "baseline_volume": 129554000,
+      "peak_volume": null,
+      "average_volume": 129554000,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 1.2,
+      "move_after_article_pct": -0.2,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:21:19.736456+00:00",
+      "cassette_available": false,
+      "tags": [
+        "China",
+        "Donald Trump",
+        "Huawei",
+        "Kevin O'Leary",
+        "Peter Schiff",
+        "semiconductors"
+      ],
+      "channels": [
+        "Asia",
+        "Government",
+        "Global",
+        "Tech"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "AMD",
+        "gt_actual_movement": "NEUTRAL",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "True Neutral",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47136503_XPON",
+    "prompt_context": {
+      "title": "Expion360 Slashes Warrant Exercise Prices To $1.31 In Inducement Deal Aimed At Raising Cash And Streamlining Capital Structure",
+      "published_time": "2025-08-14T19:34:39+00:00",
+      "ticker_symbols": [
+        "XPON"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -26.89,
+      "minutes_to_peak": 18,
+      "pattern_type": "immediate_crash",
+      "baseline_price": 2.64,
+      "peak_price": 1.93,
+      "bottom_price": null,
+      "baseline_volume": 390916406,
+      "peak_volume": null,
+      "average_volume": 390916406,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.39791666666666664
+      },
+      "move_before_article_pct": -27.9,
+      "move_after_article_pct": -26.9,
+      "peak_was_before_article": false,
+      "article_timing_category": "during_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:20:52.410091+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News",
+        "Offerings"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "XPON",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "False Neutral",
+        "is_correct": true,
+        "timing_category": "during_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47136742_RBLX",
+    "prompt_context": {
+      "title": "&#39;Attorney General Files Child Protection Lawsuit Against Roblox; Attorney General Liz Murrill&#39;s Office Announced It Has Sued A Popular Gaming Site As An Effort To Protect Louisiana Children Online&#39; - WAFB9",
+      "published_time": "2025-08-14T19:43:30+00:00",
+      "ticker_symbols": [
+        "RBLX"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -0.71,
+      "minutes_to_peak": 12,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 125.88,
+      "peak_price": 124.98,
+      "bottom_price": null,
+      "baseline_volume": 6504200,
+      "peak_volume": null,
+      "average_volume": 6504200,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -0.8,
+      "move_after_article_pct": -0.7,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:20:50.566394+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News",
+        "Legal"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "RBLX",
+        "gt_actual_movement": "NEUTRAL",
+        "predicted_sentiment": "NEGATIVE",
+        "confusion_category": "False Negative",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47155459_PANW",
+    "prompt_context": {
+      "title": "A Preview Of Palo Alto Networks&#39;s Earnings",
+      "published_time": "2025-08-15T14:00:25+00:00",
+      "ticker_symbols": [
+        "PANW"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [
+        "BZI-EP"
+      ],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 1.62,
+      "minutes_to_peak": 356,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 174.52,
+      "peak_price": 177.35,
+      "bottom_price": null,
+      "baseline_volume": 9548600,
+      "peak_volume": null,
+      "average_volume": 9548600,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 0.1,
+      "move_after_article_pct": 1.6,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:57:13.769955+00:00",
+      "cassette_available": false,
+      "tags": [
+        "BZI-EP"
+      ],
+      "channels": [
+        "Earnings"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "PANW",
+        "gt_actual_movement": "GAINER",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "False Neutral",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47155495_BHP",
+    "prompt_context": {
+      "title": "A Peek at BHP Group&#39;s Future Earnings",
+      "published_time": "2025-08-15T14:00:36+00:00",
+      "ticker_symbols": [
+        "BHP"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [
+        "BZI-EP"
+      ],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -1.19,
+      "minutes_to_peak": 258,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 54.69,
+      "peak_price": 54.04,
+      "bottom_price": null,
+      "baseline_volume": 2541325,
+      "peak_volume": null,
+      "average_volume": 2541325,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 0.1,
+      "move_after_article_pct": -1.2,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:57:10.456423+00:00",
+      "cassette_available": false,
+      "tags": [
+        "BZI-EP"
+      ],
+      "channels": [
+        "Earnings"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "BHP",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "False Neutral",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47155540_BTDR",
+    "prompt_context": {
+      "title": "Bitdeer Technologies Earnings Preview",
+      "published_time": "2025-08-15T14:01:03+00:00",
+      "ticker_symbols": [
+        "BTDR"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [
+        "BZI-EP"
+      ],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 2.49,
+      "minutes_to_peak": 269,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 13.24,
+      "peak_price": 13.57,
+      "bottom_price": null,
+      "baseline_volume": 2788949,
+      "peak_volume": null,
+      "average_volume": 2788949,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40520833333333334
+      },
+      "move_before_article_pct": -4.3,
+      "move_after_article_pct": 2.5,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:57:03.808540+00:00",
+      "cassette_available": false,
+      "tags": [
+        "BZI-EP"
+      ],
+      "channels": [
+        "Earnings"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "BTDR",
+        "gt_actual_movement": "GAINER",
+        "predicted_sentiment": "NEGATIVE",
+        "confusion_category": "False Negative",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47155563_XP",
+    "prompt_context": {
+      "title": "XP&#39;s Earnings: A Preview",
+      "published_time": "2025-08-15T14:01:17+00:00",
+      "ticker_symbols": [
+        "XP"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [
+        "BZI-EP"
+      ],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -1.3,
+      "minutes_to_peak": 182,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 17.65,
+      "peak_price": 17.42,
+      "bottom_price": null,
+      "baseline_volume": 3645305,
+      "peak_volume": null,
+      "average_volume": 3645305,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 0.9,
+      "move_after_article_pct": -1.3,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:57:01.755358+00:00",
+      "cassette_available": false,
+      "tags": [
+        "BZI-EP"
+      ],
+      "channels": [
+        "Earnings"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "XP",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "False Neutral",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47155697_COIN",
+    "prompt_context": {
+      "title": "Coinbase&#39;s Subsidiary Deribit Launches New Linear Options Contracts For BTC And ETH, Priced And Settled In USDC, Effective August 19",
+      "published_time": "2025-08-15T14:03:51+00:00",
+      "ticker_symbols": [
+        "COIN"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -1.6,
+      "minutes_to_peak": 136,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 319.74,
+      "peak_price": 314.61,
+      "bottom_price": null,
+      "baseline_volume": 7881210,
+      "peak_volume": null,
+      "average_volume": 7881210,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -1,
+      "move_after_article_pct": -1.6,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:56:53.474098+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "COIN",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "False Neutral",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47156871_UAVS",
+    "prompt_context": {
+      "title": "AgEagle Aerial Sys Q2 EPS $(0.32) Up From $(12.06) YoY, Sales $4.198M Up From $3.393M YoY",
+      "published_time": "2025-08-15T14:29:19+00:00",
+      "ticker_symbols": [
+        "UAVS"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -2.4,
+      "minutes_to_peak": 329,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 2.08,
+      "peak_price": 2.03,
+      "bottom_price": null,
+      "baseline_volume": 7473313,
+      "peak_volume": null,
+      "average_volume": 7473313,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.4
+      },
+      "move_before_article_pct": -3.3,
+      "move_after_article_pct": -2.4,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:56:28.680555+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "Earnings",
+        "News"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "UAVS",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "POSITIVE",
+        "confusion_category": "False Positive",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47158202_PFE",
+    "prompt_context": {
+      "title": "&#39;Pfizer Provides Update on Phase 3 Inclacumab Study for the Treatment of People with Sickle Cell Disease&#39;-Pfizer",
+      "published_time": "2025-08-15T15:00:31+00:00",
+      "ticker_symbols": [
+        "PFE"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -0.56,
+      "minutes_to_peak": 62,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 25.14,
+      "peak_price": 25,
+      "bottom_price": null,
+      "baseline_volume": 31844848,
+      "peak_volume": null,
+      "average_volume": 31844848,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -0.3,
+      "move_after_article_pct": -0.6,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:55:55.806334+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "Biotech",
+        "News",
+        "General"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "PFE",
+        "gt_actual_movement": "NEUTRAL",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "True Neutral",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47159013_GNS",
+    "prompt_context": {
+      "title": "Genius Group CEO Roger James Hamilton Posts On X &#34;Join us on X for a $GNS legal update with @JWesChristian @BasileEsq @Malone_Wealth to hear the positive developments in Genius Group&#39;s market manipulation case &amp; RICO case, together with progress on legal cases of small cap public companies and their shareholders vs market...&#34;",
+      "published_time": "2025-08-15T15:16:17+00:00",
+      "ticker_symbols": [
+        "GNS"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -8.49,
+      "minutes_to_peak": 262,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 1.06,
+      "peak_price": 0.97,
+      "bottom_price": null,
+      "baseline_volume": 2889800,
+      "peak_volume": null,
+      "average_volume": 2889800,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.34791666666666665
+      },
+      "move_before_article_pct": 9.3,
+      "move_after_article_pct": -8.5,
+      "peak_was_before_article": false,
+      "article_timing_category": "during_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:55:32.874545+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "GNS",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "POSITIVE",
+        "confusion_category": "False Positive",
+        "is_correct": false,
+        "timing_category": "during_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47159217_DIS",
+    "prompt_context": {
+      "title": "&#39;New ESPN App to Feature Heavy Betting Integration&#39;- Front Office Sports",
+      "published_time": "2025-08-15T15:20:40+00:00",
+      "ticker_symbols": [
+        "DIS",
+        "PENN"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -1.11,
+      "minutes_to_peak": 275,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 116.49,
+      "peak_price": 115.2,
+      "bottom_price": null,
+      "baseline_volume": 6768603,
+      "peak_volume": null,
+      "average_volume": 6768603,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -0.1,
+      "move_after_article_pct": -1.1,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:55:30.171219+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News",
+        "General"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "DIS",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "POSITIVE",
+        "confusion_category": "False Positive",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47159217_PENN",
+    "prompt_context": {
+      "title": "&#39;New ESPN App to Feature Heavy Betting Integration&#39;- Front Office Sports",
+      "published_time": "2025-08-15T15:20:40+00:00",
+      "ticker_symbols": [
+        "DIS",
+        "PENN"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 2.06,
+      "minutes_to_peak": 262,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 17.93,
+      "peak_price": 18.3,
+      "bottom_price": null,
+      "baseline_volume": 5141943,
+      "peak_volume": null,
+      "average_volume": 5141943,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -1.4,
+      "move_after_article_pct": 2.1,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:55:30.826051+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News",
+        "General"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "DIS",
+        "gt_actual_movement": "GAINER",
+        "predicted_sentiment": "POSITIVE",
+        "confusion_category": "True Positive",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47160088_DKNG",
+    "prompt_context": {
+      "title": "DraftKings Announce It Has Secured Direct Mobile Sports Betting License To Operate in Missouri",
+      "published_time": "2025-08-15T15:39:19+00:00",
+      "ticker_symbols": [
+        "DKNG"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -1.17,
+      "minutes_to_peak": 255,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 45.35,
+      "peak_price": 44.82,
+      "bottom_price": null,
+      "baseline_volume": 9604112,
+      "peak_volume": null,
+      "average_volume": 9604112,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 4.4,
+      "move_after_article_pct": -1.2,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:55:22.582955+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "DKNG",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "POSITIVE",
+        "confusion_category": "False Positive",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47161139_BAX",
+    "prompt_context": {
+      "title": "Correction Issued for the Novum IQ Large Volume Pumps, Syringe Pumps",
+      "published_time": "2025-08-15T16:15:17+00:00",
+      "ticker_symbols": [
+        "BAX"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -0.37,
+      "minutes_to_peak": 116,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 24.13,
+      "peak_price": 24.04,
+      "bottom_price": null,
+      "baseline_volume": 7713547,
+      "peak_volume": null,
+      "average_volume": 7713547,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -2.2,
+      "move_after_article_pct": -0.4,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:54:57.481335+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News",
+        "FDA",
+        "General"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "BAX",
+        "gt_actual_movement": "NEUTRAL",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "True Neutral",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47162646_MTCH",
+    "prompt_context": {
+      "title": "Match Group To Pay $14 Million In FTC Settlement Over Deceptive Practices",
+      "published_time": "2025-08-15T17:04:19+00:00",
+      "ticker_symbols": [
+        "MTCH"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [
+        "Stories That Matter"
+      ],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -1.52,
+      "minutes_to_peak": 174,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 38.86,
+      "peak_price": 38.27,
+      "bottom_price": null,
+      "baseline_volume": 3219630,
+      "peak_volume": null,
+      "average_volume": 3219630,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -0.3,
+      "move_after_article_pct": -1.5,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:54:07.704041+00:00",
+      "cassette_available": false,
+      "tags": [
+        "Stories That Matter"
+      ],
+      "channels": [
+        "News",
+        "Legal",
+        "General"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "MTCH",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "NEGATIVE",
+        "confusion_category": "True Negative",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47164748_DUK",
+    "prompt_context": {
+      "title": "Duke Energy Submits Final License Application To FERC For Bad Creek Hydroelectric Station In S.C., Seeking 50-Year Operational Extension",
+      "published_time": "2025-08-15T18:18:47+00:00",
+      "ticker_symbols": [
+        "DUK"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -0.38,
+      "minutes_to_peak": 91,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 122.4,
+      "peak_price": 121.93,
+      "bottom_price": null,
+      "baseline_volume": 4024737,
+      "peak_volume": null,
+      "average_volume": 4024737,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -0.9,
+      "move_after_article_pct": -0.4,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:52:04.403220+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "DUK",
+        "gt_actual_movement": "NEUTRAL",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "True Neutral",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47165265_BHC",
+    "prompt_context": {
+      "title": "Paulson Capital Boosts Stake In Bausch Health, Now Holds 19.13% Of Outstanding Shares",
+      "published_time": "2025-08-15T18:40:57+00:00",
+      "ticker_symbols": [
+        "BHC",
+        "BHC"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 3.3,
+      "minutes_to_peak": 43,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 8.19,
+      "peak_price": 8.46,
+      "bottom_price": null,
+      "baseline_volume": 9182300,
+      "peak_volume": null,
+      "average_volume": 9182300,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 3,
+      "move_after_article_pct": 3.3,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T22:51:57.532382+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "BHC",
+        "gt_actual_movement": "GAINER",
+        "predicted_sentiment": "POSITIVE",
+        "confusion_category": "True Positive",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47184652_MSFT",
+    "prompt_context": {
+      "title": "Microsoft Opens &#39;Urgent&#39; Probe Over Claims Israeli Military Used Its Tech To Monitor Palestinians",
+      "published_time": "2025-08-18T13:37:38+00:00",
+      "ticker_symbols": [
+        "MSFT"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -1.54,
+      "minutes_to_peak": 362,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 522.07,
+      "peak_price": 514.03,
+      "bottom_price": null,
+      "baseline_volume": 23760600,
+      "peak_volume": null,
+      "average_volume": 23760600,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 0.1,
+      "move_after_article_pct": -1.5,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:25:29.600485+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "Government",
+        "News",
+        "Politics",
+        "Tech"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "MSFT",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "False Neutral",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47185202_KLTO",
+    "prompt_context": {
+      "title": "Klotho Neurosciences Q2 EPS $(0.12) Down From $(0.03) YoY",
+      "published_time": "2025-08-18T13:50:11+00:00",
+      "ticker_symbols": [
+        "KLTO"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -15.35,
+      "minutes_to_peak": 365,
+      "pattern_type": "gradual_decline",
+      "baseline_price": 0.91,
+      "peak_price": 0.7703,
+      "bottom_price": null,
+      "baseline_volume": 3798342,
+      "peak_volume": null,
+      "average_volume": 3798342,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40520833333333334
+      },
+      "move_before_article_pct": 4.6,
+      "move_after_article_pct": -15.4,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:25:18.362825+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "Earnings",
+        "News"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "KLTO",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "NEGATIVE",
+        "confusion_category": "True Negative",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47185699_MDT",
+    "prompt_context": {
+      "title": "Insights Ahead: Medtronic&#39;s Quarterly Earnings",
+      "published_time": "2025-08-18T14:00:35+00:00",
+      "ticker_symbols": [
+        "MDT"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [
+        "BZI-EP"
+      ],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -0.53,
+      "minutes_to_peak": 351,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 93,
+      "peak_price": 92.51,
+      "bottom_price": null,
+      "baseline_volume": 11581800,
+      "peak_volume": null,
+      "average_volume": 11581800,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 0.2,
+      "move_after_article_pct": -0.5,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:24:56.841029+00:00",
+      "cassette_available": false,
+      "tags": [
+        "BZI-EP"
+      ],
+      "channels": [
+        "Earnings"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "MDT",
+        "gt_actual_movement": "NEUTRAL",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "True Neutral",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47185736_HD",
+    "prompt_context": {
+      "title": "Home Depot&#39;s Earnings Outlook",
+      "published_time": "2025-08-18T14:00:48+00:00",
+      "ticker_symbols": [
+        "HD"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [
+        "BZI-EP"
+      ],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -0.49,
+      "minutes_to_peak": 351,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 395.57,
+      "peak_price": 393.62,
+      "bottom_price": null,
+      "baseline_volume": 4407109,
+      "peak_volume": null,
+      "average_volume": 4407109,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40520833333333334
+      },
+      "move_before_article_pct": -0.3,
+      "move_after_article_pct": -0.5,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:24:55.913345+00:00",
+      "cassette_available": false,
+      "tags": [
+        "BZI-EP"
+      ],
+      "channels": [
+        "Earnings"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "HD",
+        "gt_actual_movement": "NEUTRAL",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "True Neutral",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47185760_ZTO",
+    "prompt_context": {
+      "title": "Uncovering Potential: ZTO Express (Cayman)&#39;s Earnings Preview",
+      "published_time": "2025-08-18T14:01:01+00:00",
+      "ticker_symbols": [
+        "ZTO"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [
+        "BZI-EP"
+      ],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -1.37,
+      "minutes_to_peak": 89,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 20.37,
+      "peak_price": 20.09,
+      "bottom_price": null,
+      "baseline_volume": 4140900,
+      "peak_volume": null,
+      "average_volume": 4140900,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -1.1,
+      "move_after_article_pct": -1.4,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:24:54.976510+00:00",
+      "cassette_available": false,
+      "tags": [
+        "BZI-EP"
+      ],
+      "channels": [
+        "Earnings"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "ZTO",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "False Neutral",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47185835_AS",
+    "prompt_context": {
+      "title": "A Peek at Amer Sports&#39;s Future Earnings",
+      "published_time": "2025-08-18T14:02:11+00:00",
+      "ticker_symbols": [
+        "AS"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [
+        "BZI-EP"
+      ],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -2.71,
+      "minutes_to_peak": 241,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 38.03,
+      "peak_price": 37,
+      "bottom_price": null,
+      "baseline_volume": 7103500,
+      "peak_volume": null,
+      "average_volume": 7103500,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -2.4,
+      "move_after_article_pct": -2.7,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:24:37.741113+00:00",
+      "cassette_available": false,
+      "tags": [
+        "BZI-EP"
+      ],
+      "channels": [
+        "Earnings"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "AS",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "False Neutral",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47185846_JHX",
+    "prompt_context": {
+      "title": "James Hardie Industries Earnings Preview",
+      "published_time": "2025-08-18T14:02:22+00:00",
+      "ticker_symbols": [
+        "JHX"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [
+        "BZI-EP"
+      ],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -2.04,
+      "minutes_to_peak": 356,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 29.48,
+      "peak_price": 28.88,
+      "bottom_price": null,
+      "baseline_volume": 6526400,
+      "peak_volume": null,
+      "average_volume": 6526400,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -0.4,
+      "move_after_article_pct": -2,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:24:36.060046+00:00",
+      "cassette_available": false,
+      "tags": [
+        "BZI-EP"
+      ],
+      "channels": [
+        "Earnings"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "JHX",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "False Neutral",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47185868_VIK",
+    "prompt_context": {
+      "title": "Preview: Viking Holdings&#39;s Earnings",
+      "published_time": "2025-08-18T14:02:45+00:00",
+      "ticker_symbols": [
+        "VIK"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [
+        "BZI-EP"
+      ],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -1.05,
+      "minutes_to_peak": 86,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 60.72,
+      "peak_price": 60.08,
+      "bottom_price": null,
+      "baseline_volume": 4114741,
+      "peak_volume": null,
+      "average_volume": 4114741,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 0.6,
+      "move_after_article_pct": -1.1,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:24:34.455498+00:00",
+      "cassette_available": false,
+      "tags": [
+        "BZI-EP"
+      ],
+      "channels": [
+        "Earnings"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "VIK",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "False Neutral",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47185878_ALC",
+    "prompt_context": {
+      "title": "An Overview of Alcon&#39;s Earnings",
+      "published_time": "2025-08-18T14:02:58+00:00",
+      "ticker_symbols": [
+        "ALC"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [
+        "BZI-EP"
+      ],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -0.6,
+      "minutes_to_peak": 356,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 88.74,
+      "peak_price": 88.21,
+      "bottom_price": null,
+      "baseline_volume": 2410900,
+      "peak_volume": null,
+      "average_volume": 2410900,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 1.2,
+      "move_after_article_pct": -0.6,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:24:33.551248+00:00",
+      "cassette_available": false,
+      "tags": [
+        "BZI-EP"
+      ],
+      "channels": [
+        "Earnings"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "ALC",
+        "gt_actual_movement": "NEUTRAL",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "True Neutral",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47186401_SHLS",
+    "prompt_context": {
+      "title": "Shoals Technologies Breaks Ground On Maryvale Solar And Storage Project With PCL Construction And Gentari",
+      "published_time": "2025-08-18T14:12:59+00:00",
+      "ticker_symbols": [
+        "SHLS"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 8.39,
+      "minutes_to_peak": 346,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 5.6,
+      "peak_price": 6.07,
+      "bottom_price": null,
+      "baseline_volume": 9461126,
+      "peak_volume": null,
+      "average_volume": 9461126,
+      "volume_spike_ratio": null,
+      "sustained_movement": true,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 3.7,
+      "move_after_article_pct": 8.4,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:24:25.527265+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "SHLS",
+        "gt_actual_movement": "GAINER",
+        "predicted_sentiment": "POSITIVE",
+        "confusion_category": "True Positive",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47187373_CNK",
+    "prompt_context": {
+      "title": "Cinemark Holdings Announces Dual Listing Of Its Common Stock On NYSE Texas",
+      "published_time": "2025-08-18T14:41:14+00:00",
+      "ticker_symbols": [
+        "CNK"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 1,
+      "minutes_to_peak": 77,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 26.09,
+      "peak_price": 26.35,
+      "bottom_price": null,
+      "baseline_volume": 5603000,
+      "peak_volume": null,
+      "average_volume": 5603000,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 1.6,
+      "move_after_article_pct": 1,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:24:03.511205+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "CNK",
+        "gt_actual_movement": "NEUTRAL",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "True Neutral",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47188101_PINC",
+    "prompt_context": {
+      "title": "Earnings Outlook For Premier",
+      "published_time": "2025-08-18T15:00:59+00:00",
+      "ticker_symbols": [
+        "PINC"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [
+        "BZI-EP"
+      ],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -1.85,
+      "minutes_to_peak": 298,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 24.88,
+      "peak_price": 24.42,
+      "bottom_price": null,
+      "baseline_volume": 2689400,
+      "peak_volume": null,
+      "average_volume": 2689400,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -0.6,
+      "move_after_article_pct": -1.8,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:23:40.948968+00:00",
+      "cassette_available": false,
+      "tags": [
+        "BZI-EP"
+      ],
+      "channels": [
+        "Earnings"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "PINC",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "False Neutral",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47188512_FE",
+    "prompt_context": {
+      "title": "West Penn Power Completes Electric Service Upgrades For 2,300 Customers In Unity And Hempfield As Part Of $368M Grid Investment",
+      "published_time": "2025-08-18T15:08:55+00:00",
+      "ticker_symbols": [
+        "FE"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -0.76,
+      "minutes_to_peak": 290,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 43.15,
+      "peak_price": 42.82,
+      "bottom_price": null,
+      "baseline_volume": 4097800,
+      "peak_volume": null,
+      "average_volume": 4097800,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -0.8,
+      "move_after_article_pct": -0.8,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:23:25.721036+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "FE",
+        "gt_actual_movement": "NEUTRAL",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "True Neutral",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47189311_STR",
+    "prompt_context": {
+      "title": "Sitio Royalties Stockholders Approve Merger With Viper Energy; Deal Expected To Close August 19, 2025",
+      "published_time": "2025-08-18T15:31:29+00:00",
+      "ticker_symbols": [
+        "STR"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -1.15,
+      "minutes_to_peak": 229,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 18.25,
+      "peak_price": 18.04,
+      "bottom_price": null,
+      "baseline_volume": 15913144,
+      "peak_volume": null,
+      "average_volume": 15913144,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": -0.1,
+      "move_after_article_pct": -1.2,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:23:08.483261+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "STR",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "False Neutral",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47189358_META",
+    "prompt_context": {
+      "title": "Texas Attorney General Ken Paxton Posts On X &#34;NEW: I&#39;m investigating Meta and Character AI for misleading children with deceptive AI-generated mental health services.In today&#39;s digital age, we must continue to fight to protect Texas kids from deceptive and exploitative technology.&#34;",
+      "published_time": "2025-08-18T15:32:58+00:00",
+      "ticker_symbols": [
+        "META"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 0.97,
+      "minutes_to_peak": 251,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 764.05,
+      "peak_price": 771.49,
+      "bottom_price": null,
+      "baseline_volume": 16513737,
+      "peak_volume": null,
+      "average_volume": 16513737,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.403125
+      },
+      "move_before_article_pct": -1.4,
+      "move_after_article_pct": 1,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:23:02.993810+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News",
+        "General"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "META",
+        "gt_actual_movement": "NEUTRAL",
+        "predicted_sentiment": "NEGATIVE",
+        "confusion_category": "False Negative",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47189603_CROX",
+    "prompt_context": {
+      "title": "&#39;NFL and Crocs Seek Big Yardage Two Feet at a Time With New Deal&#39;- Adweek",
+      "published_time": "2025-08-18T15:43:19+00:00",
+      "ticker_symbols": [
+        "CROX"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": -2.67,
+      "minutes_to_peak": 244,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 85.07,
+      "peak_price": 82.8,
+      "bottom_price": null,
+      "baseline_volume": 2525600,
+      "peak_volume": null,
+      "average_volume": 2525600,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 0.9,
+      "move_after_article_pct": -2.7,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:22:52.077995+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News",
+        "General"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "CROX",
+        "gt_actual_movement": "LOSER",
+        "predicted_sentiment": "POSITIVE",
+        "confusion_category": "False Positive",
+        "is_correct": false,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47191809_NVDA",
+    "prompt_context": {
+      "title": "&#39;Celebrating More Than 2 Million Developers Embracing NVIDIA Robotics&#39;- Blog",
+      "published_time": "2025-08-18T17:08:17+00:00",
+      "ticker_symbols": [
+        "NVDA",
+        "SERV"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 0.76,
+      "minutes_to_peak": 120,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 181.23,
+      "peak_price": 182.61,
+      "bottom_price": null,
+      "baseline_volume": 132008000,
+      "peak_volume": null,
+      "average_volume": 132008000,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 0.3,
+      "move_after_article_pct": 0.8,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:20:52.869587+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News",
+        "General"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "NVDA",
+        "gt_actual_movement": "NEUTRAL",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "True Neutral",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47191809_SERV",
+    "prompt_context": {
+      "title": "&#39;Celebrating More Than 2 Million Developers Embracing NVIDIA Robotics&#39;- Blog",
+      "published_time": "2025-08-18T17:08:17+00:00",
+      "ticker_symbols": [
+        "NVDA",
+        "SERV"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 1.16,
+      "minutes_to_peak": 50,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 10.33,
+      "peak_price": 10.45,
+      "bottom_price": null,
+      "baseline_volume": 6964100,
+      "peak_volume": null,
+      "average_volume": 6964100,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 5.1,
+      "move_after_article_pct": 1.2,
+      "peak_was_before_article": false,
+      "article_timing_category": "during_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:20:53.432614+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News",
+        "General"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "NVDA",
+        "gt_actual_movement": "GAINER",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "False Neutral",
+        "is_correct": true,
+        "timing_category": "during_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47192443_ILLR",
+    "prompt_context": {
+      "title": "Triller Investor Relations Posts On X &#34;Following the completion of our strategic review, our Board and Team are making certain changes in our team to drive our strategic plans.  As we advance our accelerated development phase, focusing on Social Media, Fintech, and Mobile Entertainment, we are actively reorganizing to maximize our speed of execution and delivery of revenue growth. Stay tuned for exciting updates in coming weeks. $ILLR&#34;",
+      "published_time": "2025-08-18T17:30:21+00:00",
+      "ticker_symbols": [
+        "ILLR"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 19.64,
+      "minutes_to_peak": 4,
+      "pattern_type": "immediate_pop_and_drop",
+      "baseline_price": 0.5508,
+      "peak_price": 0.659,
+      "bottom_price": null,
+      "baseline_volume": 19135700,
+      "peak_volume": null,
+      "average_volume": 19135700,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.33854166666666674
+      },
+      "move_before_article_pct": 22.4,
+      "move_after_article_pct": 19.6,
+      "peak_was_before_article": false,
+      "article_timing_category": "during_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:20:29.083087+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News",
+        "General"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "ILLR",
+        "gt_actual_movement": "GAINER",
+        "predicted_sentiment": "POSITIVE",
+        "confusion_category": "True Positive",
+        "is_correct": true,
+        "timing_category": "during_move"
+      }
+    ]
+  },
+  {
+    "eval_id": "benzinga_47194773_ACN",
+    "prompt_context": {
+      "title": "Accenture Acquires Highlands Consulting Group; Financial Terms Undisclosed",
+      "published_time": "2025-08-18T19:13:14+00:00",
+      "ticker_symbols": [
+        "ACN"
+      ],
+      "source": "polygon",
+      "publisher": "",
+      "keywords": [],
+      "market_session": "regular",
+      "time_to_market_open": null
+    },
+    "ground_truth": {
+      "peak_gain_percent": 0.29,
+      "minutes_to_peak": 44,
+      "pattern_type": "no_significant_impact",
+      "baseline_price": 248.54,
+      "peak_price": 249.27,
+      "bottom_price": null,
+      "baseline_volume": 3776430,
+      "peak_volume": null,
+      "average_volume": 3776430,
+      "volume_spike_ratio": null,
+      "sustained_movement": false,
+      "data_issues": {
+        "price_data": [
+          "sparse_data"
+        ],
+        "analysis": [],
+        "coverage": 0.40625
+      },
+      "move_before_article_pct": 0.6,
+      "move_after_article_pct": 0.3,
+      "peak_was_before_article": false,
+      "article_timing_category": "pre_move"
+    },
+    "metadata": {
+      "has_complete_intraday_analysis": true,
+      "ticker_market_cap": null,
+      "analysis_timestamp": "2025-11-12T23:18:29.700636+00:00",
+      "cassette_available": false,
+      "tags": [],
+      "channels": [
+        "News"
+      ]
+    },
+    "evaluation": [
+      {
+        "ticker": "ACN",
+        "gt_actual_movement": "NEUTRAL",
+        "predicted_sentiment": "NEUTRAL",
+        "confusion_category": "True Neutral",
+        "is_correct": true,
+        "timing_category": "pre_move"
+      }
+    ]
+  }
+]
