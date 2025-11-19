@@ -1,8 +1,10 @@
 """FastAPI application for benz_sent_filter."""
 
+import logging
 from datetime import datetime
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel
 
 from benz_sent_filter.models.classification import (
@@ -15,11 +17,27 @@ from benz_sent_filter.models.classification import (
 )
 from benz_sent_filter.services.classifier import ClassificationService
 
+# Set up logging
+logger = logging.getLogger(__name__)
+
 app = FastAPI(
     title="Benz Sent Filter",
     description="MNLS-based sentiment classification service for article title analysis",
     version="0.1.0",
 )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """Log validation errors with request payload for debugging."""
+    body = await request.body()
+    logger.error(
+        f"Validation error on {request.method} {request.url.path}\n"
+        f"Request body: {body.decode('utf-8')}\n"
+        f"Errors: {exc.errors()}"
+    )
+    # Re-raise to return standard 422 response
+    raise exc
 
 
 class HealthResponse(BaseModel):
