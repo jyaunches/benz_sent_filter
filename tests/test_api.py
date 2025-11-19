@@ -147,6 +147,83 @@ def test_classify_endpoint_response_includes_all_scores(client):
     assert "general_score" in scores
 
 
+def test_routine_operations_endpoint_accepts_ticker_symbols_array(client):
+    """Test POST /routine-operations with ticker_symbols array (multi-ticker format)."""
+    response = client.post(
+        "/routine-operations",
+        json={
+            "headline": "Bank announces quarterly dividend payment",
+            "ticker_symbols": ["BAC", "JPM"]
+        }
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert "headline" in data
+    assert "core_classification" in data
+    assert "routine_operations_by_ticker" in data
+    assert "BAC" in data["routine_operations_by_ticker"]
+    assert "JPM" in data["routine_operations_by_ticker"]
+
+
+def test_routine_operations_endpoint_accepts_company_symbol_string(client):
+    """Test POST /routine-operations with company_symbol string (single-ticker format).
+
+    This tests backward compatibility - clients should be able to send a single
+    ticker symbol as a string (company_symbol) and have it automatically converted
+    to an array format internally.
+    """
+    response = client.post(
+        "/routine-operations",
+        json={
+            "headline": "Bank announces quarterly dividend payment",
+            "company_symbol": "BAC"
+        }
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert "headline" in data
+    assert "core_classification" in data
+    assert "routine_operations_by_ticker" in data
+    assert "BAC" in data["routine_operations_by_ticker"]
+    assert len(data["routine_operations_by_ticker"]) == 1
+
+
+def test_routine_operations_endpoint_response_structure(client):
+    """Test POST /routine-operations response has correct structure."""
+    response = client.post(
+        "/routine-operations",
+        json={
+            "headline": "Test headline",
+            "ticker_symbols": ["AAPL"]
+        }
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Check top-level fields
+    assert "headline" in data
+    assert "core_classification" in data
+    assert "routine_operations_by_ticker" in data
+
+    # Check core_classification structure
+    core = data["core_classification"]
+    assert "is_opinion" in core
+    assert "is_straight_news" in core
+    assert "temporal_category" in core
+    assert "scores" in core
+
+    # Check routine_operations_by_ticker structure
+    ticker_data = data["routine_operations_by_ticker"]["AAPL"]
+    assert "routine_operation" in ticker_data
+    assert "routine_confidence" in ticker_data
+    assert "routine_metadata" in ticker_data
+
+
 def test_classify_endpoint_response_includes_temporal_category(client):
     """Test that /classify response includes temporal category."""
     response = client.post("/classify", json={"headline": "Test headline"})
