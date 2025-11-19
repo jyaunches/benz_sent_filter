@@ -4,10 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Purpose
 
-This repository implements **benz_sent_filter** - an MNLS-based sentiment classification service for article title analysis. It provides zero-shot natural language inference capabilities to classify news headlines along two dimensions:
+This repository implements **benz_sent_filter** - an MNLS-based sentiment classification service for article title analysis. It provides zero-shot natural language inference capabilities to classify news headlines along multiple dimensions:
 
 1. **Opinion vs News**: Detect whether a headline is opinionated or straight news
 2. **Temporal Category**: Classify whether content is about past events, future events, or general topics
+3. **Company Relevance**: Detect whether a headline is about a specific company (optional, via `company` parameter)
+4. **Far-Future Forecast Detection**: Identify multi-year forecasts vs near-term guidance (automatic for future events)
+5. **Routine Operations Filter**: Detect routine business operations with immaterial impact (optional, via `company_symbol` parameter)
 
 The service runs on CPU and uses open-source models without requiring custom training.
 
@@ -83,20 +86,51 @@ Available via `.claude/commands/` (symlinked from benz_mgmt):
 - `/implement-phase` - Execute implementation phases
 - `/fix-tests` - Run and fix failing tests
 
-## ML Model Integration (To Be Implemented)
+## Implemented Features
 
-When adding MNLS classification:
-- Add dependencies: `transformers`, `torch`
-- Use zero-shot classification pipeline
-- Model: `facebook/bart-large-mnli` or similar
-- CPU-only inference required
-- Cache models appropriately (see .gitignore)
+### Core Classification
+- **Model**: `typeform/distilbert-base-uncased-mnli` (DistilBERT fine-tuned for MNLI)
+- **Method**: Zero-shot classification with carefully designed candidate labels
+- **Performance**: <2s single headline, <10s batch of 10 (CPU-only)
+- **Thresholds**: 0.6 for opinion/news, 0.5 for company relevance
+
+### Optional Filters
+
+1. **Company Relevance Detection** (via `company` parameter):
+   - Zero-shot NLI with hypothesis: "This article is about {company}"
+   - Returns `is_about_company` boolean and `company_score` (0.0-1.0)
+   - Adds ~500ms overhead per classification
+
+2. **Far-Future Forecast Detection** (automatic for FUTURE_EVENT):
+   - Pattern-based detection using regex for multi-year timeframes
+   - Returns `far_future_forecast` boolean and `forecast_timeframe` string
+   - Examples: "over 5 years", "by 2028", "X-year forecast"
+   - Helps filter out speculative long-term projections
+
+3. **Routine Operations Filter** (via `company_symbol` parameter):
+   - Detects process language, routine transactions, materiality
+   - Returns `routine_operation` boolean, `routine_confidence`, and detailed metadata
+   - Company context for FNMA, BAC, JPM, WFC, C, GS, MS, USB, TFC, PNC
+   - Focuses on financial services industry
+   - Reduces false positives on routine operations by 50%+
 
 ## API Design
 
 Service provides classification endpoints for:
-- Single headline classification
-- Batch headline processing
-- Health check endpoint
+- Single headline classification (`/classify`)
+- Batch headline processing (`/classify/batch`)
+- Health check endpoint (`/health`)
 
-Return both boolean classifications and raw scores for transparency.
+**Request Parameters**:
+- `headline` (required): Headline text to classify
+- `company` (optional): Company name for relevance detection
+- `company_symbol` (optional): Ticker symbol for routine operations filter
+
+**Response Fields**:
+- Core: `is_opinion`, `is_straight_news`, `temporal_category`, `scores`
+- Company relevance: `is_about_company`, `company_score`, `company`
+- Far-future: `far_future_forecast`, `forecast_timeframe`
+- Routine operations: `routine_operation`, `routine_confidence`, `routine_metadata`
+
+Returns both boolean classifications and raw scores for transparency.
+All optional fields use Pydantic `exclude_none=True` for backward compatibility.

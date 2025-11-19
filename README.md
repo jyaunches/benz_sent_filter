@@ -4,11 +4,13 @@ MNLS-based sentiment classification service for article title analysis.
 
 ## Overview
 
-Benz Sent Filter provides zero-shot natural language inference capabilities to classify news headlines along three dimensions:
+Benz Sent Filter provides zero-shot natural language inference capabilities to classify news headlines along multiple dimensions:
 
 1. **Opinion vs News**: Detects whether a headline is opinionated or straight news
 2. **Temporal Category**: Classifies whether content is about past events, future events, or general topics
 3. **Company Relevance**: Detects whether a headline is about a specific company (optional)
+4. **Far-Future Forecast Detection**: Identifies multi-year forecasts vs near-term guidance (automatic for future events)
+5. **Routine Operations Filter**: Detects routine business operations with immaterial financial impact (optional)
 
 The service is designed to:
 - Run on CPU (no GPU required)
@@ -205,6 +207,92 @@ curl -X POST http://localhost:8002/classify \
 # Returns: is_about_company: false, company_score: 0.12
 ```
 
+### Far-Future Forecast Detection
+
+When classifying headlines with `temporal_category: "future_event"`, the service automatically detects far-future forecasts (>1 year timeframes):
+
+```bash
+curl -X POST http://localhost:8002/classify \
+  -H "Content-Type: application/json" \
+  -d '{"headline": "Forecasts $1B Launch-Year Revenue, Sees $18B–$22B Over 5 Years"}'
+```
+
+Response (includes far-future fields when detected):
+```json
+{
+  "is_opinion": false,
+  "is_straight_news": true,
+  "temporal_category": "future_event",
+  "scores": {
+    "opinion_score": 0.20,
+    "news_score": 0.75,
+    "past_score": 0.10,
+    "future_score": 0.80,
+    "general_score": 0.10
+  },
+  "headline": "Forecasts $1B Launch-Year Revenue, Sees $18B–$22B Over 5 Years",
+  "far_future_forecast": true,
+  "forecast_timeframe": "over 5 years"
+}
+```
+
+How it works:
+- Only applies when `temporal_category` is `future_event`
+- Pattern-based detection using regex for multi-year timeframes
+- Detects patterns like: "over X years", "by 2028", "X-year forecast"
+- Returns `null` for near-term forecasts (<1 year)
+- Helps downstream systems filter out speculative long-term projections
+
+### Routine Operations Filter
+
+Detect routine business operations with immaterial financial impact by providing the optional `company_symbol` parameter:
+
+```bash
+curl -X POST http://localhost:8002/classify \
+  -H "Content-Type: application/json" \
+  -d '{
+    "headline": "Fannie Mae Begins Marketing Its Most Recent Sale Of Reperforming Loans... $560.5M",
+    "company_symbol": "FNMA"
+  }'
+```
+
+Response (includes routine operation fields):
+```json
+{
+  "is_opinion": false,
+  "is_straight_news": true,
+  "temporal_category": "past_event",
+  "scores": {
+    "opinion_score": 0.15,
+    "news_score": 0.85,
+    "past_score": 0.75,
+    "future_score": 0.10,
+    "general_score": 0.15
+  },
+  "headline": "Fannie Mae Begins Marketing Its Most Recent Sale Of Reperforming Loans... $560.5M",
+  "routine_operation": true,
+  "routine_confidence": 0.85,
+  "routine_metadata": {
+    "routine_score": 4,
+    "materiality_score": -2,
+    "detected_patterns": ["process_language", "routine_transaction", "frequency_indicator"],
+    "transaction_value": 560500000.0,
+    "materiality_ratio": 0.00014,
+    "process_stage": "early"
+  }
+}
+```
+
+How it works:
+- Detects process language ("begins marketing", "plans to", "exploring")
+- Identifies routine transaction types (loan sales, buybacks, dividends)
+- Assesses materiality relative to company size
+- Provides detailed metadata for transparency
+- Focuses on financial services industry
+- Reduces false positives on routine operations by 50%+
+
+Supported companies: FNMA, BAC, JPM, WFC, C, GS, MS, USB, TFC, PNC
+
 ### Batch Classification
 
 Classify multiple headlines in one request:
@@ -315,6 +403,8 @@ The service returns comprehensive classification data for each headline:
 - **is_opinion**: `true` if opinion score ≥ 0.6 (opinion/editorial content)
 - **is_straight_news**: `true` if news score ≥ 0.6 (factual news reporting)
 - **is_about_company**: `true` if company score ≥ 0.5 (only present when `company` parameter provided)
+- **far_future_forecast**: `true` if multi-year forecast detected (only present when `temporal_category` is `future_event`)
+- **routine_operation**: `true` if routine business operation detected (only present when `company_symbol` parameter provided)
 
 Both opinion/news flags can be `false` (uncertain), or both `true` (mixed content).
 
@@ -335,13 +425,29 @@ All probability scores (0.0 - 1.0) are exposed for transparency:
 - **general_score**: Probability of general topic content
 - **company_score**: Probability headline is about specified company (only when `company` provided)
 
-### Company Relevance Fields
-When the optional `company` parameter is provided, the response includes:
+### Optional Fields
+
+**Company Relevance** (when `company` parameter is provided):
 - **is_about_company**: Boolean flag (score ≥ 0.5)
 - **company_score**: Raw probability score (0.0 - 1.0)
 - **company**: The company name that was checked
 
-These fields are omitted from the response when `company` parameter is not provided (backward compatibility).
+**Far-Future Forecast Detection** (when `temporal_category` is `future_event`):
+- **far_future_forecast**: Boolean indicating multi-year forecast (>1 year)
+- **forecast_timeframe**: String describing the timeframe (e.g., "over 5 years", "by 2028")
+
+**Routine Operations Filter** (when `company_symbol` parameter is provided):
+- **routine_operation**: Boolean indicating routine business operation
+- **routine_confidence**: Confidence score (0.0 - 1.0)
+- **routine_metadata**: Object with detailed analysis:
+  - `routine_score`: Numeric score for routine operation indicators
+  - `materiality_score`: Numeric score for materiality assessment
+  - `detected_patterns`: List of detected pattern types
+  - `transaction_value`: Dollar value if detected
+  - `materiality_ratio`: Transaction value / company market cap
+  - `process_stage`: Stage of the process (e.g., "early", "completion")
+
+All optional fields use Pydantic `exclude_none=True` for backward compatibility (omitted when not applicable).
 
 ## Integration with Benz Ecosystem
 
