@@ -50,8 +50,5 @@ clean: ## Clean build artifacts and cache
 	find . -type d -name __pycache__ -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
 
-serve: ## Start development server with hot reload
-	uv run python -m benz_sent_filter --port 8002 --reload
-
-serve-prod: ## Start production server
+serve: ## Start server with multiple workers
 	uv run python -m benz_sent_filter --port 8002
