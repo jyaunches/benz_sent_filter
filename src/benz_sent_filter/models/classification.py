@@ -89,6 +89,16 @@ class ClassificationResult(BaseModel):
         description="Extracted timeframe from far-future forecast (e.g., '5-year', 'by 2028'). "
         "Only populated when far_future_forecast is True.",
     )
+    conditional_language: bool | None = Field(
+        default=None,
+        description="Whether headline contains conditional or hedging language patterns (e.g., 'plans to', 'may', 'exploring'). "
+        "Only populated when temporal_category is FUTURE_EVENT and conditional patterns are detected.",
+    )
+    conditional_patterns: list[str] | None = Field(
+        default=None,
+        description="List of matched conditional language patterns (e.g., ['plans to', 'may', 'potential']). "
+        "Only populated when conditional_language is True.",
+    )
     routine_operation: bool | None = Field(
         default=None,
         description="Whether headline describes a routine business operation with immaterial financial impact.",
@@ -204,4 +214,76 @@ class MultiTickerRoutineResponse(BaseModel):
     )
     routine_operations_by_ticker: dict[str, RoutineOperationResult] = Field(
         ..., description="Routine operations results keyed by ticker symbol"
+    )
+
+
+# Company Relevance Endpoint Models
+
+
+class CompanyRelevanceRequest(BaseModel):
+    """Request model for company relevance endpoint."""
+
+    headline: str = Field(..., min_length=1, description="Headline text to analyze")
+    company: str = Field(..., min_length=1, description="Company name to check relevance against")
+
+
+class CompanyRelevanceResult(BaseModel):
+    """Result model for company relevance analysis."""
+
+    headline: str = Field(..., description="Original headline text")
+    company: str = Field(..., description="Company name checked")
+    is_about_company: bool = Field(..., description="Whether headline is about the company")
+    company_score: float = Field(..., description="Relevance score (0.0 to 1.0)")
+
+
+class CompanyRelevanceBatchRequest(BaseModel):
+    """Request model for batch company relevance analysis."""
+
+    headlines: list[str] = Field(..., min_length=1, description="List of headlines to analyze")
+    company: str = Field(..., min_length=1, description="Company name to check relevance against")
+
+
+class CompanyRelevanceBatchResponse(BaseModel):
+    """Response model for batch company relevance analysis."""
+
+    company: str = Field(..., description="Company name checked")
+    results: list[CompanyRelevanceResult] = Field(..., description="List of relevance results")
+
+
+# Quantitative Catalyst Detection Models
+
+
+class QuantitativeCatalystRequest(BaseModel):
+    """Request model for quantitative catalyst detection."""
+
+    headline: str = Field(
+        ..., min_length=1, description="Article headline to analyze for quantitative catalysts"
+    )
+
+
+class QuantitativeCatalystResult(BaseModel):
+    """Result model for quantitative catalyst detection.
+
+    Uses MNLI-based presence detection and type classification combined
+    with regex-based value extraction to identify financial catalysts.
+    """
+
+    model_config = ConfigDict(exclude_none=True)
+
+    headline: str = Field(..., description="Original headline text")
+    has_quantitative_catalyst: bool = Field(
+        ...,
+        description="Whether headline announces a specific, quantitative financial catalyst",
+    )
+    catalyst_type: str | None = Field(
+        default=None,
+        description="Type of catalyst detected: 'dividend', 'acquisition', 'buyback', 'earnings', 'guidance', or 'mixed'",
+    )
+    catalyst_values: list[str] = Field(
+        default_factory=list,
+        description="Extracted quantitative values (e.g., ['$1', '$3.5B', '$37.50/Share', '10%'])",
+    )
+    confidence: float = Field(
+        ...,
+        description="Confidence in detection (0.0 to 1.0), combining presence score, type score, and value count",
     )

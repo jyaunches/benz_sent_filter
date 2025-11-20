@@ -12,9 +12,13 @@ from benz_sent_filter.config.settings import (
 from benz_sent_filter.models.classification import (
     ClassificationResult,
     ClassificationScores,
+    QuantitativeCatalystResult,
     TemporalCategory,
 )
 from benz_sent_filter.services import forecast_analyzer
+from benz_sent_filter.services.quantitative_catalyst_detector_mnls import (
+    QuantitativeCatalystDetectorMNLS,
+)
 from benz_sent_filter.services.routine_detector_mnls import RoutineOperationDetectorMNLS
 
 # Named tuple for structured company relevance results
@@ -48,6 +52,8 @@ class ClassificationService:
         """
         self._pipeline = pipeline("zero-shot-classification", model=MODEL_NAME)
         self._routine_detector = RoutineOperationDetectorMNLS()
+        # Share pipeline with quantitative catalyst detector to avoid loading BART-MNLI separately
+        self._catalyst_detector = QuantitativeCatalystDetectorMNLS(pipeline=self._pipeline)
 
     def _check_company_relevance(
         self, headline: str, company: str
@@ -93,6 +99,33 @@ class ClassificationService:
             return {"far_future_forecast": True, "forecast_timeframe": timeframe}
         else:
             return {"far_future_forecast": None, "forecast_timeframe": None}
+
+    def _analyze_conditional_language(
+        self, headline: str, temporal_category: TemporalCategory
+    ) -> dict:
+        """Analyze if headline contains conditional or hedging language patterns.
+
+        Only performs analysis for FUTURE_EVENT classifications. Returns
+        dictionary with conditional_language and conditional_patterns keys.
+
+        Args:
+            headline: Headline text to analyze
+            temporal_category: Temporal category from classification
+
+        Returns:
+            Dict with conditional_language (bool | None) and conditional_patterns (list[str] | None)
+        """
+        # Only analyze conditional language for FUTURE_EVENT classifications
+        if temporal_category != TemporalCategory.FUTURE_EVENT:
+            return {"conditional_language": None, "conditional_patterns": None}
+
+        # Check for conditional language patterns
+        has_conditional, patterns = forecast_analyzer.matches_conditional_language(headline)
+
+        if has_conditional:
+            return {"conditional_language": True, "conditional_patterns": patterns}
+        else:
+            return {"conditional_language": None, "conditional_patterns": None}
 
     def _analyze_routine_operation(
         self, headline: str, company_symbol: str | None = None
@@ -182,6 +215,9 @@ class ClassificationService:
         # Analyze far-future patterns
         far_future_metadata = self._analyze_far_future(headline, temporal_category)
 
+        # Analyze conditional language patterns
+        conditional_metadata = self._analyze_conditional_language(headline, temporal_category)
+
         # Analyze routine operations
         routine_metadata = self._analyze_routine_operation(headline, company_symbol)
 
@@ -199,6 +235,8 @@ class ClassificationService:
                 company=company,
                 far_future_forecast=far_future_metadata["far_future_forecast"],
                 forecast_timeframe=far_future_metadata["forecast_timeframe"],
+                conditional_language=conditional_metadata["conditional_language"],
+                conditional_patterns=conditional_metadata["conditional_patterns"],
                 routine_operation=routine_metadata["routine_operation"],
                 routine_confidence=routine_metadata["routine_confidence"],
                 routine_metadata=routine_metadata["routine_metadata"],
@@ -212,6 +250,8 @@ class ClassificationService:
                 headline=headline,
                 far_future_forecast=far_future_metadata["far_future_forecast"],
                 forecast_timeframe=far_future_metadata["forecast_timeframe"],
+                conditional_language=conditional_metadata["conditional_language"],
+                conditional_patterns=conditional_metadata["conditional_patterns"],
                 routine_operation=routine_metadata["routine_operation"],
                 routine_confidence=routine_metadata["routine_confidence"],
                 routine_metadata=routine_metadata["routine_metadata"],
@@ -323,3 +363,49 @@ class ClassificationService:
         return [
             self.classify_headline(headline, company=company, company_symbol=company_symbol) for headline in headlines
         ]
+
+    def check_company_relevance(self, headline: str, company: str) -> dict:
+        """Check if a headline is relevant to a specific company.
+
+        Args:
+            headline: Headline text to analyze
+            company: Company name to check relevance against
+
+        Returns:
+            Dict with headline, company, is_about_company, and company_score
+        """
+        relevance = self._check_company_relevance(headline, company)
+
+        return {
+            "headline": headline,
+            "company": company,
+            "is_about_company": relevance.is_relevant,
+            "company_score": relevance.score,
+        }
+
+    def check_company_relevance_batch(self, headlines: list[str], company: str) -> list[dict]:
+        """Check company relevance for multiple headlines.
+
+        Args:
+            headlines: List of headline texts to analyze
+            company: Company name to check relevance against
+
+        Returns:
+            List of dicts with relevance results
+        """
+        return [self.check_company_relevance(headline, company) for headline in headlines]
+
+    def detect_quantitative_catalyst(self, headline: str) -> QuantitativeCatalystResult:
+        """Detect quantitative financial catalysts in headline.
+
+        Uses shared MNLI pipeline for efficient inference. Detects presence,
+        classifies type (dividend/acquisition/buyback/earnings/guidance), and
+        extracts quantitative values.
+
+        Args:
+            headline: Headline text to analyze
+
+        Returns:
+            QuantitativeCatalystResult with detection details
+        """
+        return self._catalyst_detector.detect(headline)
