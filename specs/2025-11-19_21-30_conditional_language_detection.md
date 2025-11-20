@@ -140,7 +140,7 @@ Option C: Only when NOT far-future (complementary filtering)
 - Detects patterns: "plans to", "expected to", "aims to", "intends to", "could", "may", "might", "exploring", "considering", "evaluating"
 - Returns `(True, ["pattern1", "pattern2"])` for matches
 - Returns `(False, [])` for no matches
-- All unit tests pass (10+ new tests)
+- All unit tests pass (6-7 tests covering pattern categories)
 - No changes to existing far-future detection tests
 
 ### Phase 2: ClassificationService Integration
@@ -174,7 +174,7 @@ Option C: Only when NOT far-future (complementary filtering)
 - Returns `{"conditional_language": True, "conditional_patterns": [...]}` for matched patterns
 - Integrates into `classify_headline()` method
 - All existing unit tests continue to pass
-- 5+ new unit tests for integration logic
+- 3-4 new tests for integration logic
 
 ### Phase 3: Response Model Extension
 **Description**: Extend ClassificationResult Pydantic model with new optional fields for conditional language detection.
@@ -203,7 +203,7 @@ Option C: Only when NOT far-future (complementary filtering)
 - Serialization excludes fields when None (backward compatible)
 - `/classify` endpoint returns new fields when patterns detected
 - All model validation tests pass
-- 3+ new tests for field serialization
+- 2-3 tests for field serialization
 
 ### Phase 4: Integration Testing and Validation
 **Description**: End-to-end integration testing through the API endpoints with real-world headline examples.
@@ -223,14 +223,14 @@ Option C: Only when NOT far-future (complementary filtering)
 
 **Unit Test Requirements**:
 - Test file: `tests/test_api.py` (extend existing)
-- 5+ integration tests for `/classify` endpoint
+- 3-4 integration tests for `/classify` endpoint
 - Test each conditional language category
 - Test combination scenarios (conditional + far-future)
 - Test non-FUTURE_EVENT exclusion
 - Test backward compatibility (responses without new fields)
 
 **Acceptance Criteria**:
-- All integration tests pass (5+ new tests)
+- All integration tests pass (3-4 new tests)
 - `/classify` endpoint returns `conditional_language` and `conditional_patterns` for matched FUTURE_EVENT headlines
 - Fields omitted for PAST_EVENT and GENERAL_TOPIC temporal categories
 - Fields omitted when no conditional language detected
@@ -244,7 +244,7 @@ Option C: Only when NOT far-future (complementary filtering)
 - `tests/test_models.py` or `tests/test_classifier.py`: Model fields
 
 ### Integration Tests
-- `tests/test_api.py`: End-to-end API testing (5+ tests)
+- `tests/test_api.py`: End-to-end API testing (3-4 tests)
 - Real-world headline examples from financial news
 - Edge case scenarios (multiple patterns, boundary cases)
 
