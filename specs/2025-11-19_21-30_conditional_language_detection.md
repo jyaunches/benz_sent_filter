@@ -85,16 +85,8 @@ Headlines like "Apple plans to explore AI opportunities" and "Microsoft may cons
 
 Pattern matching should be case-insensitive with word boundaries.
 
-### Integration Logic
-**When to Apply Detection**:
-Option A: Always detect (regardless of temporal category)
-Option B: Only for FUTURE_EVENT temporal category (like far-future)
-Option C: Only when NOT far-future (complementary filtering)
-
-**Recommended**: Option B - only for FUTURE_EVENT
-- Most conditional language appears in future-oriented headlines
-- Matches existing far-future pattern (conditional execution)
-- Reduces false positives from past-tense conditional language
+### Conditional Execution Logic
+Conditional language detection only executes for FUTURE_EVENT temporal category, matching the existing far-future detection pattern. This avoids false positives from past-tense conditional language.
 
 **Return Behavior**:
 - If temporal_category != FUTURE_EVENT: return `None` for both fields
