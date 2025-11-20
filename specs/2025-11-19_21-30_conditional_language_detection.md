@@ -127,7 +127,7 @@ Conditional language detection only executes for FUTURE_EVENT temporal category,
 - All unit tests pass (6-7 tests covering pattern categories)
 - No changes to existing far-future detection tests
 
-### Phase 2: ClassificationService Integration
+### Phase 2: ClassificationService Integration [COMPLETED: 15bb4a6]
 **Description**: Add `_analyze_conditional_language()` method to ClassificationService and integrate into the classification pipeline.
 
 **Core Functionality**:
@@ -160,7 +160,7 @@ Conditional language detection only executes for FUTURE_EVENT temporal category,
 - All existing unit tests continue to pass
 - 3-4 new tests for integration logic
 
-### Phase 3: Response Model Extension
+### Phase 3: Response Model Extension [COMPLETED: 15bb4a6]
 **Description**: Extend ClassificationResult Pydantic model with new optional fields for conditional language detection.
 
 **Core Functionality**:
