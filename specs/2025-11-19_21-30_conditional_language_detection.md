@@ -51,12 +51,6 @@ Headlines like "Apple plans to explore AI opportunities" and "Microsoft may cons
 - Integration into ClassificationService similar to far-future
 - New optional fields in ClassificationResult
 
-**Integration Points**:
-- Add `matches_conditional_language()` to `forecast_analyzer.py`
-- Add `_analyze_conditional_language()` method to ClassificationService
-- Extend ClassificationResult with `conditional_language` and `conditional_patterns` fields
-- Update API response in `/classify` endpoint
-
 ## Architecture Design
 
 ### Module Organization
