@@ -224,6 +224,137 @@ def test_routine_operations_endpoint_response_structure(client):
     assert "routine_metadata" in ticker_data
 
 
+# ============================================================================
+# /classify Endpoint with company_symbol Parameter Tests
+# ============================================================================
+
+
+def test_classify_endpoint_with_company_symbol_includes_routine_fields(client):
+    """Test /classify endpoint returns routine operation fields when company_symbol provided."""
+    response = client.post(
+        "/classify",
+        json={
+            "headline": "Fannie Mae Begins Marketing Its Most Recent Sale Of Reperforming Loans; "
+                       "Sale Consists Of ~ 3,058 Loans, Having An Unpaid Principal Balance Of ~ $560.5M",
+            "company_symbol": "FNMA"
+        }
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Should include all core classification fields
+    assert "is_opinion" in data
+    assert "is_straight_news" in data
+    assert "temporal_category" in data
+    assert "scores" in data
+
+    # Should include routine operation fields when company_symbol provided
+    assert "routine_operation" in data
+    assert "routine_confidence" in data
+    assert "routine_metadata" in data
+
+    # Verify field types
+    assert isinstance(data["routine_operation"], bool)
+    assert isinstance(data["routine_confidence"], (int, float))
+    assert isinstance(data["routine_metadata"], dict)
+    assert 0.0 <= data["routine_confidence"] <= 1.0
+
+
+def test_classify_endpoint_with_company_symbol_field_types(client):
+    """Test /classify routine operation fields have correct types."""
+    response = client.post(
+        "/classify",
+        json={
+            "headline": "Company Announces $2B Acquisition Of Major Competitor",
+            "company_symbol": "AAPL"
+        }
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Should include routine operation fields
+    assert "routine_operation" in data
+    assert "routine_confidence" in data
+    assert "routine_metadata" in data
+
+    # Verify types
+    assert isinstance(data["routine_operation"], bool)
+    assert isinstance(data["routine_confidence"], (int, float))
+    assert isinstance(data["routine_metadata"], dict)
+
+
+def test_classify_endpoint_company_symbol_multiple_tickers(client):
+    """Test /classify with company_symbol works for multiple ticker symbols.
+
+    Covers scenarios from test_routine_api.sh for major banks:
+    - BAC: Share buyback programs
+    - JPM: Bond offerings
+    - FNMA: Loan sales
+    """
+    test_cases = [
+        ("Bank of America Announces Another $5B Share Buyback Program", "BAC"),
+        ("JPMorgan Files To Sell $100M In Bonds", "JPM"),
+        ("Fannie Mae Marketing Sale Of Reperforming Loans", "FNMA"),
+    ]
+
+    for headline, symbol in test_cases:
+        response = client.post(
+            "/classify",
+            json={"headline": headline, "company_symbol": symbol}
+        )
+
+        assert response.status_code == 200, f"Failed for {symbol}"
+        data = response.json()
+
+        # All should include routine operation fields
+        assert "routine_operation" in data, f"Missing routine_operation for {symbol}"
+        assert "routine_confidence" in data, f"Missing routine_confidence for {symbol}"
+        assert "routine_metadata" in data, f"Missing routine_metadata for {symbol}"
+
+        # Verify types
+        assert isinstance(data["routine_operation"], bool)
+        assert isinstance(data["routine_confidence"], (int, float))
+        assert 0.0 <= data["routine_confidence"] <= 1.0
+
+
+def test_classify_endpoint_company_symbol_various_news_events(client):
+    """Test /classify with company_symbol for various news events.
+
+    Covers scenarios from test_routine_api.sh:
+    - ESPN: Product launches
+    - Genius Group: Legal/regulatory news
+    - DraftKings: Major licensing events
+
+    Note: We test that fields are present and valid, not specific classifications,
+    since the routine detector's output depends on its internal logic.
+    """
+    test_cases = [
+        ("New ESPN App to Feature Heavy Betting Integration", "DIS"),
+        ("Genius Group CEO Posts Legal Update About Market Manipulation Case", "GNS"),
+        ("DraftKings Announce It Has Secured Direct Mobile Sports Betting License", "DKNG"),
+    ]
+
+    for headline, symbol in test_cases:
+        response = client.post(
+            "/classify",
+            json={"headline": headline, "company_symbol": symbol}
+        )
+
+        assert response.status_code == 200, f"Failed for {symbol}"
+        data = response.json()
+
+        # Should include routine operation fields
+        assert "routine_operation" in data, f"Missing routine_operation for {symbol}"
+        assert "routine_confidence" in data, f"Missing routine_confidence for {symbol}"
+        assert "routine_metadata" in data, f"Missing routine_metadata for {symbol}"
+
+        # Verify types
+        assert isinstance(data["routine_operation"], bool)
+        assert isinstance(data["routine_confidence"], (int, float))
+
+
 def test_classify_endpoint_response_includes_temporal_category(client):
     """Test that /classify response includes temporal category."""
     response = client.post("/classify", json={"headline": "Test headline"})
@@ -672,3 +803,354 @@ def test_classify_batch_endpoint_with_far_future_patterns(mock_transformers_pipe
     # But it won't match far-future pattern due to "Q2" quarterly language
     assert "far_future_forecast" not in data["results"][2]
     assert "forecast_timeframe" not in data["results"][2]
+
+
+# ============================================================================
+# Company Relevance Dedicated Endpoint Tests (Phase 3 Refactor)
+# ============================================================================
+
+
+def test_company_relevance_endpoint_single_headline(client_with_company):
+    """Test POST /company-relevance returns relevance for single headline."""
+    response = client_with_company.post(
+        "/company-relevance",
+        json={"headline": "Dell launches product", "company": "Dell"}
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify response structure
+    assert "headline" in data
+    assert "company" in data
+    assert "is_about_company" in data
+    assert "company_score" in data
+
+    # Verify values
+    assert data["headline"] == "Dell launches product"
+    assert data["company"] == "Dell"
+    assert data["is_about_company"] is True
+    assert data["company_score"] == 0.85
+
+
+def test_company_relevance_endpoint_not_relevant(client_with_company):
+    """Test POST /company-relevance returns false for non-relevant headline."""
+    response = client_with_company.post(
+        "/company-relevance",
+        json={"headline": "Dell launches product", "company": "Tesla"}
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify values
+    assert data["is_about_company"] is False
+    assert data["company_score"] == 0.15
+    assert data["company"] == "Tesla"
+
+
+def test_company_relevance_endpoint_missing_company_field(client_with_company):
+    """Test POST /company-relevance without company field returns 422."""
+    response = client_with_company.post(
+        "/company-relevance",
+        json={"headline": "Dell launches product"}
+    )
+
+    assert response.status_code == 422
+
+
+def test_company_relevance_endpoint_missing_headline_field(client_with_company):
+    """Test POST /company-relevance without headline field returns 422."""
+    response = client_with_company.post(
+        "/company-relevance",
+        json={"company": "Dell"}
+    )
+
+    assert response.status_code == 422
+
+
+def test_company_relevance_endpoint_empty_headline(client_with_company):
+    """Test POST /company-relevance with empty headline returns 422."""
+    response = client_with_company.post(
+        "/company-relevance",
+        json={"headline": "", "company": "Dell"}
+    )
+
+    assert response.status_code == 422
+
+
+def test_company_relevance_endpoint_empty_company(client_with_company):
+    """Test POST /company-relevance with empty company returns 422."""
+    response = client_with_company.post(
+        "/company-relevance",
+        json={"headline": "Dell launches product", "company": ""}
+    )
+
+    assert response.status_code == 422
+
+
+def test_company_relevance_batch_endpoint_multiple_headlines(client_with_company):
+    """Test POST /company-relevance/batch returns relevance for multiple headlines."""
+    response = client_with_company.post(
+        "/company-relevance/batch",
+        json={
+            "headlines": ["Dell launches product", "Tesla updates software"],
+            "company": "Dell"
+        }
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify response structure
+    assert "company" in data
+    assert "results" in data
+    assert len(data["results"]) == 2
+
+    # Verify each result structure
+    for result in data["results"]:
+        assert "headline" in result
+        assert "is_about_company" in result
+        assert "company_score" in result
+
+
+def test_company_relevance_batch_endpoint_empty_headlines(client_with_company):
+    """Test POST /company-relevance/batch with empty list returns 422."""
+    response = client_with_company.post(
+        "/company-relevance/batch",
+        json={"headlines": [], "company": "Dell"}
+    )
+
+    assert response.status_code == 422
+
+
+def test_company_relevance_batch_endpoint_missing_company(client_with_company):
+    """Test POST /company-relevance/batch without company returns 422."""
+    response = client_with_company.post(
+        "/company-relevance/batch",
+        json={"headlines": ["test"]}
+    )
+
+    assert response.status_code == 422
+
+
+# ============================================================================
+# Quantitative Catalyst Detection API Endpoint Tests (Phase 4)
+# ============================================================================
+
+
+def test_detect_quantitative_catalyst_endpoint_with_dividend(mock_transformers_pipeline):
+    """Test POST /detect-quantitative-catalyst detects dividend announcements."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.api.app" in sys.modules:
+        del sys.modules["benz_sent_filter.api.app"]
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    # Mock MNLI scores for catalyst detection
+    mock_transformers_pipeline({
+        "This announces a specific financial transaction like a dividend, acquisition, or buyback with a dollar amount": 0.9,
+        "This describes a stock price movement, milestone, or general business update": 0.1,
+        "This announces a dividend payment with a specific dollar amount": 0.85,
+        "This does not announce a dividend payment": 0.15,
+        "This announces an acquisition or merger with a specific purchase price": 0.2,
+        "This does not announce an acquisition or merger": 0.8,
+        "This announces a share buyback program with a specific dollar amount": 0.3,
+        "This does not announce a share buyback program": 0.7,
+        "This announces earnings results with specific dollar figures": 0.2,
+        "This does not announce earnings results": 0.8,
+        "This provides revenue guidance with specific dollar projections": 0.3,
+        "This does not provide revenue guidance": 0.7,
+    })
+
+    from benz_sent_filter.api.app import app
+    from fastapi.testclient import TestClient
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/detect-quantitative-catalyst",
+            json={"headline": "Universal Security Instruments Increases Quarterly Dividend to $1 Per Share"}
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify response structure
+    assert "headline" in data
+    assert "has_quantitative_catalyst" in data
+    assert "catalyst_type" in data
+    assert "catalyst_values" in data
+    assert "confidence" in data
+
+    # Verify detection
+    assert data["has_quantitative_catalyst"] is True
+    assert data["catalyst_type"] == "dividend"
+    assert "$1" in data["catalyst_values"]
+    assert data["confidence"] > 0.5
+
+
+def test_detect_quantitative_catalyst_endpoint_with_acquisition(mock_transformers_pipeline):
+    """Test POST /detect-quantitative-catalyst detects acquisitions."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.api.app" in sys.modules:
+        del sys.modules["benz_sent_filter.api.app"]
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    # Mock MNLI scores for acquisition
+    mock_transformers_pipeline({
+        "This announces a specific financial transaction like a dividend, acquisition, or buyback with a dollar amount": 0.92,
+        "This describes a stock price movement, milestone, or general business update": 0.08,
+        "This announces a dividend payment with a specific dollar amount": 0.1,
+        "This does not announce a dividend payment": 0.9,
+        "This announces an acquisition or merger with a specific purchase price": 0.88,
+        "This does not announce an acquisition or merger": 0.12,
+        "This announces a share buyback program with a specific dollar amount": 0.2,
+        "This does not announce a share buyback program": 0.8,
+        "This announces earnings results with specific dollar figures": 0.15,
+        "This does not announce earnings results": 0.85,
+        "This provides revenue guidance with specific dollar projections": 0.25,
+        "This does not provide revenue guidance": 0.75,
+    })
+
+    from benz_sent_filter.api.app import app
+    from fastapi.testclient import TestClient
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/detect-quantitative-catalyst",
+            json={"headline": "Alpha Metallurgical Resources to Acquire Ramaco Resources for $3.5B"}
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data["has_quantitative_catalyst"] is True
+    assert data["catalyst_type"] == "acquisition"
+    assert "$3.5B" in data["catalyst_values"]
+    assert data["confidence"] > 0.5
+
+
+def test_detect_quantitative_catalyst_endpoint_no_catalyst(mock_transformers_pipeline):
+    """Test POST /detect-quantitative-catalyst returns false for non-catalyst headlines."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.api.app" in sys.modules:
+        del sys.modules["benz_sent_filter.api.app"]
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    # Mock MNLI scores for non-catalyst (price movement)
+    mock_transformers_pipeline({
+        "This announces a specific financial transaction like a dividend, acquisition, or buyback with a dollar amount": 0.2,
+        "This describes a stock price movement, milestone, or general business update": 0.8,
+        "This announces a dividend payment with a specific dollar amount": 0.1,
+        "This does not announce a dividend payment": 0.9,
+        "This announces an acquisition or merger with a specific purchase price": 0.15,
+        "This does not announce an acquisition or merger": 0.85,
+        "This announces a share buyback program with a specific dollar amount": 0.1,
+        "This does not announce a share buyback program": 0.9,
+        "This announces earnings results with specific dollar figures": 0.2,
+        "This does not announce earnings results": 0.8,
+        "This provides revenue guidance with specific dollar projections": 0.15,
+        "This does not provide revenue guidance": 0.85,
+    })
+
+    from benz_sent_filter.api.app import app
+    from fastapi.testclient import TestClient
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/detect-quantitative-catalyst",
+            json={"headline": "Stock reaches $100 milestone"}
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data["has_quantitative_catalyst"] is False
+    # catalyst_type is excluded when None (exclude_none=True)
+    assert "catalyst_type" not in data
+    assert data["catalyst_values"] == []
+    assert data["confidence"] == 0.0
+
+
+def test_detect_quantitative_catalyst_endpoint_empty_headline(client):
+    """Test POST /detect-quantitative-catalyst with empty headline returns 422."""
+    response = client.post(
+        "/detect-quantitative-catalyst",
+        json={"headline": ""}
+    )
+
+    assert response.status_code == 422
+
+
+def test_detect_quantitative_catalyst_endpoint_missing_headline(client):
+    """Test POST /detect-quantitative-catalyst without headline field returns 422."""
+    response = client.post(
+        "/detect-quantitative-catalyst",
+        json={}
+    )
+
+    assert response.status_code == 422
+
+
+def test_detect_quantitative_catalyst_endpoint_response_structure(mock_transformers_pipeline):
+    """Test POST /detect-quantitative-catalyst has complete response structure."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.api.app" in sys.modules:
+        del sys.modules["benz_sent_filter.api.app"]
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    # Mock MNLI scores
+    mock_transformers_pipeline({
+        "This announces a specific financial transaction like a dividend, acquisition, or buyback with a dollar amount": 0.85,
+        "This describes a stock price movement, milestone, or general business update": 0.15,
+        "This announces a dividend payment with a specific dollar amount": 0.75,
+        "This does not announce a dividend payment": 0.25,
+        "This announces an acquisition or merger with a specific purchase price": 0.2,
+        "This does not announce an acquisition or merger": 0.8,
+        "This announces a share buyback program with a specific dollar amount": 0.3,
+        "This does not announce a share buyback program": 0.7,
+        "This announces earnings results with specific dollar figures": 0.2,
+        "This does not announce earnings results": 0.8,
+        "This provides revenue guidance with specific dollar projections": 0.3,
+        "This does not provide revenue guidance": 0.7,
+    })
+
+    from benz_sent_filter.api.app import app
+    from fastapi.testclient import TestClient
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/detect-quantitative-catalyst",
+            json={"headline": "Test dividend $1/share"}
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify all required fields present
+    assert "headline" in data
+    assert isinstance(data["headline"], str)
+
+    assert "has_quantitative_catalyst" in data
+    assert isinstance(data["has_quantitative_catalyst"], bool)
+
+    assert "catalyst_type" in data
+    assert data["catalyst_type"] in ["dividend", "acquisition", "buyback", "earnings", "guidance", "mixed", None]
+
+    assert "catalyst_values" in data
+    assert isinstance(data["catalyst_values"], list)
+
+    assert "confidence" in data
+    assert isinstance(data["confidence"], float)
+    assert 0.0 <= data["confidence"] <= 1.0
