@@ -1226,3 +1226,135 @@ class TestConditionalLanguagePatternDetection:
 
         assert has_conditional is True
         assert "aims to" in patterns
+
+
+# ============================================================================
+# Conditional Language Service Integration Tests (Phase 2)
+# ============================================================================
+
+
+class TestConditionalLanguageServiceIntegration:
+    """Tests for conditional language integration into ClassificationService."""
+
+    def test_analyze_conditional_language_future_event_with_patterns(
+        self, mock_transformers_pipeline
+    ):
+        """Test _analyze_conditional_language returns patterns for FUTURE_EVENT with conditional language."""
+        import sys
+
+        # Clear module cache
+        if "benz_sent_filter.services.classifier" in sys.modules:
+            del sys.modules["benz_sent_filter.services.classifier"]
+
+        mock_transformers_pipeline({
+            "This is an opinion piece or editorial": 0.2,
+            "This is a factual news report": 0.75,
+            "This is about a past event that already happened": 0.1,
+            "This is about a future event or forecast": 0.7,
+            "This is a general topic or analysis": 0.2,
+        })
+
+        from benz_sent_filter.services.classifier import ClassificationService
+        from benz_sent_filter.models.classification import TemporalCategory
+
+        service = ClassificationService()
+        result = service._analyze_conditional_language(
+            "Apple plans to explore AI opportunities",
+            TemporalCategory.FUTURE_EVENT
+        )
+
+        assert result["conditional_language"] is True
+        assert "plans to" in result["conditional_patterns"]
+        assert "explore" in result["conditional_patterns"]
+
+    def test_analyze_conditional_language_future_event_no_patterns(
+        self, mock_transformers_pipeline
+    ):
+        """Test _analyze_conditional_language returns None for FUTURE_EVENT without conditional language."""
+        import sys
+
+        # Clear module cache
+        if "benz_sent_filter.services.classifier" in sys.modules:
+            del sys.modules["benz_sent_filter.services.classifier"]
+
+        mock_transformers_pipeline({
+            "This is an opinion piece or editorial": 0.2,
+            "This is a factual news report": 0.75,
+            "This is about a past event that already happened": 0.1,
+            "This is about a future event or forecast": 0.7,
+            "This is a general topic or analysis": 0.2,
+        })
+
+        from benz_sent_filter.services.classifier import ClassificationService
+        from benz_sent_filter.models.classification import TemporalCategory
+
+        service = ClassificationService()
+        result = service._analyze_conditional_language(
+            "Apple will launch product in Q2",
+            TemporalCategory.FUTURE_EVENT
+        )
+
+        assert result["conditional_language"] is None
+        assert result["conditional_patterns"] is None
+
+    def test_analyze_conditional_language_past_event_skipped(
+        self, mock_transformers_pipeline
+    ):
+        """Test _analyze_conditional_language skips analysis for PAST_EVENT."""
+        import sys
+
+        # Clear module cache
+        if "benz_sent_filter.services.classifier" in sys.modules:
+            del sys.modules["benz_sent_filter.services.classifier"]
+
+        mock_transformers_pipeline({
+            "This is an opinion piece or editorial": 0.2,
+            "This is a factual news report": 0.75,
+            "This is about a past event that already happened": 0.7,
+            "This is about a future event or forecast": 0.1,
+            "This is a general topic or analysis": 0.2,
+        })
+
+        from benz_sent_filter.services.classifier import ClassificationService
+        from benz_sent_filter.models.classification import TemporalCategory
+
+        service = ClassificationService()
+        result = service._analyze_conditional_language(
+            "Apple planned to expand markets",
+            TemporalCategory.PAST_EVENT
+        )
+
+        assert result["conditional_language"] is None
+        assert result["conditional_patterns"] is None
+
+    def test_classify_headline_integrates_conditional_language_fields(
+        self, mock_transformers_pipeline
+    ):
+        """Test classify_headline integrates conditional language detection."""
+        import sys
+
+        # Clear module cache
+        if "benz_sent_filter.services.classifier" in sys.modules:
+            del sys.modules["benz_sent_filter.services.classifier"]
+
+        mock_transformers_pipeline({
+            "This is an opinion piece or editorial": 0.2,
+            "This is a factual news report": 0.75,
+            "This is about a past event that already happened": 0.1,
+            "This is about a future event or forecast": 0.7,
+            "This is a general topic or analysis": 0.2,
+            "This article describes a routine business operation like quarterly dividends, regular loan portfolio sales, scheduled buybacks, or normal refinancing": 0.3,
+        })
+
+        from benz_sent_filter.services.classifier import ClassificationService
+
+        service = ClassificationService()
+        result = service.classify_headline("Microsoft may consider acquisitions")
+
+        # Verify conditional language fields populated
+        assert result.conditional_language is True
+        assert "may" in result.conditional_patterns
+        assert "consider" in result.conditional_patterns
+
+        # Verify existing classification still works
+        assert result.is_straight_news is True
