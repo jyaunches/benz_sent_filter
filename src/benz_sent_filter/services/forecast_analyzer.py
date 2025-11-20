@@ -6,6 +6,30 @@ by matching multi-year timeframe patterns and excluding near-term indicators.
 
 import re
 
+# Precompiled regex patterns for conditional language detection
+# Pattern dict maps pattern name to compiled regex for performance
+CONDITIONAL_PATTERNS = {
+    "plans to": re.compile(r"\bplans\s+to\b", re.IGNORECASE),
+    "aims to": re.compile(r"\baims\s+to\b", re.IGNORECASE),
+    "intends to": re.compile(r"\bintends\s+to\b", re.IGNORECASE),
+    "seeks to": re.compile(r"\bseeks\s+to\b", re.IGNORECASE),
+    "expected to": re.compile(r"\bexpected\s+to\b", re.IGNORECASE),
+    "anticipated to": re.compile(r"\banticipated\s+to\b", re.IGNORECASE),
+    "could": re.compile(r"\bcould\b", re.IGNORECASE),
+    "may": re.compile(r"\bmay\b", re.IGNORECASE),
+    "might": re.compile(r"\bmight\b", re.IGNORECASE),
+    "would": re.compile(r"\bwould\b", re.IGNORECASE),
+    "exploring": re.compile(r"\bexploring\b", re.IGNORECASE),
+    "considering": re.compile(r"\bconsidering\b", re.IGNORECASE),
+    "evaluating": re.compile(r"\bevaluating\b", re.IGNORECASE),
+    "reviewing": re.compile(r"\breviewing\b", re.IGNORECASE),
+    "potential": re.compile(r"\bpotential\b", re.IGNORECASE),
+    "possible": re.compile(r"\bpossible\b", re.IGNORECASE),
+    "looking to": re.compile(r"\blooking\s+to\b", re.IGNORECASE),
+    "explore": re.compile(r"\bexplore\b", re.IGNORECASE),
+    "consider": re.compile(r"\bconsider\b", re.IGNORECASE),
+}
+
 
 def matches_multi_year_timeframe(text: str) -> tuple[bool, str | None]:
     """Detect multi-year timeframe patterns in text.
@@ -96,3 +120,39 @@ def is_far_future(text: str) -> tuple[bool, str | None]:
         return True, timeframe
 
     return False, None
+
+
+def matches_conditional_language(text: str) -> tuple[bool, list[str]]:
+    """Detect conditional or hedging language patterns in text.
+
+    Detects patterns indicating uncertainty, intention, or exploration rather
+    than concrete commitments. Useful for distinguishing hedged future statements
+    from definitive announcements.
+
+    Pattern categories:
+    - Intention: "plans to", "aims to", "intends to", "seeks to"
+    - Expectation: "expected to", "anticipated to"
+    - Modal uncertainty: "could", "may", "might", "would"
+    - Exploration: "exploring", "considering", "evaluating", "reviewing"
+    - Optionality: "potential", "possible", "looking to"
+
+    Args:
+        text: Text to analyze (typically headline)
+
+    Returns:
+        Tuple of (has_conditional: bool, matched_patterns: list[str])
+        - has_conditional: True if any conditional patterns detected
+        - matched_patterns: List of matched pattern names in dict iteration order
+    """
+    matched_patterns = []
+
+    # Iterate through precompiled patterns and collect matches
+    for pattern_name, compiled_regex in CONDITIONAL_PATTERNS.items():
+        if compiled_regex.search(text):
+            matched_patterns.append(pattern_name)
+
+    # Return True with patterns if any matches, otherwise False with empty list
+    if matched_patterns:
+        return True, matched_patterns
+    else:
+        return False, []
