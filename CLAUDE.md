@@ -14,6 +14,10 @@ This repository implements **benz_sent_filter** - an MNLS-based sentiment classi
 
 The service runs on CPU and uses open-source models without requiring custom training.
 
+## Cross-Repository Work
+
+For architectural and system knowledge about this repository, invoke the `sentiment-filter-expert` skill which provides comprehensive understanding of MNLS-based classification, zero-shot inference, and filtering logic. For tasks spanning multiple benz ecosystem repositories, use the `cross-repo-helper` agent in benz_mgmt. Agents and slash commands automatically invoke skills when deep system knowledge is needed.
+
 ## Architecture
 
 ### Service Type
