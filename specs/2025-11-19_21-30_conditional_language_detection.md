@@ -76,18 +76,14 @@ Headlines like "Apple plans to explore AI opportunities" and "Microsoft may cons
 - Pydantic serialization handles optional fields
 
 ### Pattern Detection Strategy
-**Conditional Language Categories**:
-1. **Intention verbs**: "plans to", "aims to", "intends to", "seeks to"
-2. **Expectation language**: "expected to", "anticipated to"
-3. **Modal uncertainty**: "could", "may", "might", "would"
-4. **Exploration/consideration**: "exploring", "considering", "evaluating", "reviewing"
-5. **Optionality**: "potential", "possible", "looking to"
+**Conditional Language Patterns to Detect**:
+- Intention: "plans to", "aims to", "intends to", "seeks to"
+- Expectation: "expected to", "anticipated to"
+- Modal uncertainty: "could", "may", "might", "would"
+- Exploration: "exploring", "considering", "evaluating", "reviewing"
+- Optionality: "potential", "possible", "looking to"
 
-**Detection Approach**:
-- Case-insensitive pattern matching
-- Word boundary checks to avoid partial matches
-- Return list of actual matched patterns (not categories)
-- No scoring or weighting (boolean detection only)
+Pattern matching should be case-insensitive with word boundaries.
 
 ### Integration Logic
 **When to Apply Detection**:
