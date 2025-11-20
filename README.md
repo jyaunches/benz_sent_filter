@@ -11,6 +11,7 @@ Benz Sent Filter provides zero-shot natural language inference capabilities to c
 3. **Company Relevance**: Detects whether a headline is about a specific company (optional)
 4. **Far-Future Forecast Detection**: Identifies multi-year forecasts vs near-term guidance (automatic for future events)
 5. **Routine Operations Filter**: Detects routine business operations with immaterial financial impact (optional)
+6. **Quantitative Catalyst Detection**: Identifies specific financial catalysts with dollar amounts (dividends, acquisitions, buybacks)
 
 The service is designed to:
 - Run on CPU (no GPU required)
@@ -242,6 +243,68 @@ How it works:
 - Detects patterns like: "over X years", "by 2028", "X-year forecast"
 - Returns `null` for near-term forecasts (<1 year)
 - Helps downstream systems filter out speculative long-term projections
+
+### Quantitative Catalyst Detection
+
+Detect whether a headline announces a specific, quantitative financial catalyst (dividend amount, acquisition price, buyback size):
+
+```bash
+curl -X POST http://localhost:8002/detect-quantitative-catalyst \
+  -H "Content-Type: application/json" \
+  -d '{"headline": "Universal Safety Declares $1 Special Dividend After Feit Electric Asset Sale"}'
+```
+
+Response:
+```json
+{
+  "headline": "Universal Safety Declares $1 Special Dividend After Feit Electric Asset Sale",
+  "has_quantitative_catalyst": true,
+  "catalyst_type": "dividend",
+  "catalyst_values": ["$1"],
+  "confidence": 0.92
+}
+```
+
+How it works:
+- Uses MNLI semantic understanding to detect catalyst presence
+- Extracts dollar amounts, per-share prices, and percentages via regex
+- Classifies catalyst type: dividend, acquisition, buyback, earnings, guidance, or mixed
+- Returns confidence score (0.0 - 1.0) based on semantic match strength
+- Helps downstream systems identify quantifiable financial events
+
+**Examples by catalyst type:**
+
+**Dividend:**
+```bash
+curl -X POST http://localhost:8002/detect-quantitative-catalyst \
+  -H "Content-Type: application/json" \
+  -d '{"headline": "Universal Safety Declares $1 Special Dividend After Feit Electric Asset Sale"}'
+```
+Response: `has_quantitative_catalyst: true, catalyst_type: "dividend", catalyst_values: ["$1"]`
+
+**Acquisition:**
+```bash
+curl -X POST http://localhost:8002/detect-quantitative-catalyst \
+  -H "Content-Type: application/json" \
+  -d '{"headline": "Sompo To Acquire Aspen For $3.5B, Or $37.50/Share And Redeem All Class A Shares"}'
+```
+Response: `has_quantitative_catalyst: true, catalyst_type: "acquisition", catalyst_values: ["$3.5B", "$37.50/Share"]`
+
+**Buyback:**
+```bash
+curl -X POST http://localhost:8002/detect-quantitative-catalyst \
+  -H "Content-Type: application/json" \
+  -d '{"headline": "Riskified Board Authorizes Repurchase Of Up To $75M Of Its Class A Ordinary Shares"}'
+```
+Response: `has_quantitative_catalyst: true, catalyst_type: "buyback", catalyst_values: ["$75M"]`
+
+**Negative case (no catalyst):**
+```bash
+curl -X POST http://localhost:8002/detect-quantitative-catalyst \
+  -H "Content-Type: application/json" \
+  -d '{"headline": "Company Updates Strategic Outlook"}'
+```
+Response: `has_quantitative_catalyst: false, catalyst_type: null, catalyst_values: [], confidence: 0.0`
 
 ### Routine Operations Filter
 
