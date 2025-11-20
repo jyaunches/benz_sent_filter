@@ -1154,3 +1154,172 @@ def test_detect_quantitative_catalyst_endpoint_response_structure(mock_transform
     assert "confidence" in data
     assert isinstance(data["confidence"], float)
     assert 0.0 <= data["confidence"] <= 1.0
+
+
+# ============================================================================
+# Conditional Language Detection API Integration Tests (Phase 4)
+# ============================================================================
+
+
+def test_classify_endpoint_conditional_language_detected_future_event(mock_transformers_pipeline):
+    """Test POST /classify returns conditional language fields for FUTURE_EVENT with conditional patterns."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.api.app" in sys.modules:
+        del sys.modules["benz_sent_filter.api.app"]
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    mock_transformers_pipeline({
+        "This is an opinion piece or editorial": 0.2,
+        "This is a factual news report": 0.75,
+        "This is about a past event that already happened": 0.1,
+        "This is about a future event or forecast": 0.7,
+        "This is a general topic or analysis": 0.2,
+        "This article describes a routine business operation like quarterly dividends, regular loan portfolio sales, scheduled buybacks, or normal refinancing": 0.3,
+    })
+
+    from benz_sent_filter.api.app import app
+    from fastapi.testclient import TestClient
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/classify",
+            json={"headline": "Apple plans to explore AI opportunities in 2025"}
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify temporal category
+    assert data["temporal_category"] == "future_event"
+
+    # Verify conditional language fields present
+    assert data["conditional_language"] is True
+    assert "conditional_patterns" in data
+    assert "plans to" in data["conditional_patterns"]
+    assert "explore" in data["conditional_patterns"]
+
+
+def test_classify_endpoint_no_conditional_language_concrete_future(mock_transformers_pipeline):
+    """Test POST /classify excludes conditional fields for concrete FUTURE_EVENT statements."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.api.app" in sys.modules:
+        del sys.modules["benz_sent_filter.api.app"]
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    mock_transformers_pipeline({
+        "This is an opinion piece or editorial": 0.2,
+        "This is a factual news report": 0.75,
+        "This is about a past event that already happened": 0.1,
+        "This is about a future event or forecast": 0.7,
+        "This is a general topic or analysis": 0.2,
+        "This article describes a routine business operation like quarterly dividends, regular loan portfolio sales, scheduled buybacks, or normal refinancing": 0.3,
+    })
+
+    from benz_sent_filter.api.app import app
+    from fastapi.testclient import TestClient
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/classify",
+            json={"headline": "Apple will launch iPhone 16 in September"}
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify temporal category
+    assert data["temporal_category"] == "future_event"
+
+    # Verify conditional language fields NOT in response (exclude_none)
+    assert "conditional_language" not in data
+    assert "conditional_patterns" not in data
+
+
+def test_classify_endpoint_conditional_language_not_detected_past_event(mock_transformers_pipeline):
+    """Test POST /classify excludes conditional fields for PAST_EVENT (even with conditional words)."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.api.app" in sys.modules:
+        del sys.modules["benz_sent_filter.api.app"]
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    mock_transformers_pipeline({
+        "This is an opinion piece or editorial": 0.2,
+        "This is a factual news report": 0.75,
+        "This is about a past event that already happened": 0.7,
+        "This is about a future event or forecast": 0.1,
+        "This is a general topic or analysis": 0.2,
+        "This article describes a routine business operation like quarterly dividends, regular loan portfolio sales, scheduled buybacks, or normal refinancing": 0.3,
+    })
+
+    from benz_sent_filter.api.app import app
+    from fastapi.testclient import TestClient
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/classify",
+            json={"headline": "Apple planned to expand but changed direction"}
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify temporal category
+    assert data["temporal_category"] == "past_event"
+
+    # Verify conditional language fields NOT in response (only analyzed for FUTURE_EVENT)
+    assert "conditional_language" not in data
+    assert "conditional_patterns" not in data
+
+
+def test_classify_endpoint_conditional_with_far_future_combination(mock_transformers_pipeline):
+    """Test POST /classify with both conditional language and far-future patterns."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.api.app" in sys.modules:
+        del sys.modules["benz_sent_filter.api.app"]
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    mock_transformers_pipeline({
+        "This is an opinion piece or editorial": 0.2,
+        "This is a factual news report": 0.75,
+        "This is about a past event that already happened": 0.1,
+        "This is about a future event or forecast": 0.7,
+        "This is a general topic or analysis": 0.2,
+        "This article describes a routine business operation like quarterly dividends, regular loan portfolio sales, scheduled buybacks, or normal refinancing": 0.3,
+    })
+
+    from benz_sent_filter.api.app import app
+    from fastapi.testclient import TestClient
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/classify",
+            json={"headline": "Dell may target $10B revenue by 2028"}
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify temporal category
+    assert data["temporal_category"] == "future_event"
+
+    # Verify conditional language fields present
+    assert data["conditional_language"] is True
+    assert "conditional_patterns" in data
+    assert "may" in data["conditional_patterns"]
+
+    # Verify far-future fields also present
+    assert data["far_future_forecast"] is True
+    assert data["forecast_timeframe"] is not None
+    assert "2028" in data["forecast_timeframe"]
