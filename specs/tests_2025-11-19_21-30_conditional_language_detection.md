@@ -51,7 +51,7 @@ Location: `tests/test_classifier.py`
 
 5. **test_conditional_language_detects_multiple_patterns**
    - **Input**: "Company plans to explore potential acquisitions and may announce by Q2"
-   - **Expected**: `(True, ["plans to", "explore", "potential", "may"])`
+   - **Expected**: `(True, list)` where list contains "plans to", "explore", "potential", "may" (order matches CONDITIONAL_PATTERNS dict order)
    - **Covers**: Multiple pattern detection in single headline
 
 6. **test_conditional_language_no_match_concrete_language**

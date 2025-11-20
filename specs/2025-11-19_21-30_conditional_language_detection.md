@@ -109,6 +109,7 @@ Conditional language detection only executes for FUTURE_EVENT temporal category,
 - Define precompiled regex patterns at module level using `re.compile()` for performance
 - Pattern dict maps pattern name (str) to compiled regex: `{"plans to": re.compile(r"\bplans\s+to\b", re.IGNORECASE), ...}`
 - Iterate through patterns, collect matches using `.search()` on each compiled regex
+- Return matched pattern names in dict iteration order (deterministic in Python 3.7+)
 - Return empty list if no matches, list of matched pattern names otherwise
 
 **Unit Test Requirements**:
