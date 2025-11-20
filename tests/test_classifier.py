@@ -1144,3 +1144,85 @@ def test_classify_headline_multi_ticker_performance_validation(monkeypatch):
         f"Multi-ticker ({multi_ticker_calls} calls) should be faster than "
         f"sequential ({sequential_calls} calls)"
     )
+
+
+# ============================================================================
+# Conditional Language Pattern Detection Tests (Phase 1)
+# ============================================================================
+
+
+class TestConditionalLanguagePatternDetection:
+    """Tests for conditional language pattern matching function."""
+
+    def test_conditional_language_detects_intention_verbs(self):
+        """Test detection of intention verb patterns like 'plans to'."""
+        from benz_sent_filter.services.forecast_analyzer import matches_conditional_language
+
+        headline = "Apple plans to expand into new markets next year"
+        has_conditional, patterns = matches_conditional_language(headline)
+
+        assert has_conditional is True
+        assert "plans to" in patterns
+
+    def test_conditional_language_detects_expectation_patterns(self):
+        """Test detection of expectation language patterns like 'expected to'."""
+        from benz_sent_filter.services.forecast_analyzer import matches_conditional_language
+
+        headline = "Company expected to announce results in Q4"
+        has_conditional, patterns = matches_conditional_language(headline)
+
+        assert has_conditional is True
+        assert "expected to" in patterns
+
+    def test_conditional_language_detects_modal_uncertainty(self):
+        """Test detection of modal uncertainty patterns like 'may', 'could'."""
+        from benz_sent_filter.services.forecast_analyzer import matches_conditional_language
+
+        headline = "Microsoft may acquire startup for undisclosed sum"
+        has_conditional, patterns = matches_conditional_language(headline)
+
+        assert has_conditional is True
+        assert "may" in patterns
+
+    def test_conditional_language_detects_exploration_language(self):
+        """Test detection of exploration/consideration patterns."""
+        from benz_sent_filter.services.forecast_analyzer import matches_conditional_language
+
+        headline = "Tesla exploring opportunities in autonomous vehicles"
+        has_conditional, patterns = matches_conditional_language(headline)
+
+        assert has_conditional is True
+        assert "exploring" in patterns
+
+    def test_conditional_language_detects_multiple_patterns(self):
+        """Test detection of multiple conditional patterns in same headline."""
+        from benz_sent_filter.services.forecast_analyzer import matches_conditional_language
+
+        headline = "Company plans to explore potential acquisitions and may announce by Q2"
+        has_conditional, patterns = matches_conditional_language(headline)
+
+        assert has_conditional is True
+        assert len(patterns) >= 3  # Should detect multiple patterns
+        assert "plans to" in patterns
+        assert "potential" in patterns
+        assert "may" in patterns
+
+    def test_conditional_language_no_match_concrete_language(self):
+        """Test no false positives on concrete future statements."""
+        from benz_sent_filter.services.forecast_analyzer import matches_conditional_language
+
+        headline = "Apple will launch new iPhone in September"
+        has_conditional, patterns = matches_conditional_language(headline)
+
+        assert has_conditional is False
+        assert patterns == []
+
+    def test_conditional_language_case_insensitive_matching(self):
+        """Test case-insensitive pattern matching."""
+        from benz_sent_filter.services.forecast_analyzer import matches_conditional_language
+
+        headline = "Company AIMS TO increase revenue next quarter"
+        has_conditional, patterns = matches_conditional_language(headline)
+
+        assert has_conditional is True
+        assert "aims to" in patterns
