@@ -315,9 +315,9 @@ class StrategicCatalystResult(BaseModel):
         ...,
         description="Whether headline announces a strategic corporate catalyst",
     )
-    catalyst_type: str | None = Field(
+    catalyst_subtype: str | None = Field(
         default=None,
-        description="Type of catalyst detected: 'executive_change', 'merger_agreement', 'strategic_partnership', 'product_launch', 'rebranding', 'clinical_trial_results', or 'mixed'",
+        description="Type of catalyst detected: 'executive_changes', 'm&a', 'partnership', 'product_launch', 'clinical_trial', 'corporate_restructuring', or 'mixed'",
     )
     confidence: float = Field(
         ...,

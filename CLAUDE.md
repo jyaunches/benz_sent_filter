@@ -131,11 +131,11 @@ Available via `.claude/commands/` (symlinked from benz_mgmt):
 
 5. **Strategic Catalyst Detection** (via `/detect-strategic-catalyst` endpoint):
    - MNLI-based presence detection and type classification
-   - Returns `has_strategic_catalyst`, `catalyst_type`, `confidence`
-   - Types: executive_change, merger_agreement, strategic_partnership, product_launch, rebranding, clinical_trial_results
+   - Returns `has_strategic_catalyst`, `catalyst_subtype`, `confidence`
+   - Types: executive_changes, m&a, partnership, product_launch, corporate_restructuring, clinical_trial
    - Examples:
-     - Executive change: "X4 Pharmaceuticals CEO and CFO Step Down" → executive_change (0.94 confidence)
-     - Merger: "Workhorse Group And ATW Partners Announce Merger Agreement" → merger_agreement (0.88 confidence)
+     - Executive change: "X4 Pharmaceuticals CEO and CFO Step Down" → executive_changes (0.94 confidence)
+     - Merger: "Workhorse Group And ATW Partners Announce Merger Agreement" → m&a (0.88 confidence)
      - Product launch: "SMX Partners with UN to Launch Global Product Platform" → product_launch (0.82 confidence)
    - Performance: <1s for single headline
    - Accuracy: 90%+ on 11 real-world test cases
@@ -165,7 +165,7 @@ Service provides classification endpoints for:
 
 **Request/Response** (`/detect-strategic-catalyst`):
 - Request: `{"headline": "Company appoints new CEO"}`
-- Response: `{"headline": "...", "has_strategic_catalyst": true, "catalyst_type": "executive_change", "confidence": 0.89}`
+- Response: `{"headline": "...", "has_strategic_catalyst": true, "catalyst_subtype": "executive_changes", "confidence": 0.89}`
 
 **Request/Response** (`/detect-quantitative-catalyst`):
 - Request: `{"headline": "Company announces $1 dividend"}`
