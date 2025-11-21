@@ -287,3 +287,39 @@ class QuantitativeCatalystResult(BaseModel):
         ...,
         description="Confidence in detection (0.0 to 1.0), combining presence score, type score, and value count",
     )
+
+
+# Strategic Catalyst Detection Models
+
+
+class StrategicCatalystRequest(BaseModel):
+    """Request model for strategic catalyst detection."""
+
+    headline: str = Field(
+        ..., min_length=1, description="Article headline to analyze for strategic catalysts"
+    )
+
+
+class StrategicCatalystResult(BaseModel):
+    """Result model for strategic catalyst detection.
+
+    Uses MNLI-based presence detection and type classification to identify
+    strategic corporate catalysts (executive changes, mergers, partnerships,
+    product launches, rebranding, clinical trials).
+    """
+
+    model_config = ConfigDict(exclude_none=True)
+
+    headline: str = Field(..., description="Original headline text")
+    has_strategic_catalyst: bool = Field(
+        ...,
+        description="Whether headline announces a strategic corporate catalyst",
+    )
+    catalyst_type: str | None = Field(
+        default=None,
+        description="Type of catalyst detected: 'executive_change', 'merger_agreement', 'strategic_partnership', 'product_launch', 'rebranding', 'clinical_trial_results', or 'mixed'",
+    )
+    confidence: float = Field(
+        ...,
+        description="Confidence in detection (0.0 to 1.0), based on MNLI type classification score",
+    )
