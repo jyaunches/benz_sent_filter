@@ -103,27 +103,27 @@ class TestTypeClassification:
     """Test MNLI type classification for strategic catalysts."""
 
     def test_classify_executive_change_type(self, detector):
-        """XFOR case: Should classify as executive_change."""
+        """XFOR case: Should classify as executive_changes."""
         headline = "X4 Pharmaceuticals' President And CEO Paula Ragan And CFO Adam Mostafa Have Stepped Down..."
         result = detector.detect(headline)
 
-        assert result.catalyst_type == "executive_change"
+        assert result.catalyst_subtype == "executive_changes"
         assert result.confidence >= 0.6
 
     def test_classify_executive_change_cfo_appointment(self, detector):
-        """SHCO case: CFO appointment should classify as executive_change."""
+        """SHCO case: CFO appointment should classify as executive_changes."""
         headline = "Soho House & Co Inc. Appoints David Bowie As Chief Financial Officer"
         result = detector.detect(headline)
 
-        assert result.catalyst_type == "executive_change"
+        assert result.catalyst_subtype == "executive_changes"
         assert result.confidence >= 0.6
 
     def test_classify_merger_agreement_type(self, detector):
-        """WKHS case: Should classify as merger_agreement."""
+        """WKHS case: Should classify as m&a."""
         headline = "Workhorse Group And ATW Partners Announce Merger Agreement"
         result = detector.detect(headline)
 
-        assert result.catalyst_type == "merger_agreement"
+        assert result.catalyst_subtype == "m&a"
         assert result.confidence >= 0.6
 
     def test_classify_product_launch_type(self, detector):
@@ -131,31 +131,31 @@ class TestTypeClassification:
         headline = "SMX (SECURITY MATTERS) PLC Partners with UN to Launch Global Product Authentication Platform"
         result = detector.detect(headline)
 
-        assert result.catalyst_type == "product_launch"
+        assert result.catalyst_subtype == "product_launch"
         assert result.confidence >= 0.6
 
     def test_classify_strategic_partnership_type(self, detector):
-        """IMG case: Should classify as strategic_partnership."""
+        """IMG case: Should classify as partnership."""
         headline = "Imgn Media Signs Mou With Adl Intelligent Labs For Gene-Editing Product Development"
         result = detector.detect(headline)
 
-        assert result.catalyst_type == "strategic_partnership"
+        assert result.catalyst_subtype == "partnership"
         assert result.confidence >= 0.6
 
     def test_classify_rebranding_type(self, detector):
-        """NEHC case: Should classify as rebranding."""
+        """NEHC case: Should classify as corporate_restructuring."""
         headline = "NorthEast Healthcare Announces Name Change to Alliance HealthCare Services"
         result = detector.detect(headline)
 
-        assert result.catalyst_type == "rebranding"
+        assert result.catalyst_subtype == "corporate_restructuring"
         assert result.confidence >= 0.6
 
     def test_classify_clinical_trial_results_type(self, detector):
-        """PSTV case: Should classify as clinical_trial_results."""
+        """PSTV case: Should classify as clinical_trial."""
         headline = "Positron Announces Positive Phase 1 Clinical Trial Results"
         result = detector.detect(headline)
 
-        assert result.catalyst_type == "clinical_trial_results"
+        assert result.catalyst_subtype == "clinical_trial"
         assert result.confidence >= 0.6
 
 
@@ -167,7 +167,7 @@ class TestEdgeCases:
         result = detector.detect(None)
 
         assert result.has_strategic_catalyst is False
-        assert result.catalyst_type is None
+        assert result.catalyst_subtype is None
         assert result.confidence == 0.0
         assert result.headline == ""
 
@@ -176,7 +176,7 @@ class TestEdgeCases:
         result = detector.detect("")
 
         assert result.has_strategic_catalyst is False
-        assert result.catalyst_type is None
+        assert result.catalyst_subtype is None
         assert result.confidence == 0.0
 
     def test_ambiguous_headline_returns_mixed(self, detector):
@@ -188,7 +188,7 @@ class TestEdgeCases:
         # if MNLI can't confidently classify the type
         if result.has_strategic_catalyst:
             # Allow either "mixed" or a valid type with lower confidence
-            assert result.catalyst_type is not None
+            assert result.catalyst_subtype is not None
 
     def test_confidence_score_range(self, detector):
         """Confidence scores should be between 0.0 and 1.0."""
@@ -206,24 +206,24 @@ class TestRealWorldExamples:
         [
             (
                 "X4 Pharmaceuticals' President And CEO Paula Ragan And CFO Adam Mostafa Have Stepped Down...",
-                "executive_change",
+                "executive_changes",
             ),
             (
                 "Soho House & Co Inc. Appoints David Bowie As Chief Financial Officer",
-                "executive_change",
+                "executive_changes",
             ),
-            ("Opendoor CEO Eric Wu Steps Down", "executive_change"),
+            ("Opendoor CEO Eric Wu Steps Down", "executive_changes"),
             (
                 "Option Care Health Appoints John Rademacher as CFO",
-                "executive_change",
+                "executive_changes",
             ),
             (
                 "Workhorse Group And ATW Partners Announce Merger Agreement",
-                "merger_agreement",
+                "m&a",
             ),
             (
                 "NorthEast Healthcare Announces Name Change to Alliance HealthCare Services",
-                "rebranding",
+                "corporate_restructuring",
             ),
             (
                 "SMX (SECURITY MATTERS) PLC Partners with UN to Launch Global Product Authentication Platform",
@@ -235,15 +235,15 @@ class TestRealWorldExamples:
             ),
             (
                 "Imgn Media Signs Mou With Adl Intelligent Labs For Gene-Editing Product Development",
-                "strategic_partnership",
+                "partnership",
             ),
             (
                 "Workday Partners with IBM on Enterprise AI Solutions",
-                "strategic_partnership",
+                "partnership",
             ),
             (
                 "Positron Announces Positive Phase 1 Clinical Trial Results",
-                "clinical_trial_results",
+                "clinical_trial",
             ),
         ],
     )
@@ -255,6 +255,87 @@ class TestRealWorldExamples:
             result.has_strategic_catalyst is True
         ), f"Failed to detect catalyst in: {headline}"
         assert (
-            result.catalyst_type == expected_type
-        ), f"Expected {expected_type}, got {result.catalyst_type} for: {headline}"
+            result.catalyst_subtype == expected_type
+        ), f"Expected {expected_type}, got {result.catalyst_subtype} for: {headline}"
         assert result.confidence >= 0.6, f"Low confidence for: {headline}"
+
+
+class TestBugFixes:
+    """Test fixes for bug benz_sent_filter-edb5: Strategic catalyst classification accuracy issues."""
+
+    def test_quantitative_catalysts_not_detected_as_strategic(self, detector):
+        """Issue #1: Quantitative catalysts should NOT be detected as strategic catalysts.
+
+        WOW $1.5B acquisition and WDAY earnings contain dollar amounts and financial
+        keywords indicating quantitative catalysts, not strategic transformational events.
+        """
+        # WOW case: Dollar amount indicates quantitative catalyst (acquisition value)
+        wow_headline = "WOW Unlimited Media Acquires Animation Studio for $1.5B"
+        wow_result = detector.detect(wow_headline)
+
+        assert wow_result.has_strategic_catalyst is False, (
+            f"WOW quantitative catalyst misclassified as strategic: {wow_result.catalyst_subtype}"
+        )
+
+        # WDAY case: "earnings" keyword + financial results indicate quantitative catalyst
+        wday_headline = "Workday Reports Q4 Earnings Beat with Revenue Growth"
+        wday_result = detector.detect(wday_headline)
+
+        assert wday_result.has_strategic_catalyst is False, (
+            f"WDAY quantitative catalyst misclassified as strategic: {wday_result.catalyst_subtype}"
+        )
+
+    def test_no_mixed_subtype_returned(self, detector):
+        """Issue #2: Detector should never return 'mixed' as catalyst_subtype.
+
+        OPEN CEO transition is a clear executive_changes catalyst. The detector
+        should return a specific subtype or None, never 'mixed'.
+        """
+        # OPEN case: Clear CEO departure should classify as executive_changes
+        open_headline = "Opendoor CEO Eric Wu Steps Down"
+        open_result = detector.detect(open_headline)
+
+        # Should be detected as strategic catalyst
+        assert open_result.has_strategic_catalyst is True, (
+            "OPEN CEO transition should be detected as strategic catalyst"
+        )
+
+        # Should classify as executive_changes, not "mixed"
+        assert open_result.catalyst_subtype == "executive_changes", (
+            f"Expected 'executive_changes', got '{open_result.catalyst_subtype}'"
+        )
+
+        # Subtype should never be "mixed" for any detected catalyst
+        assert open_result.catalyst_subtype != "mixed", (
+            "'mixed' is not a valid catalyst_subtype value"
+        )
+
+    def test_product_launch_detection_sensitivity(self, detector):
+        """Issue #3: Product launches should be detected (false negative fix).
+
+        CTXR AI platform launch and MURA product announcement are clear strategic
+        catalysts but were not detected. Improve detection sensitivity.
+        """
+        # CTXR case: AI platform launch should be detected
+        ctxr_headline = "Citius Pharmaceuticals Launches AI Platform for Drug Development"
+        ctxr_result = detector.detect(ctxr_headline)
+
+        assert ctxr_result.has_strategic_catalyst is True, (
+            "CTXR product launch not detected as strategic catalyst"
+        )
+        assert ctxr_result.catalyst_subtype == "product_launch", (
+            f"CTXR expected 'product_launch', got '{ctxr_result.catalyst_subtype}'"
+        )
+
+        # MURA case: Product announcement should be detected
+        # Note: Medical/biotech product announcements are ambiguous - could be product_launch
+        # or clinical_trial depending on context. Both are acceptable for this edge case.
+        mura_headline = "Mural Oncology Announces New Cancer Treatment Product"
+        mura_result = detector.detect(mura_headline)
+
+        assert mura_result.has_strategic_catalyst is True, (
+            "MURA product announcement not detected as strategic catalyst"
+        )
+        assert mura_result.catalyst_subtype in ["product_launch", "clinical_trial"], (
+            f"MURA expected 'product_launch' or 'clinical_trial', got '{mura_result.catalyst_subtype}'"
+        )

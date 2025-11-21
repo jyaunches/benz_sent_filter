@@ -9,8 +9,13 @@ Pure MNLI approach:
 - MNLI: Presence detection (semantic understanding)
 - MNLI: Type classification (6 catalyst categories)
 - Confidence: MNLI type classification score
+
+Quantitative Pre-Filter:
+- Regex: Reject headlines with dollar amounts + financial keywords
+- Purpose: Prevent quantitative catalysts from being detected as strategic
 """
 
+import re
 from typing import Optional
 
 from transformers import pipeline
@@ -24,8 +29,21 @@ class StrategicCatalystDetectorMNLS:
     Uses zero-shot classification to detect whether a headline announces
     a strategic corporate catalyst and classify its type across 6 categories.
 
-    Pure MNLI approach - no regex patterns needed for strategic catalysts.
+    Hybrid approach:
+    - Regex: Pre-filter to reject quantitative catalysts (dollar amounts + financial keywords)
+    - MNLI: Semantic detection and type classification for strategic catalysts
     """
+
+    # Quantitative catalyst pre-filter patterns (reused from quantitative_catalyst_detector_mnls)
+    DOLLAR_PATTERN = re.compile(
+        r"\$(\d+(?:,\d{3})*(?:\.\d+)?)\s*([BMK])?\b(?:/[Ss]hare|\s+[Pp]er\s+[Ss]hare)?",
+        re.IGNORECASE,
+    )
+    PERCENTAGE_PATTERN = re.compile(r"\b(\d+(?:\.\d+)?)\s*%", re.IGNORECASE)
+    FINANCIAL_KEYWORDS = re.compile(
+        r"\b(dividend|yield|growth|return|margin|beat|miss|eps|earnings|revenue|guidance)\b",
+        re.IGNORECASE,
+    )
 
     # MNLI candidate labels for presence detection
     # Optimized to distinguish strategic catalysts from financial results and routine operations
@@ -42,29 +60,29 @@ class StrategicCatalystDetectorMNLS:
 
     # MNLI labels for catalyst type classification
     CATALYST_TYPE_LABELS = {
-        "executive_change": [
-            "This announces a C-suite executive appointment, departure, or transition including CEO, CFO, President, or other senior leadership",
-            "This does not announce an executive leadership change",
+        "executive_changes": [
+            "This announces an executive leadership change, CEO appointment or departure, CFO transition, President stepping down, or other C-suite personnel change",
+            "This does not announce an executive leadership change or personnel transition",
         ],
-        "strategic_partnership": [
-            "This announces a strategic partnership, collaboration agreement, memorandum of understanding, or joint venture",
-            "This does not announce a strategic partnership",
+        "partnership": [
+            "This announces that two or more companies are signing an agreement (MoU, partnership, collaboration, joint venture, or alliance) to work together on joint development or collaborative projects while remaining independent",
+            "This does not announce a strategic partnership, collaboration agreement, or alliance between multiple companies",
         ],
         "product_launch": [
-            "This announces a new product launch, technology platform deployment, or service introduction",
-            "This does not announce a product launch",
+            "This announces that a single company is launching, releasing, or making available to the market a finished product or service that is ready for customers to use",
+            "This does not announce a product launch, and this is not about future development, joint development with partners, or companies signing agreements to work together",
         ],
-        "merger_agreement": [
-            "This announces a merger agreement, acquisition announcement, or strategic combination",
+        "m&a": [
+            "This announces a merger where companies combine or an acquisition where one company purchases another",
             "This does not announce a merger or acquisition",
         ],
-        "rebranding": [
-            "This announces a company name change, ticker symbol change, or corporate rebranding",
-            "This does not announce a rebranding",
+        "corporate_restructuring": [
+            "This announces a company name change, ticker symbol change, corporate rebranding, or restructuring",
+            "This does not announce a corporate restructuring or rebranding",
         ],
-        "clinical_trial_results": [
-            "This announces clinical trial results, medical research findings, or drug efficacy data",
-            "This does not announce clinical trial results",
+        "clinical_trial": [
+            "This announces positive or negative results, outcomes, or data from a completed clinical trial, medical study, or drug efficacy test",
+            "This does not announce clinical trial results, study outcomes, test data, or research findings",
         ],
     }
 
@@ -98,7 +116,25 @@ class StrategicCatalystDetectorMNLS:
             return StrategicCatalystResult(
                 headline=headline or "",
                 has_strategic_catalyst=False,
-                catalyst_type=None,
+                catalyst_subtype=None,
+                confidence=0.0,
+            )
+
+        # Step 0: Quantitative pre-filter - reject headlines with financial values
+        # Check for dollar amounts, percentages, and financial keywords
+        has_dollar_amount = bool(self.DOLLAR_PATTERN.search(headline))
+        has_percentage = bool(self.PERCENTAGE_PATTERN.search(headline))
+        has_financial_keyword = bool(self.FINANCIAL_KEYWORDS.search(headline))
+
+        # Reject headlines with quantitative financial indicators:
+        # - Any dollar amount (signals quantitative catalyst like acquisition value, dividend amount)
+        # - Percentage + financial keyword (signals quantitative results like earnings growth)
+        # - Financial keyword alone (signals financial results like earnings, revenue reports)
+        if has_dollar_amount or (has_percentage and has_financial_keyword) or has_financial_keyword:
+            return StrategicCatalystResult(
+                headline=headline,
+                has_strategic_catalyst=False,
+                catalyst_subtype=None,
                 confidence=0.0,
             )
 
@@ -110,13 +146,13 @@ class StrategicCatalystDetectorMNLS:
             return StrategicCatalystResult(
                 headline=headline,
                 has_strategic_catalyst=False,
-                catalyst_type=None,
+                catalyst_subtype=None,
                 confidence=presence_score,
             )
 
         # Step 2: Classify catalyst type using MNLI
         type_result = self._classify_type(headline)
-        catalyst_type = type_result["type"]
+        catalyst_subtype = type_result["type"]
         type_score = type_result["confidence"]
 
         # Step 3: Use type classification score as confidence
@@ -128,7 +164,7 @@ class StrategicCatalystDetectorMNLS:
         return StrategicCatalystResult(
             headline=headline,
             has_strategic_catalyst=has_catalyst,
-            catalyst_type=catalyst_type,
+            catalyst_subtype=catalyst_subtype,
             confidence=confidence,
         )
 

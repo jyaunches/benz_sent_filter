@@ -1356,18 +1356,18 @@ def test_detect_strategic_catalyst_endpoint_executive_change(mock_transformers_p
     mock_transformers_pipeline({
         "This announces a specific strategic corporate event like an executive change, merger, partnership, product launch, or rebranding": 0.9,
         "This describes financial results, stock price movements, routine operations, or general market commentary": 0.1,
-        "This announces a C-suite executive appointment, departure, or transition including CEO, CFO, President, or other senior leadership": 0.85,
-        "This does not announce an executive leadership change": 0.15,
-        "This announces a strategic partnership, collaboration agreement, memorandum of understanding, or joint venture": 0.2,
-        "This does not announce a strategic partnership": 0.8,
-        "This announces a new product launch, technology platform deployment, or service introduction": 0.15,
-        "This does not announce a product launch": 0.85,
-        "This announces a merger agreement, acquisition announcement, or strategic combination": 0.1,
+        "This announces an executive leadership change, CEO appointment or departure, CFO transition, President stepping down, or other C-suite personnel change": 0.85,
+        "This does not announce an executive leadership change or personnel transition": 0.15,
+        "This announces that two or more companies are signing an agreement (MoU, partnership, collaboration, joint venture, or alliance) to work together on joint development or collaborative projects while remaining independent": 0.2,
+        "This does not announce a strategic partnership, collaboration agreement, or alliance between multiple companies": 0.8,
+        "This announces that a single company is launching, releasing, or making available to the market a finished product or service that is ready for customers to use": 0.15,
+        "This does not announce a product launch, and this is not about future development, joint development with partners, or companies signing agreements to work together": 0.85,
+        "This announces a merger where companies combine or an acquisition where one company purchases another": 0.1,
         "This does not announce a merger or acquisition": 0.9,
-        "This announces a company name change, ticker symbol change, or corporate rebranding": 0.1,
-        "This does not announce a rebranding": 0.9,
-        "This announces clinical trial results, medical research findings, or drug efficacy data": 0.05,
-        "This does not announce clinical trial results": 0.95,
+        "This announces a company name change, ticker symbol change, corporate rebranding, or restructuring": 0.1,
+        "This does not announce a corporate restructuring or rebranding": 0.9,
+        "This announces positive or negative results, outcomes, or data from a completed clinical trial, medical study, or drug efficacy test": 0.05,
+        "This does not announce clinical trial results, study outcomes, test data, or research findings": 0.95,
     })
 
     from benz_sent_filter.api.app import app
@@ -1385,12 +1385,12 @@ def test_detect_strategic_catalyst_endpoint_executive_change(mock_transformers_p
     # Verify response structure
     assert "headline" in data
     assert "has_strategic_catalyst" in data
-    assert "catalyst_type" in data
+    assert "catalyst_subtype" in data
     assert "confidence" in data
 
     # Verify detection
     assert data["has_strategic_catalyst"] is True
-    assert data["catalyst_type"] == "executive_change"
+    assert data["catalyst_subtype"] == "executive_changes"
     assert data["confidence"] >= 0.6
 
 
@@ -1408,18 +1408,18 @@ def test_detect_strategic_catalyst_endpoint_merger(mock_transformers_pipeline):
     mock_transformers_pipeline({
         "This announces a specific strategic corporate event like an executive change, merger, partnership, product launch, or rebranding": 0.92,
         "This describes financial results, stock price movements, routine operations, or general market commentary": 0.08,
-        "This announces a C-suite executive appointment, departure, or transition including CEO, CFO, President, or other senior leadership": 0.1,
-        "This does not announce an executive leadership change": 0.9,
-        "This announces a strategic partnership, collaboration agreement, memorandum of understanding, or joint venture": 0.2,
-        "This does not announce a strategic partnership": 0.8,
-        "This announces a new product launch, technology platform deployment, or service introduction": 0.15,
-        "This does not announce a product launch": 0.85,
-        "This announces a merger agreement, acquisition announcement, or strategic combination": 0.88,
+        "This announces an executive leadership change, CEO appointment or departure, CFO transition, President stepping down, or other C-suite personnel change": 0.1,
+        "This does not announce an executive leadership change or personnel transition": 0.9,
+        "This announces that two or more companies are signing an agreement (MoU, partnership, collaboration, joint venture, or alliance) to work together on joint development or collaborative projects while remaining independent": 0.2,
+        "This does not announce a strategic partnership, collaboration agreement, or alliance between multiple companies": 0.8,
+        "This announces that a single company is launching, releasing, or making available to the market a finished product or service that is ready for customers to use": 0.15,
+        "This does not announce a product launch, and this is not about future development, joint development with partners, or companies signing agreements to work together": 0.85,
+        "This announces a merger where companies combine or an acquisition where one company purchases another": 0.88,
         "This does not announce a merger or acquisition": 0.12,
-        "This announces a company name change, ticker symbol change, or corporate rebranding": 0.1,
-        "This does not announce a rebranding": 0.9,
-        "This announces clinical trial results, medical research findings, or drug efficacy data": 0.05,
-        "This does not announce clinical trial results": 0.95,
+        "This announces a company name change, ticker symbol change, corporate rebranding, or restructuring": 0.1,
+        "This does not announce a corporate restructuring or rebranding": 0.9,
+        "This announces positive or negative results, outcomes, or data from a completed clinical trial, medical study, or drug efficacy test": 0.05,
+        "This does not announce clinical trial results, study outcomes, test data, or research findings": 0.95,
     })
 
     from benz_sent_filter.api.app import app
@@ -1435,7 +1435,7 @@ def test_detect_strategic_catalyst_endpoint_merger(mock_transformers_pipeline):
     data = response.json()
 
     assert data["has_strategic_catalyst"] is True
-    assert data["catalyst_type"] == "merger_agreement"
+    assert data["catalyst_subtype"] == "m&a"
     assert data["confidence"] >= 0.6
 
 
@@ -1480,8 +1480,8 @@ def test_detect_strategic_catalyst_endpoint_no_catalyst(mock_transformers_pipeli
     data = response.json()
 
     assert data["has_strategic_catalyst"] is False
-    # catalyst_type is excluded when None (exclude_none=True)
-    assert "catalyst_type" not in data
+    # catalyst_subtype is excluded when None (exclude_none=True)
+    assert "catalyst_subtype" not in data
     # Confidence reflects presence score even when no catalyst detected
     assert data["confidence"] < 0.5  # Below presence threshold
 
@@ -1553,8 +1553,8 @@ def test_detect_strategic_catalyst_response_model_structure(mock_transformers_pi
     assert "has_strategic_catalyst" in data
     assert isinstance(data["has_strategic_catalyst"], bool)
 
-    assert "catalyst_type" in data
-    assert data["catalyst_type"] in ["executive_change", "merger_agreement", "strategic_partnership", "product_launch", "rebranding", "clinical_trial_results", "mixed", None]
+    assert "catalyst_subtype" in data
+    assert data["catalyst_subtype"] in ["executive_changes", "m&a", "partnership", "product_launch", "corporate_restructuring", "clinical_trial", "mixed", None]
 
     assert "confidence" in data
     assert isinstance(data["confidence"], float)
