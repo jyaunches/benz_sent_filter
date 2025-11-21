@@ -252,7 +252,7 @@ Create `tests/test_strategic_catalyst_detector_mnls.py`:
 - [ ] All unit tests pass with 90%+ type classification accuracy
 - [ ] 100% coverage of detector module
 
-### Phase 2: API Integration - Endpoint and Models
+### Phase 2: API Integration - Endpoint and Models [COMPLETED: 0ea82cd]
 
 **Description**: Create REST API endpoint and integrate detector with ClassificationService.
 
