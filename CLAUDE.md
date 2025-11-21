@@ -11,6 +11,8 @@ This repository implements **benz_sent_filter** - an MNLS-based sentiment classi
 3. **Company Relevance**: Detect whether a headline is about a specific company (optional, via `company` parameter)
 4. **Far-Future Forecast Detection**: Identify multi-year forecasts vs near-term guidance (automatic for future events)
 5. **Routine Operations Filter**: Detect routine business operations with immaterial impact (optional, via `company_symbol` parameter)
+6. **Quantitative Catalyst Detection**: Identify financial catalysts with dollar amounts (dividends, acquisitions, buybacks, earnings, guidance)
+7. **Strategic Catalyst Detection**: Identify strategic corporate events (executive changes, mergers, partnerships, product launches, rebranding, clinical trials)
 
 The service runs on CPU and uses open-source models without requiring custom training.
 
@@ -118,23 +120,56 @@ Available via `.claude/commands/` (symlinked from benz_mgmt):
    - Focuses on financial services industry
    - Reduces false positives on routine operations by 50%+
 
+### Catalyst Detection
+
+4. **Quantitative Catalyst Detection** (via `/detect-quantitative-catalyst` endpoint):
+   - MNLI-based presence detection + regex value extraction
+   - Returns `has_quantitative_catalyst`, `catalyst_type`, `catalyst_values`, `confidence`
+   - Types: dividend, acquisition, buyback, earnings, guidance
+   - Extracts dollar amounts, percentages, and per-share values
+   - Performance: <1s for single headline
+
+5. **Strategic Catalyst Detection** (via `/detect-strategic-catalyst` endpoint):
+   - MNLI-based presence detection and type classification
+   - Returns `has_strategic_catalyst`, `catalyst_type`, `confidence`
+   - Types: executive_change, merger_agreement, strategic_partnership, product_launch, rebranding, clinical_trial_results
+   - Examples:
+     - Executive change: "X4 Pharmaceuticals CEO and CFO Step Down" → executive_change (0.94 confidence)
+     - Merger: "Workhorse Group And ATW Partners Announce Merger Agreement" → merger_agreement (0.88 confidence)
+     - Product launch: "SMX Partners with UN to Launch Global Product Platform" → product_launch (0.82 confidence)
+   - Performance: <1s for single headline
+   - Accuracy: 90%+ on 11 real-world test cases
+   - Shares MNLI pipeline with other detectors for efficiency
+
 ## API Design
 
 Service provides classification endpoints for:
 - Single headline classification (`/classify`)
 - Batch headline processing (`/classify/batch`)
+- Company relevance check (`/company-relevance`, `/company-relevance/batch`)
+- Routine operations analysis (`/routine-operations`)
+- Quantitative catalyst detection (`/detect-quantitative-catalyst`)
+- Strategic catalyst detection (`/detect-strategic-catalyst`)
 - Health check endpoint (`/health`)
 
-**Request Parameters**:
+**Request Parameters** (`/classify`, `/classify/batch`):
 - `headline` (required): Headline text to classify
 - `company` (optional): Company name for relevance detection
 - `company_symbol` (optional): Ticker symbol for routine operations filter
 
-**Response Fields**:
+**Response Fields** (`/classify`):
 - Core: `is_opinion`, `is_straight_news`, `temporal_category`, `scores`
 - Company relevance: `is_about_company`, `company_score`, `company`
 - Far-future: `far_future_forecast`, `forecast_timeframe`
 - Routine operations: `routine_operation`, `routine_confidence`, `routine_metadata`
+
+**Request/Response** (`/detect-strategic-catalyst`):
+- Request: `{"headline": "Company appoints new CEO"}`
+- Response: `{"headline": "...", "has_strategic_catalyst": true, "catalyst_type": "executive_change", "confidence": 0.89}`
+
+**Request/Response** (`/detect-quantitative-catalyst`):
+- Request: `{"headline": "Company announces $1 dividend"}`
+- Response: `{"headline": "...", "has_quantitative_catalyst": true, "catalyst_type": "dividend", "catalyst_values": ["$1"], "confidence": 0.87}`
 
 Returns both boolean classifications and raw scores for transparency.
 All optional fields use Pydantic `exclude_none=True` for backward compatibility.
