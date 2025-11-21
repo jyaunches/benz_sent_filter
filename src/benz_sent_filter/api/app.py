@@ -3,8 +3,9 @@
 import logging
 from datetime import datetime
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from benz_sent_filter.models.classification import (
@@ -20,6 +21,8 @@ from benz_sent_filter.models.classification import (
     MultiTickerRoutineResponse,
     QuantitativeCatalystRequest,
     QuantitativeCatalystResult,
+    StrategicCatalystRequest,
+    StrategicCatalystResult,
 )
 from benz_sent_filter.services.classifier import ClassificationService
 
@@ -35,15 +38,16 @@ app = FastAPI(
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    """Log validation errors with request payload for debugging."""
-    body = await request.body()
+    """Log validation errors for debugging and return 422 response."""
     logger.error(
         f"Validation error on {request.method} {request.url.path}\n"
-        f"Request body: {body.decode('utf-8')}\n"
         f"Errors: {exc.errors()}"
     )
-    # Re-raise to return standard 422 response
-    raise exc
+    # Return standard 422 response
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={"detail": exc.errors()},
+    )
 
 
 class HealthResponse(BaseModel):
@@ -257,4 +261,36 @@ async def detect_quantitative_catalyst(request: QuantitativeCatalystRequest):
         }
     """
     result = app.state.classifier.detect_quantitative_catalyst(request.headline)
+    return result
+
+
+@app.post("/detect-strategic-catalyst", response_model=StrategicCatalystResult, response_model_exclude_none=True)
+async def detect_strategic_catalyst(request: StrategicCatalystRequest):
+    """Detect strategic corporate catalysts in headline.
+
+    Uses MNLI-based semantic understanding to identify strategic corporate
+    catalysts such as executive changes, mergers, partnerships, product launches,
+    rebranding, and clinical trial results.
+
+    Args:
+        request: Request containing headline text to analyze
+
+    Returns:
+        Detection result with catalyst presence, type, and confidence
+
+    Example:
+        Request:
+        {
+            "headline": "X4 Pharmaceuticals' President And CEO Paula Ragan And CFO Adam Mostafa Have Stepped Down..."
+        }
+
+        Response:
+        {
+            "headline": "X4 Pharmaceuticals' President And CEO Paula Ragan And CFO Adam Mostafa Have Stepped Down...",
+            "has_strategic_catalyst": true,
+            "catalyst_type": "executive_change",
+            "confidence": 0.94
+        }
+    """
+    result = app.state.classifier.detect_strategic_catalyst(request.headline)
     return result

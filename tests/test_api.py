@@ -1482,7 +1482,8 @@ def test_detect_strategic_catalyst_endpoint_no_catalyst(mock_transformers_pipeli
     assert data["has_strategic_catalyst"] is False
     # catalyst_type is excluded when None (exclude_none=True)
     assert "catalyst_type" not in data
-    assert data["confidence"] == 0.0
+    # Confidence reflects presence score even when no catalyst detected
+    assert data["confidence"] < 0.5  # Below presence threshold
 
 
 def test_detect_strategic_catalyst_endpoint_validation_empty_headline(client):

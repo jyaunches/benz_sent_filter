@@ -13,6 +13,7 @@ from benz_sent_filter.models.classification import (
     ClassificationResult,
     ClassificationScores,
     QuantitativeCatalystResult,
+    StrategicCatalystResult,
     TemporalCategory,
 )
 from benz_sent_filter.services import forecast_analyzer
@@ -20,6 +21,9 @@ from benz_sent_filter.services.quantitative_catalyst_detector_mnls import (
     QuantitativeCatalystDetectorMNLS,
 )
 from benz_sent_filter.services.routine_detector_mnls import RoutineOperationDetectorMNLS
+from benz_sent_filter.services.strategic_catalyst_detector_mnls import (
+    StrategicCatalystDetectorMNLS,
+)
 
 # Named tuple for structured company relevance results
 CompanyRelevance = namedtuple("CompanyRelevance", ["is_relevant", "score"])
@@ -54,6 +58,8 @@ class ClassificationService:
         self._routine_detector = RoutineOperationDetectorMNLS()
         # Share pipeline with quantitative catalyst detector to avoid loading BART-MNLI separately
         self._catalyst_detector = QuantitativeCatalystDetectorMNLS(pipeline=self._pipeline)
+        # Share pipeline with strategic catalyst detector
+        self._strategic_catalyst_detector = StrategicCatalystDetectorMNLS(pipeline=self._pipeline)
 
     def _check_company_relevance(
         self, headline: str, company: str
@@ -409,3 +415,18 @@ class ClassificationService:
             QuantitativeCatalystResult with detection details
         """
         return self._catalyst_detector.detect(headline)
+
+    def detect_strategic_catalyst(self, headline: str) -> StrategicCatalystResult:
+        """Detect strategic corporate catalysts in headline.
+
+        Uses shared MNLI pipeline for efficient inference. Detects presence
+        and classifies type (executive_change/merger_agreement/strategic_partnership/
+        product_launch/rebranding/clinical_trial_results).
+
+        Args:
+            headline: Headline text to analyze
+
+        Returns:
+            StrategicCatalystResult with detection details
+        """
+        return self._strategic_catalyst_detector.detect(headline)
