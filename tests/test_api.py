@@ -10,10 +10,16 @@ def client(mock_transformers_pipeline):
     import sys
 
     # Clear module cache before importing app
-    if "benz_sent_filter.api.app" in sys.modules:
-        del sys.modules["benz_sent_filter.api.app"]
-    if "benz_sent_filter.services.classifier" in sys.modules:
-        del sys.modules["benz_sent_filter.services.classifier"]
+    modules_to_clear = [
+        "benz_sent_filter.api.app",
+        "benz_sent_filter.services.classifier",
+        "benz_sent_filter.services.routine_detector_mnls",
+        "benz_sent_filter.services.quantitative_catalyst_detector_mnls",
+        "benz_sent_filter.services.routine_detector",
+    ]
+    for module in modules_to_clear:
+        if module in sys.modules:
+            del sys.modules[module]
 
     # Set up mock with default scores
     mock_transformers_pipeline({
@@ -375,10 +381,16 @@ def client_with_company(mock_transformers_pipeline):
     import sys
 
     # Clear module cache before importing app
-    if "benz_sent_filter.api.app" in sys.modules:
-        del sys.modules["benz_sent_filter.api.app"]
-    if "benz_sent_filter.services.classifier" in sys.modules:
-        del sys.modules["benz_sent_filter.services.classifier"]
+    modules_to_clear = [
+        "benz_sent_filter.api.app",
+        "benz_sent_filter.services.classifier",
+        "benz_sent_filter.services.routine_detector_mnls",
+        "benz_sent_filter.services.quantitative_catalyst_detector_mnls",
+        "benz_sent_filter.services.routine_detector",
+    ]
+    for module in modules_to_clear:
+        if module in sys.modules:
+            del sys.modules[module]
 
     # Set up mock with company relevance scores
     mock_transformers_pipeline({
@@ -1323,3 +1335,241 @@ def test_classify_endpoint_conditional_with_far_future_combination(mock_transfor
     assert data["far_future_forecast"] is True
     assert data["forecast_timeframe"] is not None
     assert "2028" in data["forecast_timeframe"]
+
+
+# ============================================================================
+# Strategic Catalyst Detection API Endpoint Tests (Phase 2)
+# ============================================================================
+
+
+def test_detect_strategic_catalyst_endpoint_executive_change(mock_transformers_pipeline):
+    """Test POST /detect-strategic-catalyst detects executive changes."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.api.app" in sys.modules:
+        del sys.modules["benz_sent_filter.api.app"]
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    # Mock MNLI scores for strategic catalyst detection
+    mock_transformers_pipeline({
+        "This announces a specific strategic corporate event like an executive change, merger, partnership, product launch, or rebranding": 0.9,
+        "This describes financial results, stock price movements, routine operations, or general market commentary": 0.1,
+        "This announces a C-suite executive appointment, departure, or transition including CEO, CFO, President, or other senior leadership": 0.85,
+        "This does not announce an executive leadership change": 0.15,
+        "This announces a strategic partnership, collaboration agreement, memorandum of understanding, or joint venture": 0.2,
+        "This does not announce a strategic partnership": 0.8,
+        "This announces a new product launch, technology platform deployment, or service introduction": 0.15,
+        "This does not announce a product launch": 0.85,
+        "This announces a merger agreement, acquisition announcement, or strategic combination": 0.1,
+        "This does not announce a merger or acquisition": 0.9,
+        "This announces a company name change, ticker symbol change, or corporate rebranding": 0.1,
+        "This does not announce a rebranding": 0.9,
+        "This announces clinical trial results, medical research findings, or drug efficacy data": 0.05,
+        "This does not announce clinical trial results": 0.95,
+    })
+
+    from benz_sent_filter.api.app import app
+    from fastapi.testclient import TestClient
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/detect-strategic-catalyst",
+            json={"headline": "X4 Pharmaceuticals' President And CEO Paula Ragan And CFO Adam Mostafa Have Stepped Down..."}
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify response structure
+    assert "headline" in data
+    assert "has_strategic_catalyst" in data
+    assert "catalyst_type" in data
+    assert "confidence" in data
+
+    # Verify detection
+    assert data["has_strategic_catalyst"] is True
+    assert data["catalyst_type"] == "executive_change"
+    assert data["confidence"] >= 0.6
+
+
+def test_detect_strategic_catalyst_endpoint_merger(mock_transformers_pipeline):
+    """Test POST /detect-strategic-catalyst detects merger agreements."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.api.app" in sys.modules:
+        del sys.modules["benz_sent_filter.api.app"]
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    # Mock MNLI scores for merger detection
+    mock_transformers_pipeline({
+        "This announces a specific strategic corporate event like an executive change, merger, partnership, product launch, or rebranding": 0.92,
+        "This describes financial results, stock price movements, routine operations, or general market commentary": 0.08,
+        "This announces a C-suite executive appointment, departure, or transition including CEO, CFO, President, or other senior leadership": 0.1,
+        "This does not announce an executive leadership change": 0.9,
+        "This announces a strategic partnership, collaboration agreement, memorandum of understanding, or joint venture": 0.2,
+        "This does not announce a strategic partnership": 0.8,
+        "This announces a new product launch, technology platform deployment, or service introduction": 0.15,
+        "This does not announce a product launch": 0.85,
+        "This announces a merger agreement, acquisition announcement, or strategic combination": 0.88,
+        "This does not announce a merger or acquisition": 0.12,
+        "This announces a company name change, ticker symbol change, or corporate rebranding": 0.1,
+        "This does not announce a rebranding": 0.9,
+        "This announces clinical trial results, medical research findings, or drug efficacy data": 0.05,
+        "This does not announce clinical trial results": 0.95,
+    })
+
+    from benz_sent_filter.api.app import app
+    from fastapi.testclient import TestClient
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/detect-strategic-catalyst",
+            json={"headline": "Workhorse Group And ATW Partners Announce Merger Agreement"}
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data["has_strategic_catalyst"] is True
+    assert data["catalyst_type"] == "merger_agreement"
+    assert data["confidence"] >= 0.6
+
+
+def test_detect_strategic_catalyst_endpoint_no_catalyst(mock_transformers_pipeline):
+    """Test POST /detect-strategic-catalyst returns false for non-catalyst headlines."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.api.app" in sys.modules:
+        del sys.modules["benz_sent_filter.api.app"]
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    # Mock MNLI scores for non-catalyst (financial results)
+    mock_transformers_pipeline({
+        "This announces a specific strategic corporate event like an executive change, merger, partnership, product launch, or rebranding": 0.2,
+        "This describes financial results, stock price movements, routine operations, or general market commentary": 0.8,
+        "This announces a C-suite executive appointment, departure, or transition including CEO, CFO, President, or other senior leadership": 0.1,
+        "This does not announce an executive leadership change": 0.9,
+        "This announces a strategic partnership, collaboration agreement, memorandum of understanding, or joint venture": 0.15,
+        "This does not announce a strategic partnership": 0.85,
+        "This announces a new product launch, technology platform deployment, or service introduction": 0.1,
+        "This does not announce a product launch": 0.9,
+        "This announces a merger agreement, acquisition announcement, or strategic combination": 0.1,
+        "This does not announce a merger or acquisition": 0.9,
+        "This announces a company name change, ticker symbol change, or corporate rebranding": 0.05,
+        "This does not announce a rebranding": 0.95,
+        "This announces clinical trial results, medical research findings, or drug efficacy data": 0.05,
+        "This does not announce clinical trial results": 0.95,
+    })
+
+    from benz_sent_filter.api.app import app
+    from fastapi.testclient import TestClient
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/detect-strategic-catalyst",
+            json={"headline": "Company reports Q3 earnings of $1.2B revenue"}
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data["has_strategic_catalyst"] is False
+    # catalyst_type is excluded when None (exclude_none=True)
+    assert "catalyst_type" not in data
+    assert data["confidence"] == 0.0
+
+
+def test_detect_strategic_catalyst_endpoint_validation_empty_headline(client):
+    """Test POST /detect-strategic-catalyst with empty headline returns 422."""
+    response = client.post(
+        "/detect-strategic-catalyst",
+        json={"headline": ""}
+    )
+
+    assert response.status_code == 422
+
+
+def test_detect_strategic_catalyst_endpoint_validation_missing_headline(client):
+    """Test POST /detect-strategic-catalyst without headline field returns 422."""
+    response = client.post(
+        "/detect-strategic-catalyst",
+        json={}
+    )
+
+    assert response.status_code == 422
+
+
+def test_detect_strategic_catalyst_response_model_structure(mock_transformers_pipeline):
+    """Test POST /detect-strategic-catalyst has correct response structure."""
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.api.app" in sys.modules:
+        del sys.modules["benz_sent_filter.api.app"]
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    # Mock MNLI scores for clinical trial results
+    mock_transformers_pipeline({
+        "This announces a specific strategic corporate event like an executive change, merger, partnership, product launch, or rebranding": 0.9,
+        "This describes financial results, stock price movements, routine operations, or general market commentary": 0.1,
+        "This announces a C-suite executive appointment, departure, or transition including CEO, CFO, President, or other senior leadership": 0.1,
+        "This does not announce an executive leadership change": 0.9,
+        "This announces a strategic partnership, collaboration agreement, memorandum of understanding, or joint venture": 0.15,
+        "This does not announce a strategic partnership": 0.85,
+        "This announces a new product launch, technology platform deployment, or service introduction": 0.1,
+        "This does not announce a product launch": 0.9,
+        "This announces a merger agreement, acquisition announcement, or strategic combination": 0.1,
+        "This does not announce a merger or acquisition": 0.9,
+        "This announces a company name change, ticker symbol change, or corporate rebranding": 0.05,
+        "This does not announce a rebranding": 0.95,
+        "This announces clinical trial results, medical research findings, or drug efficacy data": 0.82,
+        "This does not announce clinical trial results": 0.18,
+    })
+
+    from benz_sent_filter.api.app import app
+    from fastapi.testclient import TestClient
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/detect-strategic-catalyst",
+            json={"headline": "Positron Announces Positive Phase 1 Clinical Trial Results"}
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify all required fields present
+    assert "headline" in data
+    assert isinstance(data["headline"], str)
+
+    assert "has_strategic_catalyst" in data
+    assert isinstance(data["has_strategic_catalyst"], bool)
+
+    assert "catalyst_type" in data
+    assert data["catalyst_type"] in ["executive_change", "merger_agreement", "strategic_partnership", "product_launch", "rebranding", "clinical_trial_results", "mixed", None]
+
+    assert "confidence" in data
+    assert isinstance(data["confidence"], float)
+    assert 0.0 <= data["confidence"] <= 1.0
+
+
+def test_detect_strategic_catalyst_backward_compatibility(client):
+    """Test that existing endpoints work unchanged after adding strategic catalyst endpoint."""
+    # Test /health endpoint
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.json()["status"] == "healthy"
+
+    # Test /classify endpoint
+    response = client.post("/classify", json={"headline": "Test headline"})
+    assert response.status_code == 200
+    assert "is_opinion" in response.json()
+    assert "is_straight_news" in response.json()
+    assert "temporal_category" in response.json()
