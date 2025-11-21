@@ -197,7 +197,7 @@ Add `detect_strategic_catalyst` method to `ClassificationService` class that:
 
 ## Implementation Phases
 
-### Phase 1: Core Detector Implementation
+### Phase 1: Core Detector Implementation [COMPLETED: 74b11a8]
 
 **Description**: Implement complete strategic catalyst detector with presence detection and type classification using MNLI. This phase delivers the full detection capability in one coherent implementation, matching the proven pattern from quantitative catalyst detector.
 
