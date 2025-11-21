@@ -339,3 +339,87 @@ class TestBugFixes:
         assert mura_result.catalyst_subtype in ["product_launch", "clinical_trial"], (
             f"MURA expected 'product_launch' or 'clinical_trial', got '{mura_result.catalyst_subtype}'"
         )
+
+
+class TestProductionHeadlines:
+    """Test production headlines from benz_sent_filter-20cc evaluation runs.
+
+    These are the actual headlines that failed in production, representing
+    real-world messy data with extra context, hype language, and noise.
+    """
+
+    def test_production_nehc_corporate_restructuring(self, detector):
+        """NEHC: Name and ticker change should be detected as corporate_restructuring.
+
+        Production issue: Was NOT detected (false negative).
+        Actual move: +22.7%
+        """
+        headline = "New Era Helium Changes Name To New Era Energy & Digital; To Trade Under New Ticker 'NUAI'"
+        result = detector.detect(headline)
+
+        assert result.has_strategic_catalyst is True, (
+            f"NEHC name/ticker change not detected: {headline}"
+        )
+        assert result.catalyst_subtype == "corporate_restructuring", (
+            f"NEHC expected 'corporate_restructuring', got '{result.catalyst_subtype}'"
+        )
+
+    def test_production_xfor_triple_executive_changes(self, detector):
+        """XFOR: Triple C-suite transition (3 executives!) should be detected.
+
+        Production issue: Was NOT detected (false negative).
+        Actual move: +85.9% (HUGE!)
+        Note: Multiple C-suite changes in one announcement - very significant catalyst.
+        """
+        headline = "X4 Pharmaceuticals' President And CEO Paula Ragan And CFO Adam Mostafa Have Stepped Down From Their Respective Roles, X4 Board Of Directors Has Appointed Adam Craig, As Executive Chair, John Volpone As President, And David Kirske As CFO Effectively Immediately"
+        result = detector.detect(headline)
+
+        assert result.has_strategic_catalyst is True, (
+            f"XFOR triple C-suite change not detected: {headline[:100]}..."
+        )
+        assert result.catalyst_subtype == "executive_changes", (
+            f"XFOR expected 'executive_changes', got '{result.catalyst_subtype}'"
+        )
+
+    def test_production_smx_product_launch_with_context(self, detector):
+        """SMX: Product launch with UN partnership context should be detected.
+
+        Production issue: Was NOT detected (false negative).
+        Actual move: +37.4%
+        Note: Has explicit "Launches" keyword with new product/platform.
+        """
+        headline = "SMX Launches Global Plastics Passport to Track and Monetize All Plastics, Offers Tech Free to Support UN Treaty"
+        result = detector.detect(headline)
+
+        assert result.has_strategic_catalyst is True, (
+            f"SMX product launch not detected: {headline}"
+        )
+        assert result.catalyst_subtype == "product_launch", (
+            f"SMX expected 'product_launch', got '{result.catalyst_subtype}'"
+        )
+
+    def test_production_wow_quantitative_should_be_filtered(self, detector):
+        """WOW: Headline with $1.5B deal price should NOT be strategic (quantitative filter).
+
+        Production issue: Was detected as strategic with wrong subtype.
+        Expected: Quantitative pre-filter should reject (has dollar amount).
+        """
+        headline = "WOW! Stock Rockets As DigitalBridge Strikes $1.5 Billion Deal"
+        result = detector.detect(headline)
+
+        assert result.has_strategic_catalyst is False, (
+            f"WOW with $1.5B should be filtered as quantitative: {headline}"
+        )
+
+    def test_production_mura_quantitative_with_per_share_price(self, detector):
+        """MURA: Acquisition with per-share price should NOT be strategic.
+
+        Production note: Was correctly NOT detected (quantitative filter working).
+        Has explicit per-share price ($2.035-$2.24/share).
+        """
+        headline = "Mural Oncology To be Acquired By Xoma Royalty Subsidiary, XRA 5, For between $2.035 And $2.24 In Cash Per Share"
+        result = detector.detect(headline)
+
+        assert result.has_strategic_catalyst is False, (
+            f"MURA with per-share price should be filtered as quantitative: {headline}"
+        )

@@ -1352,22 +1352,22 @@ def test_detect_strategic_catalyst_endpoint_executive_change(mock_transformers_p
     if "benz_sent_filter.services.classifier" in sys.modules:
         del sys.modules["benz_sent_filter.services.classifier"]
 
-    # Mock MNLI scores for strategic catalyst detection
+    # Mock MNLI scores for strategic catalyst detection (simplified labels)
     mock_transformers_pipeline({
         "This announces a specific strategic corporate event like an executive change, merger, partnership, product launch, or rebranding": 0.9,
         "This describes financial results, stock price movements, routine operations, or general market commentary": 0.1,
-        "This announces an executive leadership change, CEO appointment or departure, CFO transition, President stepping down, or other C-suite personnel change": 0.85,
-        "This does not announce an executive leadership change or personnel transition": 0.15,
-        "This announces that two or more companies are signing an agreement (MoU, partnership, collaboration, joint venture, or alliance) to work together on joint development or collaborative projects while remaining independent": 0.2,
-        "This does not announce a strategic partnership, collaboration agreement, or alliance between multiple companies": 0.8,
-        "This announces that a single company is launching, releasing, or making available to the market a finished product or service that is ready for customers to use": 0.15,
-        "This does not announce a product launch, and this is not about future development, joint development with partners, or companies signing agreements to work together": 0.85,
-        "This announces a merger where companies combine or an acquisition where one company purchases another": 0.1,
+        "This announces executive leadership changes or C-suite appointments and departures": 0.85,
+        "This does not announce executive leadership changes": 0.15,
+        "This announces a partnership, collaboration, or joint venture between companies": 0.2,
+        "This does not announce a partnership or collaboration": 0.8,
+        "This announces launching or releasing a new product or service": 0.15,
+        "This does not announce a product launch": 0.85,
+        "This announces a merger or acquisition between companies": 0.1,
         "This does not announce a merger or acquisition": 0.9,
-        "This announces a company name change, ticker symbol change, corporate rebranding, or restructuring": 0.1,
-        "This does not announce a corporate restructuring or rebranding": 0.9,
-        "This announces positive or negative results, outcomes, or data from a completed clinical trial, medical study, or drug efficacy test": 0.05,
-        "This does not announce clinical trial results, study outcomes, test data, or research findings": 0.95,
+        "This announces corporate rebranding, name changes, or restructuring": 0.1,
+        "This does not announce corporate restructuring or rebranding": 0.9,
+        "This announces clinical trial results or medical study outcomes": 0.05,
+        "This does not announce clinical trial results": 0.95,
     })
 
     from benz_sent_filter.api.app import app

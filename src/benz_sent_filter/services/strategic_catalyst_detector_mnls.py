@@ -59,30 +59,32 @@ class StrategicCatalystDetectorMNLS:
     TYPE_THRESHOLD = 0.6  # Aligned with quantitative catalyst type classification
 
     # MNLI labels for catalyst type classification
+    # Simplified labels for better MNLI semantic disambiguation
+    # Key principle: Focus on core distinguishing features, avoid over-specification
     CATALYST_TYPE_LABELS = {
         "executive_changes": [
-            "This announces an executive leadership change, CEO appointment or departure, CFO transition, President stepping down, or other C-suite personnel change",
-            "This does not announce an executive leadership change or personnel transition",
+            "This announces executive leadership changes or C-suite appointments and departures",
+            "This does not announce executive leadership changes",
         ],
         "partnership": [
-            "This announces that two or more companies are signing an agreement (MoU, partnership, collaboration, joint venture, or alliance) to work together on joint development or collaborative projects while remaining independent",
-            "This does not announce a strategic partnership, collaboration agreement, or alliance between multiple companies",
+            "This announces a partnership, collaboration, or joint venture between companies",
+            "This does not announce a partnership or collaboration",
         ],
         "product_launch": [
-            "This announces that a single company is launching, releasing, or making available to the market a finished product or service that is ready for customers to use",
-            "This does not announce a product launch, and this is not about future development, joint development with partners, or companies signing agreements to work together",
+            "This announces launching or releasing a new product or service",
+            "This does not announce a product launch",
         ],
         "m&a": [
-            "This announces a merger where companies combine or an acquisition where one company purchases another",
+            "This announces a merger or acquisition between companies",
             "This does not announce a merger or acquisition",
         ],
         "corporate_restructuring": [
-            "This announces a company name change, ticker symbol change, corporate rebranding, or restructuring",
-            "This does not announce a corporate restructuring or rebranding",
+            "This announces corporate rebranding, name changes, or restructuring",
+            "This does not announce corporate restructuring or rebranding",
         ],
         "clinical_trial": [
-            "This announces positive or negative results, outcomes, or data from a completed clinical trial, medical study, or drug efficacy test",
-            "This does not announce clinical trial results, study outcomes, test data, or research findings",
+            "This announces clinical trial results or medical study outcomes",
+            "This does not announce clinical trial results",
         ],
     }
 
