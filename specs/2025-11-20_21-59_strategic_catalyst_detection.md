@@ -382,12 +382,6 @@ End-to-end test cases:
 - Stock movements: "Stock rises 10% on strong volume"
 - Routine operations: "Bank files quarterly MBS report"
 
-### Performance Benchmarks
-
-- Single headline: <1s (6 MNLI calls for type classification)
-- Presence detection only: <500ms (1 MNLI call)
-- Memory: Share pipeline with existing classifier (no additional model load)
-
 ## Success Criteria
 
 ### Functional Requirements
