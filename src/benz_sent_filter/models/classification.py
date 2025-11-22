@@ -14,6 +14,7 @@ class TemporalCategory(str, Enum):
 
     PAST_EVENT = "past_event"
     FUTURE_EVENT = "future_event"
+    GENERAL_TOPIC = "general_topic"
 
 
 class ClassifyRequest(BaseModel):
