@@ -1146,6 +1146,50 @@ def test_classify_headline_multi_ticker_performance_validation(monkeypatch):
     )
 
 
+def test_classify_headline_multi_ticker_general_topic_temporal(mock_transformers_pipeline):
+    """Test multi-ticker classification with general topic headline.
+
+    Reproduces bug where TemporalCategory.GENERAL_TOPIC raises AttributeError.
+    The enum is missing the GENERAL_TOPIC member, causing the code to fail
+    when general_score is the highest temporal score.
+    """
+    import sys
+
+    # Clear module cache
+    if "benz_sent_filter.services.classifier" in sys.modules:
+        del sys.modules["benz_sent_filter.services.classifier"]
+
+    # Mock scores where general_score is highest (0.7 > 0.2 and 0.1)
+    mock_transformers_pipeline({
+        "This is an opinion piece or editorial": 0.3,
+        "This is a factual news report": 0.6,
+        "This is about a past event that already happened": 0.2,
+        "This is about a future event or forecast": 0.1,
+        "This is a general topic or analysis": 0.7,  # Highest temporal score
+        "This article describes a routine business operation like quarterly dividends, regular loan portfolio sales, scheduled buybacks, or normal refinancing": 0.3,
+    })
+
+    from benz_sent_filter.services.classifier import ClassificationService
+
+    service = ClassificationService()
+    result = service.classify_headline_multi_ticker(
+        "Analysis of Banking Industry Trends",
+        ticker_symbols=["BAC", "JPM"]
+    )
+
+    # Verify core classification
+    assert "core_classification" in result
+    core = result["core_classification"]
+
+    # Should classify as general topic (not past or future)
+    assert core["temporal_category"] == "general_topic"
+    assert core["scores"]["general_score"] == 0.7
+
+    # Verify routine operations analyzed for both tickers
+    assert "routine_operations_by_ticker" in result
+    assert len(result["routine_operations_by_ticker"]) == 2
+
+
 # ============================================================================
 # Conditional Language Pattern Detection Tests (Phase 1)
 # ============================================================================
