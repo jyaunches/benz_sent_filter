@@ -60,11 +60,6 @@ make lint             # Check code quality
 make serve            # Start dev server (port 8002)
 ```
 
-### Package Management
-- Use `uv` for all package operations (NEVER pip)
-- Dependencies defined in `pyproject.toml`
-- Add ML dependencies during implementation phase
-
 ### Testing
 - Unit tests in `tests/` directory
 - PYTHONPATH=src for imports
@@ -76,6 +71,16 @@ make serve            # Start dev server (port 8002)
 - Type annotations required
 - Follow existing patterns in benz ecosystem
 
+## Deployment
+
+All deployment tasks (GitHub Actions, Fly.io deployments, production operations) are managed through the `benz_mgmt` repository's centralized deployment utilities. See `benz_deployment/fly/` in benz_mgmt for:
+- Configuration management via `config.yml`
+- Workflow generation and updates
+- Secret management and auditing
+- Tier-based deployment orchestration
+
+If user requests deployment operations, direct them to use `benz_mgmt` repository.
+
 ## Integration Patterns
 
 When working across the ecosystem:
@@ -83,6 +88,25 @@ When working across the ecosystem:
 - Maintain consistency with other benz services
 - Use shared documentation via `shared_docs/` symlink
 - Follow patterns documented in `.claude/PATTERNS.md`
+
+## Task Tracking with Beads
+
+This repository uses the Beads task management system (MCP server) for tracking issues, features, and bugs.
+
+**Basic Commands**:
+- `mcp__beads__list` - List all issues with optional filters
+- `mcp__beads__create` - Create new tasks, bugs, or features
+- `mcp__beads__show` - View detailed issue information
+- `mcp__beads__update` - Update issue status or details
+- `mcp__beads__ready` - Find tasks ready to work on
+
+**Workflow**:
+1. Create issues for new work: `create(title="...", issue_type="task|bug|feature")`
+2. Find ready work: `ready()` - shows tasks with no blockers
+3. Claim work: `update(issue_id="...", status="in_progress")`
+4. Complete work: `close(issue_id="...", reason="Completed")`
+
+See `.beads/` directory for task database. All MCP functions use `workspace_root` parameter (auto-set to repository root).
 
 ## Slash Commands
 
