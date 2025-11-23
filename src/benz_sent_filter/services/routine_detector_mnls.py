@@ -67,13 +67,12 @@ class RoutineOperationDetectorMNLS:
     ROUTINE_THRESHOLD_REVENUE = 0.05  # 5% of revenue
     ROUTINE_THRESHOLD_ASSETS = 0.005  # 0.5% of assets (for financials)
 
-    # MNLS candidate labels (optimized through experimentation)
-    # Business Impact Focus: Distinguishes transformational vs incremental changes
-    # Achieves 100% accuracy on test set (8/8 correct)
-    # Investor perspective: Incremental progress unlikely to move stock price
+    # MNLS candidate labels (materiality from investor perspective)
+    # Material: Significant corporate events (deals, partnerships, major transactions, clinical results)
+    # Routine: Recurring scheduled activities (quarterly payments, regular filings, expected operations)
     ROUTINE_LABELS = [
-        "This is a transformational change to the business",
-        "This is incremental progress or routine business updates",
+        "This is a newsworthy corporate event",
+        "This is a scheduled recurring activity",
     ]
 
     # Company context dictionary (same as pattern-based version)
@@ -279,17 +278,17 @@ class RoutineOperationDetectorMNLS:
                         materiality_score = 0
 
         # Final decision: combine MNLS score with materiality
-        # Routine if:
-        # 1. MNLS score > 0.5 (more routine than material) AND
-        # 2. Either no materiality assessment OR materiality_score <= -1
+        # Priority order:
+        # 1. Strong immateriality evidence (materiality_score <= -2) → routine
+        # 2. MNLS score > 0.5 → routine
+        # 3. Otherwise → material
         result = False
-        if routine_score > 0.5:
-            if materiality_score == 0:
-                # No materiality assessment - use MNLS only
-                result = True
-            elif materiality_score <= -1:
-                # Immaterial - definitely routine
-                result = True
+        if materiality_score <= -2:
+            # Very immaterial transaction - definitely routine regardless of MNLI
+            result = True
+        elif routine_score > 0.5:
+            # MNLI says routine
+            result = True
 
         return RoutineDetectionResult(
             routine_score=routine_score,
