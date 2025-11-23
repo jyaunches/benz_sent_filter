@@ -69,11 +69,12 @@ class RoutineOperationDetectorMNLS:
 
     # MNLS candidate labels (materiality from investor perspective)
     # Tuned to distinguish between material events and routine business operations
-    # Material: Transformational corporate events (strategic deals, partnerships, major milestones)
-    # Routine: Predictable recurring activities (quarterly dividends, regular filings, standard operations)
+    # Material: ONE-TIME transformational corporate events (strategic deals, partnerships, major milestones)
+    # Routine: RECURRING predictable activities (quarterly dividends, regular filings, standard operations)
+    # Key distinction: Emphasize "happens once" vs "happens every quarter/year"
     ROUTINE_LABELS = [
-        "This announces a newsworthy strategic corporate event like a major acquisition, partnership agreement, clinical trial breakthrough, or transformational business development that significantly changes the company's future",
-        "This announces a predictable scheduled business activity like a quarterly dividend declaration, regular SEC compliance filing, routine financial report, or expected operational disclosure that occurs every quarter or year",
+        "This announces a major one-time business transaction or milestone like selling company assets, acquiring another business, winning government contracts or being selected for military programs, announcing significant clinical trial successes with complete responses or positive outcomes, securing gigawatt-scale energy deployment deals, raising significant capital, or completing multi-billion dollar transactions",
+        "This announces a recurring scheduled event that happens every quarter or every year like quarterly dividend payments, annual shareholder meetings, regular earnings reports, or routine SEC compliance filings",
     ]
 
     # Company context dictionary (same as pattern-based version)
