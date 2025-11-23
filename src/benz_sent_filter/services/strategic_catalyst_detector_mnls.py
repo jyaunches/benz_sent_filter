@@ -56,35 +56,34 @@ class StrategicCatalystDetectorMNLS:
     PRESENCE_THRESHOLD = 0.5  # Aligned with company relevance detection
 
     # Type classification threshold
-    TYPE_THRESHOLD = 0.6  # Aligned with quantitative catalyst type classification
+    TYPE_THRESHOLD = 0.5  # Lowered to match presence detection threshold for better recall
 
     # MNLI labels for catalyst type classification
-    # Simplified labels for better MNLI semantic disambiguation
-    # Key principle: Focus on core distinguishing features, avoid over-specification
+    # Using specific, non-overlapping descriptions for clear disambiguation
     CATALYST_TYPE_LABELS = {
+        "m&a": [
+            "This is about a merger agreement or acquisition where one company is buying another",
+            "This is not about mergers or acquisitions",
+        ],
         "executive_changes": [
-            "This announces executive leadership changes or C-suite appointments and departures",
-            "This does not announce executive leadership changes",
+            "This is about a top executive like a CEO or CFO joining the company or leaving their role",
+            "This is not about executive hiring or departures",
         ],
         "partnership": [
-            "This announces a partnership, collaboration, or joint venture between companies",
-            "This does not announce a partnership or collaboration",
+            "This is about two separate companies forming a strategic partnership or collaboration",
+            "This is not about partnerships between companies",
         ],
         "product_launch": [
-            "This announces launching or releasing a new product or service",
-            "This does not announce a product launch",
-        ],
-        "m&a": [
-            "This announces a merger or acquisition between companies",
-            "This does not announce a merger or acquisition",
+            "This is about a company introducing a new product or platform to the market",
+            "This is not about launching new products",
         ],
         "corporate_restructuring": [
-            "This announces corporate rebranding, name changes, or restructuring",
-            "This does not announce corporate restructuring or rebranding",
+            "This is about a company renaming itself or changing its brand identity",
+            "This is not about company rebranding",
         ],
         "clinical_trial": [
-            "This announces clinical trial results or medical study outcomes",
-            "This does not announce clinical trial results",
+            "This is about positive or negative results from a Phase 1, Phase 2, or Phase 3 medical trial",
+            "This is not about medical trial results",
         ],
     }
 
