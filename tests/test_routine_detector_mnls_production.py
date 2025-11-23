@@ -12,6 +12,20 @@ flag as routine operations.
 
 import pytest
 
+from benz_sent_filter.services.routine_detector_mnls import (
+    RoutineOperationDetectorMNLS,
+)
+
+
+@pytest.fixture
+def detector():
+    """Create a fresh detector instance for each test.
+
+    This ensures the MNLI pipeline is reset between tests to avoid
+    state leakage that can cause intermittent failures in the full suite.
+    """
+    return RoutineOperationDetectorMNLS()
+
 
 class TestProductionMaterialEventsNotRoutine:
     """Test that clearly material events are NOT classified as routine.
@@ -21,18 +35,13 @@ class TestProductionMaterialEventsNotRoutine:
     marked as routine operations.
     """
 
-    def test_echostar_23b_spectrum_sale_not_routine(self):
+    def test_echostar_23b_spectrum_sale_not_routine(self, detector):
         """$23B spectrum license sale should be material, not routine.
 
         Article: benzinga_47327444_SATS
         Tickers: SATS, T
         Issue: Incorrectly classified as routine after GENERAL_TOPIC fix
         """
-        from benz_sent_filter.services.routine_detector_mnls import (
-            RoutineOperationDetectorMNLS,
-        )
-
-        detector = RoutineOperationDetectorMNLS()
         headline = (
             "EchoStar To Sell 3.45 GHz And 600 MHz Spectrum Licenses To AT&T For $23B, "
             "Establishes Hybrid MNO Agreement With Boost Mobile To Address FCC Inquiries"
@@ -51,18 +60,13 @@ class TestProductionMaterialEventsNotRoutine:
             f"Got {result.confidence:.2f}"
         )
 
-    def test_nuscale_power_agreement_not_routine(self):
+    def test_nuscale_power_agreement_not_routine(self, detector):
         """Major 6 GW deployment agreement should be material, not routine.
 
         Article: benzinga_47469914_SMR
         Tickers: SMR
         Issue: Incorrectly classified as routine after GENERAL_TOPIC fix
         """
-        from benz_sent_filter.services.routine_detector_mnls import (
-            RoutineOperationDetectorMNLS,
-        )
-
-        detector = RoutineOperationDetectorMNLS()
         headline = (
             "NuScale Power Supports ENTRA1 Energy's Agreement With Tennessee Valley Authority "
             "To Deploy Up To 6 Gigawatts Of NuScale SMR Capacity Across TVA's Seven-State Service Region"
@@ -76,18 +80,13 @@ class TestProductionMaterialEventsNotRoutine:
             f"Got routine_operation={result.result}, confidence={result.confidence:.2f}"
         )
 
-    def test_airnet_180m_offering_not_routine(self):
+    def test_airnet_180m_offering_not_routine(self, detector):
         """$180M capital raise should be material, not routine.
 
         Article: benzinga_47279040_ANTE
         Tickers: ANTE
         Issue: Incorrectly classified as routine after GENERAL_TOPIC fix
         """
-        from benz_sent_filter.services.routine_detector_mnls import (
-            RoutineOperationDetectorMNLS,
-        )
-
-        detector = RoutineOperationDetectorMNLS()
         headline = (
             "AirNet Technology Enters Registered Direct Offering For Sale Of 80,826,225 "
             "Ordinary Shares And Accompanying Warrants At Combined Purchase Price Of $2.227; "
@@ -106,7 +105,7 @@ class TestProductionMaterialEventsNotRoutine:
             f"Got {result.confidence:.2f}"
         )
 
-    def test_lantronix_defense_contract_not_routine(self):
+    def test_lantronix_defense_contract_not_routine(self, detector):
         """Military drone program selection should be material, not routine.
 
         Article: benzinga_47181720_RCAT
@@ -114,11 +113,6 @@ class TestProductionMaterialEventsNotRoutine:
         Note: While this doesn't have a specific dollar amount, being selected for
         a U.S. Army program is a significant strategic win.
         """
-        from benz_sent_filter.services.routine_detector_mnls import (
-            RoutineOperationDetectorMNLS,
-        )
-
-        detector = RoutineOperationDetectorMNLS()
         headline = (
             "Lantronix's TAA- And NDAA-Compliant Solution Selected By Teal Drones For "
             "Production Of Black Widow Drones Under U.S. Army's Short-Range Reconnaissance Program"
@@ -132,7 +126,7 @@ class TestProductionMaterialEventsNotRoutine:
             f"Got routine_operation={result.result}, confidence={result.confidence:.2f}"
         )
 
-    def test_immunitybio_clinical_trial_results_not_routine(self):
+    def test_immunitybio_clinical_trial_results_not_routine(self, detector):
         """Positive clinical trial results (complete responses) should be material.
 
         Article: benzinga_47088121_IBRX
@@ -140,11 +134,6 @@ class TestProductionMaterialEventsNotRoutine:
         Note: Clinical trial results showing complete responses are significant events
         for biotech companies.
         """
-        from benz_sent_filter.services.routine_detector_mnls import (
-            RoutineOperationDetectorMNLS,
-        )
-
-        detector = RoutineOperationDetectorMNLS()
         headline = (
             "ImmunityBio Announces Early QUILT-106 Phase I Data Showing Complete Responses "
             "In Waldenstrom Macroglobulinemia Patients Treated With CD19 CAR-NK Therapy"
@@ -162,13 +151,8 @@ class TestProductionMaterialEventsNotRoutine:
 class TestRoutineDetectorTransactionExtraction:
     """Test that transaction values are correctly extracted."""
 
-    def test_extract_23b_from_echostar_headline(self):
+    def test_extract_23b_from_echostar_headline(self, detector):
         """Should extract $23B from spectrum sale headline."""
-        from benz_sent_filter.services.routine_detector_mnls import (
-            RoutineOperationDetectorMNLS,
-        )
-
-        detector = RoutineOperationDetectorMNLS()
         headline = (
             "EchoStar To Sell 3.45 GHz And 600 MHz Spectrum Licenses To AT&T For $23B, "
             "Establishes Hybrid MNO Agreement With Boost Mobile To Address FCC Inquiries"
@@ -181,13 +165,8 @@ class TestRoutineDetectorTransactionExtraction:
             f"Should extract $23B (23000000000). Got {result.transaction_value}"
         )
 
-    def test_extract_180m_from_airnet_headline(self):
+    def test_extract_180m_from_airnet_headline(self, detector):
         """Should extract $180M from offering headline."""
-        from benz_sent_filter.services.routine_detector_mnls import (
-            RoutineOperationDetectorMNLS,
-        )
-
-        detector = RoutineOperationDetectorMNLS()
         headline = (
             "AirNet Technology Enters Registered Direct Offering For Sale Of 80,826,225 "
             "Ordinary Shares And Accompanying Warrants At Combined Purchase Price Of $2.227; "
@@ -212,13 +191,8 @@ class TestRoutineOperationsShouldBeRoutine:
     - Standard loan portfolio sales (for financial institutions)
     """
 
-    def test_quarterly_dividend_is_routine(self):
+    def test_quarterly_dividend_is_routine(self, detector):
         """Quarterly dividend should be routine for established companies."""
-        from benz_sent_filter.services.routine_detector_mnls import (
-            RoutineOperationDetectorMNLS,
-        )
-
-        detector = RoutineOperationDetectorMNLS()
         headline = "Bank announces quarterly dividend payment"
 
         result = detector.detect(headline)
@@ -229,13 +203,8 @@ class TestRoutineOperationsShouldBeRoutine:
             f"Got routine_operation={result.result}, confidence={result.confidence:.2f}"
         )
 
-    def test_sec_filing_is_routine(self):
+    def test_sec_filing_is_routine(self, detector):
         """Routine SEC filing should be classified as routine."""
-        from benz_sent_filter.services.routine_detector_mnls import (
-            RoutineOperationDetectorMNLS,
-        )
-
-        detector = RoutineOperationDetectorMNLS()
         headline = "Bank files quarterly MBS disclosure report with SEC"
 
         result = detector.detect(headline)
@@ -246,17 +215,12 @@ class TestRoutineOperationsShouldBeRoutine:
             f"Got routine_operation={result.result}, confidence={result.confidence:.2f}"
         )
 
-    def test_fnma_loan_sale_560m_is_routine_for_fnma(self):
+    def test_fnma_loan_sale_560m_is_routine_for_fnma(self, detector):
         """$560M loan sale is routine for FNMA given its $4T asset base.
 
         Example from test_api.py
         FNMA context: $4T assets, so $560M is 0.014% of assets (immaterial)
         """
-        from benz_sent_filter.services.routine_detector_mnls import (
-            RoutineOperationDetectorMNLS,
-        )
-
-        detector = RoutineOperationDetectorMNLS()
         headline = (
             "Fannie Mae Begins Marketing Its Most Recent Sale Of Reperforming Loans; "
             "Sale Consists Of ~ 3,058 Loans, Having An Unpaid Principal Balance Of ~ $560.5M"

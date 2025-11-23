@@ -59,31 +59,32 @@ class StrategicCatalystDetectorMNLS:
     TYPE_THRESHOLD = 0.5  # Lowered to match presence detection threshold for better recall
 
     # MNLI labels for catalyst type classification
-    # Using specific, non-overlapping descriptions for clear disambiguation
+    # Tuned for semantic clarity with action-oriented verbs and distinctive features
+    # Key principle: Avoid semantic overlap, use action verbs, include distinctive keywords
     CATALYST_TYPE_LABELS = {
         "m&a": [
-            "This is about a merger agreement or acquisition where one company is buying another",
-            "This is not about mergers or acquisitions",
+            "This announces a merger where companies combine into one entity or an acquisition where one company purchases and takes control of another company",
+            "This does not announce a merger, acquisition, or companies combining into a single entity",
         ],
         "executive_changes": [
-            "This is about a top executive like a CEO or CFO joining the company or leaving their role",
-            "This is not about executive hiring or departures",
+            "This announces that a C-suite executive (CEO, CFO, President, or COO) is joining, leaving, stepping down from, or being appointed to their leadership position",
+            "This does not announce executive appointments, departures, or C-suite leadership transitions",
         ],
         "partnership": [
-            "This is about two separate companies forming a strategic partnership or collaboration",
-            "This is not about partnerships between companies",
+            "This announces that two or more separate companies are signing an agreement to collaborate, partner, or work together on a joint project while remaining independent companies",
+            "This does not announce a partnership, collaboration agreement, or companies working together while staying separate",
         ],
         "product_launch": [
-            "This is about a company introducing a new product or platform to the market",
-            "This is not about launching new products",
+            "This announces that a single company is launching, releasing, or making available a new finished product, service, or platform that is ready for customers to use now",
+            "This does not announce a product launch, release, or new offering becoming available to customers",
         ],
         "corporate_restructuring": [
-            "This is about a company renaming itself or changing its brand identity",
-            "This is not about company rebranding",
+            "This announces a company is changing its corporate name, rebranding its identity, changing its ticker symbol, or restructuring its corporate structure",
+            "This does not announce a name change, rebranding, ticker change, or corporate restructuring",
         ],
         "clinical_trial": [
-            "This is about positive or negative results from a Phase 1, Phase 2, or Phase 3 medical trial",
-            "This is not about medical trial results",
+            "This announces positive or negative results, outcomes, or data from a completed Phase 1, Phase 2, or Phase 3 clinical trial or medical study",
+            "This does not announce clinical trial results, medical study outcomes, or research findings from completed trials",
         ],
     }
 

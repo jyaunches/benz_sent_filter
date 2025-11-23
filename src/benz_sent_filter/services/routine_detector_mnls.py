@@ -68,11 +68,12 @@ class RoutineOperationDetectorMNLS:
     ROUTINE_THRESHOLD_ASSETS = 0.005  # 0.5% of assets (for financials)
 
     # MNLS candidate labels (materiality from investor perspective)
-    # Material: Significant corporate events (deals, partnerships, major transactions, clinical results)
-    # Routine: Recurring scheduled activities (quarterly payments, regular filings, expected operations)
+    # Tuned to distinguish between material events and routine business operations
+    # Material: Transformational corporate events (strategic deals, partnerships, major milestones)
+    # Routine: Predictable recurring activities (quarterly dividends, regular filings, standard operations)
     ROUTINE_LABELS = [
-        "This is a newsworthy corporate event",
-        "This is a scheduled recurring activity",
+        "This announces a newsworthy strategic corporate event like a major acquisition, partnership agreement, clinical trial breakthrough, or transformational business development that significantly changes the company's future",
+        "This announces a predictable scheduled business activity like a quarterly dividend declaration, regular SEC compliance filing, routine financial report, or expected operational disclosure that occurs every quarter or year",
     ]
 
     # Company context dictionary (same as pattern-based version)
@@ -235,13 +236,13 @@ class RoutineOperationDetectorMNLS:
         # Extract routine score (confidence that it's routine)
         # mnls_result['labels'][0] is the top prediction
         # mnls_result['scores'][0] is the confidence for top prediction
-        # ROUTINE_LABELS[0] = "transformational change" (material)
-        # ROUTINE_LABELS[1] = "incremental progress or routine business updates" (routine)
+        # ROUTINE_LABELS[0] = "significant strategic corporate event" (material)
+        # ROUTINE_LABELS[1] = "routine recurring business activity" (routine)
         if mnls_result["labels"][0] == self.ROUTINE_LABELS[1]:
             # Top prediction is "routine" - use its score
             routine_score = mnls_result["scores"][0]
         else:
-            # Top prediction is "transformational" - use routine score (second score)
+            # Top prediction is "material" - use routine score (second score)
             routine_score = mnls_result["scores"][1]
 
         # Extract transaction value (keep helper from pattern matching)
