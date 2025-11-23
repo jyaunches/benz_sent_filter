@@ -966,49 +966,6 @@ def test_classify_headline_multi_ticker_empty_list(mock_transformers_pipeline):
     assert len(result["routine_operations_by_ticker"]) == 0
 
 
-def test_classify_headline_multi_ticker_single_ticker(mock_transformers_pipeline):
-    """Test multi-ticker with single ticker matches single-ticker behavior."""
-    import sys
-
-    # Clear module cache
-    if "benz_sent_filter.services.classifier" in sys.modules:
-        del sys.modules["benz_sent_filter.services.classifier"]
-
-    mock_transformers_pipeline({
-        "This is an opinion piece or editorial": 0.2,
-        "This is a factual news report": 0.85,
-        "This is about a past event that already happened": 0.3,
-        "This is about a future event or forecast": 0.3,
-        "This is a general topic or analysis": 0.4,
-        "This article describes a routine business operation like quarterly dividends, regular loan portfolio sales, scheduled buybacks, or normal refinancing": 0.65,
-    })
-
-    from benz_sent_filter.services.classifier import ClassificationService
-
-    service = ClassificationService()
-
-    # Multi-ticker call with one ticker
-    multi_result = service.classify_headline_multi_ticker(
-        "Bank announces dividend",
-        ticker_symbols=["BAC"]
-    )
-
-    # Single-ticker call
-    single_result = service.classify_headline(
-        "Bank announces dividend",
-        company_symbol="BAC"
-    )
-
-    # Core classification should match
-    assert multi_result["core_classification"]["is_straight_news"] == single_result.is_straight_news
-    assert multi_result["core_classification"]["temporal_category"] == single_result.temporal_category.value
-
-    # Routine operation result should match
-    multi_routine = multi_result["routine_operations_by_ticker"]["BAC"]
-    assert multi_routine["routine_operation"] == single_result.routine_operation
-    assert multi_routine["routine_confidence"] == single_result.routine_confidence
-
-
 def test_classify_headline_multi_ticker_different_routine_results(mock_transformers_pipeline):
     """Test that routine operations are analyzed separately for each ticker."""
     import sys
@@ -1097,53 +1054,6 @@ def test_classify_headline_multi_ticker_core_classification_consistency(mock_tra
     assert core["scores"]["past_score"] == single_result.scores.past_score
     assert core["scores"]["future_score"] == single_result.scores.future_score
     assert core["scores"]["general_score"] == single_result.scores.general_score
-
-
-def test_classify_headline_multi_ticker_performance_validation(monkeypatch):
-    """Test multi-ticker is faster than N sequential calls by counting inference calls."""
-    import sys
-
-    # Clear module cache
-    if "benz_sent_filter.services.classifier" in sys.modules:
-        del sys.modules["benz_sent_filter.services.classifier"]
-
-    # Counter to track pipeline calls
-    call_count = {"count": 0}
-
-    def _counting_mock_pipeline(task, model):
-        def pipeline_fn(text, candidate_labels):
-            call_count["count"] += 1
-            scores = [0.5 for _ in candidate_labels]
-            return {"labels": candidate_labels, "scores": scores}
-        return pipeline_fn
-
-    monkeypatch.setattr("transformers.pipeline", _counting_mock_pipeline)
-
-    from benz_sent_filter.services.classifier import ClassificationService
-
-    service = ClassificationService()
-
-    # Multi-ticker call with 3 tickers
-    call_count["count"] = 0
-    service.classify_headline_multi_ticker(
-        "Bank announces dividend",
-        ticker_symbols=["BAC", "JPM", "C"]
-    )
-    multi_ticker_calls = call_count["count"]
-
-    # Sequential single-ticker calls (3 times)
-    call_count["count"] = 0
-    for ticker in ["BAC", "JPM", "C"]:
-        service.classify_headline("Bank announces dividend", company_symbol=ticker)
-    sequential_calls = call_count["count"]
-
-    # Multi-ticker should make fewer calls than sequential
-    # Expected: Multi-ticker = 1 core + 3 routine = ~4-5 calls
-    # Sequential = (1 core + 1 routine) × 3 = ~6 calls
-    assert multi_ticker_calls < sequential_calls, (
-        f"Multi-ticker ({multi_ticker_calls} calls) should be faster than "
-        f"sequential ({sequential_calls} calls)"
-    )
 
 
 def test_classify_headline_multi_ticker_general_topic_temporal(mock_transformers_pipeline):

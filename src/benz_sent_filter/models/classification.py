@@ -24,9 +24,6 @@ class ClassifyRequest(BaseModel):
     company: str | None = Field(
         default=None, description="Optional company name to check relevance"
     )
-    company_symbol: str | None = Field(
-        default=None, description="Optional company ticker symbol for materiality assessment (e.g., 'FNMA', 'BAC')"
-    )
 
 
 class BatchClassifyRequest(BaseModel):
@@ -37,9 +34,6 @@ class BatchClassifyRequest(BaseModel):
     )
     company: str | None = Field(
         default=None, description="Optional company name to check relevance for all headlines"
-    )
-    company_symbol: str | None = Field(
-        default=None, description="Optional company ticker symbol for materiality assessment (e.g., 'FNMA', 'BAC')"
     )
 
 
@@ -98,18 +92,6 @@ class ClassificationResult(BaseModel):
         default=None,
         description="List of matched conditional language patterns (e.g., ['plans to', 'may', 'potential']). "
         "Only populated when conditional_language is True.",
-    )
-    routine_operation: bool | None = Field(
-        default=None,
-        description="Whether headline describes a routine business operation with immaterial financial impact.",
-    )
-    routine_confidence: float | None = Field(
-        default=None,
-        description="Confidence in routine operation classification (0.0 to 1.0).",
-    )
-    routine_metadata: dict | None = Field(
-        default=None,
-        description="Detailed routine operation detection metadata including routine_score, materiality_score, etc.",
     )
 
 

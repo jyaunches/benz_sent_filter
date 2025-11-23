@@ -171,17 +171,16 @@ class ClassificationService:
         }
 
     def classify_headline(
-        self, headline: str, company: str | None = None, company_symbol: str | None = None
+        self, headline: str, company: str | None = None
     ) -> ClassificationResult:
         """Classify a single headline.
 
         Args:
             headline: Headline text to classify
             company: Optional company name to check relevance
-            company_symbol: Optional company ticker symbol for materiality assessment
 
         Returns:
-            ClassificationResult with boolean flags, scores, temporal category, and routine operation detection
+            ClassificationResult with boolean flags, scores, and temporal category
 
         Raises:
             RuntimeError: If inference fails
@@ -224,9 +223,6 @@ class ClassificationService:
         # Analyze conditional language patterns
         conditional_metadata = self._analyze_conditional_language(headline, temporal_category)
 
-        # Analyze routine operations
-        routine_metadata = self._analyze_routine_operation(headline, company_symbol)
-
         # Check company relevance if company provided
         if company is not None:
             relevance = self._check_company_relevance(headline, company)
@@ -243,9 +239,6 @@ class ClassificationService:
                 forecast_timeframe=far_future_metadata["forecast_timeframe"],
                 conditional_language=conditional_metadata["conditional_language"],
                 conditional_patterns=conditional_metadata["conditional_patterns"],
-                routine_operation=routine_metadata["routine_operation"],
-                routine_confidence=routine_metadata["routine_confidence"],
-                routine_metadata=routine_metadata["routine_metadata"],
             )
         else:
             return ClassificationResult(
@@ -258,9 +251,6 @@ class ClassificationService:
                 forecast_timeframe=far_future_metadata["forecast_timeframe"],
                 conditional_language=conditional_metadata["conditional_language"],
                 conditional_patterns=conditional_metadata["conditional_patterns"],
-                routine_operation=routine_metadata["routine_operation"],
-                routine_confidence=routine_metadata["routine_confidence"],
-                routine_metadata=routine_metadata["routine_metadata"],
             )
 
     def classify_headline_multi_ticker(
@@ -351,7 +341,7 @@ class ClassificationService:
         }
 
     def classify_batch(
-        self, headlines: list[str], company: str | None = None, company_symbol: str | None = None
+        self, headlines: list[str], company: str | None = None
     ) -> list[ClassificationResult]:
         """Classify multiple headlines.
 
@@ -361,13 +351,12 @@ class ClassificationService:
         Args:
             headlines: List of headline texts to classify
             company: Optional company name to check relevance for all headlines
-            company_symbol: Optional company ticker symbol for materiality assessment
 
         Returns:
             List of ClassificationResult objects in same order as input
         """
         return [
-            self.classify_headline(headline, company=company, company_symbol=company_symbol) for headline in headlines
+            self.classify_headline(headline, company=company) for headline in headlines
         ]
 
     def check_company_relevance(self, headline: str, company: str) -> dict:
