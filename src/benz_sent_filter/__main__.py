@@ -1,49 +1,43 @@
-"""Entry point for benz_sent_filter service."""
+"""Entry point for running the benz_sent_filter service."""
 
-import os
+import logging
+import sys
 
-import typer
+import uvicorn
 
-app = typer.Typer()
+from benz_sent_filter.config.settings import Settings
 
 
-@app.command()
-def main(
-    port: int = typer.Option(8002, help="Port to run the server on"),
-    host: str = typer.Option("0.0.0.0", help="Host to bind the server to"),
-    reload: bool = typer.Option(False, help="Enable auto-reload for development"),
-    workers: int = typer.Option(
-        None,
-        help="Number of worker processes (default: CPU count, incompatible with --reload)",
-    ),
-):
-    """Start the Benz Sent Filter API server."""
-    import uvicorn
+def main():
+    """Run the benz_sent_filter service."""
+    # Load settings first to get log level
+    try:
+        settings = Settings()
+    except Exception as e:
+        logging.error(f"Failed to load settings: {e}")
+        sys.exit(1)
 
-    # Determine worker count
-    if reload:
-        # Reload mode requires single worker
-        actual_workers = 1
-        if workers is not None and workers > 1:
-            typer.echo(
-                "Warning: --reload is incompatible with multiple workers, using 1 worker"
-            )
-    else:
-        # Use specified workers or default to CPU count
-        actual_workers = workers if workers is not None else os.cpu_count()
-
-    typer.echo(
-        f"Starting Benz Sent Filter on {host}:{port} with {actual_workers} worker(s)"
+    # Configure logging with settings
+    logging.basicConfig(
+        level=getattr(logging, settings.log_level.upper()),
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
 
+    # Configure uvicorn logging
+    log_config = uvicorn.config.LOGGING_CONFIG
+    log_config["formatters"]["default"]["fmt"] = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    log_config["formatters"]["access"]["fmt"] = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+    # Run the server
     uvicorn.run(
         "benz_sent_filter.api.app:app",
-        host=host,
-        port=port,
-        reload=reload,
-        workers=actual_workers,
+        host=settings.api_host,
+        port=settings.api_port,
+        log_level=settings.log_level.lower(),
+        log_config=log_config,
+        workers=settings.uvicorn_workers,
     )
 
 
 if __name__ == "__main__":
-    app()
+    main()
