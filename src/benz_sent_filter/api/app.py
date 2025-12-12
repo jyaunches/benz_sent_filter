@@ -26,6 +26,13 @@ from benz_sent_filter.models.classification import (
     StrategicCatalystResult,
 )
 from benz_sent_filter.services.classifier import ClassificationService
+from benz_sent_filter.logging_config import setup_logging
+
+
+# Initialize logging when module is imported (covers both direct uvicorn and __main__ entry)
+# setup_logging() is idempotent - safe to call multiple times
+setup_logging()
+
 
 app = FastAPI(
     title="Benz Sent Filter",
