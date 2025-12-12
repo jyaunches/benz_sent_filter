@@ -6,9 +6,11 @@ combined with materiality assessment.
 """
 
 import re
+import time
 from dataclasses import dataclass
 from typing import Optional
 
+from loguru import logger
 from pydantic import BaseModel
 from transformers import pipeline
 
@@ -220,8 +222,16 @@ class RoutineOperationDetectorMNLS:
         Returns:
             RoutineDetectionResult with MNLS scores and materiality assessment
         """
+        logger.debug(
+            "Starting routine operation detection",
+            headline_length=len(headline) if headline else 0,
+            company_symbol=company_symbol,
+        )
+        start_time = time.time()
+
         # Handle None/empty input
         if not headline:
+            logger.warning("Empty headline provided for routine detection")
             return RoutineDetectionResult(
                 routine_score=0.5,
                 confidence=0.5,
@@ -291,6 +301,19 @@ class RoutineOperationDetectorMNLS:
         elif routine_score > 0.5:
             # MNLI says routine
             result = True
+
+        duration = time.time() - start_time
+        logger.info(
+            "Routine operation detection completed",
+            is_routine=result,
+            routine_score=round(routine_score, 3),
+            has_transaction_value=transaction_value is not None,
+            transaction_value=transaction_value,
+            process_stage=process_stage,
+            materiality_score=materiality_score,
+            company_symbol=company_symbol,
+            duration_ms=round(duration * 1000, 2),
+        )
 
         return RoutineDetectionResult(
             routine_score=routine_score,

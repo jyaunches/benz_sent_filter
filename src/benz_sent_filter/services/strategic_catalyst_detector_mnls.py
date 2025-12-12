@@ -16,8 +16,10 @@ Quantitative Pre-Filter:
 """
 
 import re
+import time
 from typing import Optional
 
+from loguru import logger
 from transformers import pipeline
 
 from benz_sent_filter.models.classification import StrategicCatalystResult
@@ -113,8 +115,15 @@ class StrategicCatalystDetectorMNLS:
         Returns:
             StrategicCatalystResult with detection details
         """
+        logger.debug(
+            "Starting strategic catalyst detection",
+            headline_length=len(headline) if headline else 0,
+        )
+        start_time = time.time()
+
         # Handle None/empty input
         if not headline:
+            logger.warning("Empty headline provided for strategic catalyst detection")
             return StrategicCatalystResult(
                 headline=headline or "",
                 has_strategic_catalyst=False,
@@ -133,6 +142,14 @@ class StrategicCatalystDetectorMNLS:
         # - Percentage + financial keyword (signals quantitative results like earnings growth)
         # - Financial keyword alone (signals financial results like earnings, revenue reports)
         if has_dollar_amount or (has_percentage and has_financial_keyword) or has_financial_keyword:
+            duration = time.time() - start_time
+            logger.info(
+                "Strategic catalyst rejected by quantitative pre-filter",
+                has_dollar=has_dollar_amount,
+                has_percentage=has_percentage,
+                has_financial_keyword=has_financial_keyword,
+                duration_ms=round(duration * 1000, 2),
+            )
             return StrategicCatalystResult(
                 headline=headline,
                 has_strategic_catalyst=False,
@@ -141,10 +158,21 @@ class StrategicCatalystDetectorMNLS:
             )
 
         # Step 1: MNLI presence check
+        logger.debug("Running MNLI presence detection")
         presence_score = self._check_presence(headline)
+        logger.debug(
+            "MNLI presence detection completed", presence_score=round(presence_score, 3)
+        )
 
         # Fast path: If MNLI says not a catalyst, return negative result
         if presence_score < self.PRESENCE_THRESHOLD:
+            duration = time.time() - start_time
+            logger.info(
+                "Strategic catalyst not detected (presence score below threshold)",
+                presence_score=round(presence_score, 3),
+                threshold=self.PRESENCE_THRESHOLD,
+                duration_ms=round(duration * 1000, 2),
+            )
             return StrategicCatalystResult(
                 headline=headline,
                 has_strategic_catalyst=False,
@@ -153,15 +181,30 @@ class StrategicCatalystDetectorMNLS:
             )
 
         # Step 2: Classify catalyst type using MNLI
+        logger.debug("Classifying catalyst subtype")
         type_result = self._classify_type(headline)
         catalyst_subtype = type_result["type"]
         type_score = type_result["confidence"]
+        logger.debug(
+            "Type classification completed",
+            catalyst_subtype=catalyst_subtype,
+            type_score=round(type_score, 3),
+        )
 
         # Step 3: Use type classification score as confidence
         confidence = type_score
 
         # Final decision: Has catalyst if presence detected
         has_catalyst = True
+
+        duration = time.time() - start_time
+        logger.info(
+            "Strategic catalyst detection completed",
+            has_catalyst=has_catalyst,
+            catalyst_subtype=catalyst_subtype,
+            confidence=round(confidence, 3),
+            duration_ms=round(duration * 1000, 2),
+        )
 
         return StrategicCatalystResult(
             headline=headline,

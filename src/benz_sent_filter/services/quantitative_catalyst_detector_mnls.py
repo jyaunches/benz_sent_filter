@@ -11,8 +11,10 @@ Hybrid approach:
 """
 
 import re
+import time
 from typing import Optional
 
+from loguru import logger
 from transformers import pipeline
 
 from benz_sent_filter.models.classification import QuantitativeCatalystResult
@@ -106,8 +108,15 @@ class QuantitativeCatalystDetectorMNLS:
         Returns:
             QuantitativeCatalystResult with detection details
         """
+        logger.debug(
+            "Starting quantitative catalyst detection",
+            headline_length=len(headline) if headline else 0,
+        )
+        start_time = time.time()
+
         # Handle None/empty input
         if not headline:
+            logger.warning("Empty headline provided for quantitative catalyst detection")
             return QuantitativeCatalystResult(
                 headline=headline or "",
                 has_quantitative_catalyst=False,
@@ -117,10 +126,21 @@ class QuantitativeCatalystDetectorMNLS:
             )
 
         # Step 1: MNLI presence check
+        logger.debug("Running MNLI presence detection")
         presence_score = self._check_presence(headline)
+        logger.debug(
+            "MNLI presence detection completed", presence_score=round(presence_score, 3)
+        )
 
         # Fast path: If MNLI says not a catalyst, return negative result
         if presence_score < self.PRESENCE_THRESHOLD:
+            duration = time.time() - start_time
+            logger.info(
+                "Quantitative catalyst not detected (presence score below threshold)",
+                presence_score=round(presence_score, 3),
+                threshold=self.PRESENCE_THRESHOLD,
+                duration_ms=round(duration * 1000, 2),
+            )
             return QuantitativeCatalystResult(
                 headline=headline,
                 has_quantitative_catalyst=False,
@@ -130,12 +150,24 @@ class QuantitativeCatalystDetectorMNLS:
             )
 
         # Step 2: Extract values using regex
+        logger.debug("Extracting quantitative values")
         catalyst_values = self._extract_values(headline)
+        logger.debug(
+            "Value extraction completed",
+            value_count=len(catalyst_values),
+            values=catalyst_values,
+        )
 
         # Step 3: Classify catalyst type (Phase 2)
+        logger.debug("Classifying catalyst type")
         type_result = self._classify_type(headline)
         catalyst_type = type_result["type"]
         type_score = type_result["confidence"]
+        logger.debug(
+            "Type classification completed",
+            catalyst_type=catalyst_type,
+            type_score=round(type_score, 3),
+        )
 
         # Step 4: Calculate confidence
         confidence = self._calculate_confidence(
@@ -153,6 +185,20 @@ class QuantitativeCatalystDetectorMNLS:
             has_catalyst = False
             catalyst_type = None
             confidence = presence_score * 0.3  # Penalize
+            logger.warning(
+                "Catalyst detected but no values extracted - likely false positive",
+                presence_score=round(presence_score, 3),
+            )
+
+        duration = time.time() - start_time
+        logger.info(
+            "Quantitative catalyst detection completed",
+            has_catalyst=has_catalyst,
+            catalyst_type=catalyst_type,
+            value_count=len(catalyst_values),
+            confidence=round(confidence, 3),
+            duration_ms=round(duration * 1000, 2),
+        )
 
         return QuantitativeCatalystResult(
             headline=headline,

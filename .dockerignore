@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+!README.md
+docs/
+specs/
+
+# Test files
+tests/
+integration/
+*.csv
+evaluate_*.py
+ROUTINE_*.md
+VALIDATION_*.md
+
+# Build artifacts
+.beads/
+
+# Claude
+.claude/
+
+# Other
+Makefile
+*.log
+*.db
+*.sqlite

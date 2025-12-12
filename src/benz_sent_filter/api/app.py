@@ -1,11 +1,12 @@
 """FastAPI application for benz_sent_filter."""
 
-import logging
+import time
 from datetime import datetime
 
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from loguru import logger
 from pydantic import BaseModel
 
 from benz_sent_filter.models.classification import (
@@ -26,9 +27,6 @@ from benz_sent_filter.models.classification import (
 )
 from benz_sent_filter.services.classifier import ClassificationService
 
-# Set up logging
-logger = logging.getLogger(__name__)
-
 app = FastAPI(
     title="Benz Sent Filter",
     description="MNLS-based sentiment classification service for article title analysis",
@@ -36,12 +34,45 @@ app = FastAPI(
 )
 
 
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    """Log all HTTP requests and responses with timing."""
+    start_time = time.time()
+
+    # Log incoming request
+    logger.info(
+        "HTTP request received",
+        method=request.method,
+        path=request.url.path,
+        client_host=request.client.host if request.client else None,
+    )
+
+    # Process request
+    response = await call_next(request)
+
+    # Calculate duration
+    duration = time.time() - start_time
+
+    # Log response
+    logger.info(
+        "HTTP request completed",
+        method=request.method,
+        path=request.url.path,
+        status_code=response.status_code,
+        duration_ms=round(duration * 1000, 2),
+    )
+
+    return response
+
+
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Log validation errors for debugging and return 422 response."""
     logger.error(
-        f"Validation error on {request.method} {request.url.path}\n"
-        f"Errors: {exc.errors()}"
+        "Validation error",
+        method=request.method,
+        path=request.url.path,
+        errors=exc.errors(),
     )
     # Return standard 422 response
     return JSONResponse(
@@ -61,12 +92,26 @@ class HealthResponse(BaseModel):
 @app.on_event("startup")
 async def startup_event():
     """Initialize classification service on startup (eager loading)."""
+    logger.info("FastAPI startup event - initializing classification service")
+    start_time = time.time()
     app.state.classifier = ClassificationService()
+    duration = time.time() - start_time
+    logger.info(
+        "Classification service initialized successfully",
+        duration_seconds=round(duration, 2),
+    )
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Cleanup on shutdown."""
+    logger.info("FastAPI shutdown event - cleaning up resources")
 
 
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
     """Health check endpoint."""
+    logger.debug("Health check requested")
     return HealthResponse(
         status="healthy",
         service="benz_sent_filter",
@@ -81,8 +126,22 @@ async def classify_headline(request: ClassifyRequest):
     Returns boolean flags, temporal category, and all raw scores.
     Optionally includes company relevance when company parameter provided.
     """
+    logger.info(
+        "POST /classify",
+        headline_length=len(request.headline),
+        has_company=request.company is not None,
+    )
+    start_time = time.time()
+
     result = app.state.classifier.classify_headline(
         request.headline, company=request.company
+    )
+
+    duration = time.time() - start_time
+    logger.info(
+        "POST /classify completed",
+        status="success",
+        duration_ms=round(duration * 1000, 2),
     )
     return result
 
@@ -94,8 +153,23 @@ async def classify_batch(request: BatchClassifyRequest):
     Returns array of classification results in same order as input.
     Optionally includes company relevance when company parameter provided.
     """
+    logger.info(
+        "POST /classify/batch",
+        batch_size=len(request.headlines),
+        has_company=request.company is not None,
+    )
+    start_time = time.time()
+
     results = app.state.classifier.classify_batch(
         request.headlines, company=request.company
+    )
+
+    duration = time.time() - start_time
+    logger.info(
+        "POST /classify/batch completed",
+        status="success",
+        batch_size=len(results),
+        duration_ms=round(duration * 1000, 2),
     )
     return BatchClassificationResult(results=results)
 
@@ -137,8 +211,23 @@ async def classify_routine_operations_multi_ticker(request: MultiTickerRoutineRe
             }
         }
     """
+    logger.info(
+        "POST /routine-operations",
+        headline_length=len(request.headline),
+        ticker_count=len(request.ticker_symbols),
+    )
+    start_time = time.time()
+
     result = app.state.classifier.classify_headline_multi_ticker(
         request.headline, request.ticker_symbols
+    )
+
+    duration = time.time() - start_time
+    logger.info(
+        "POST /routine-operations completed",
+        status="success",
+        ticker_count=len(request.ticker_symbols),
+        duration_ms=round(duration * 1000, 2),
     )
     return MultiTickerRoutineResponse(
         headline=request.headline,
@@ -175,8 +264,23 @@ async def check_company_relevance(request: CompanyRelevanceRequest):
             "company_score": 0.92
         }
     """
+    logger.info(
+        "POST /company-relevance",
+        headline_length=len(request.headline),
+        company=request.company,
+    )
+    start_time = time.time()
+
     result = app.state.classifier.check_company_relevance(
         request.headline, request.company
+    )
+
+    duration = time.time() - start_time
+    logger.info(
+        "POST /company-relevance completed",
+        status="success",
+        is_about_company=result["is_about_company"],
+        duration_ms=round(duration * 1000, 2),
     )
     return CompanyRelevanceResult(**result)
 
@@ -220,8 +324,23 @@ async def check_company_relevance_batch(request: CompanyRelevanceBatchRequest):
             ]
         }
     """
+    logger.info(
+        "POST /company-relevance/batch",
+        batch_size=len(request.headlines),
+        company=request.company,
+    )
+    start_time = time.time()
+
     results = app.state.classifier.check_company_relevance_batch(
         request.headlines, request.company
+    )
+
+    duration = time.time() - start_time
+    logger.info(
+        "POST /company-relevance/batch completed",
+        status="success",
+        batch_size=len(results),
+        duration_ms=round(duration * 1000, 2),
     )
     return CompanyRelevanceBatchResponse(
         company=request.company,
@@ -258,7 +377,21 @@ async def detect_quantitative_catalyst(request: QuantitativeCatalystRequest):
             "confidence": 0.87
         }
     """
+    logger.info(
+        "POST /detect-quantitative-catalyst", headline_length=len(request.headline)
+    )
+    start_time = time.time()
+
     result = app.state.classifier.detect_quantitative_catalyst(request.headline)
+
+    duration = time.time() - start_time
+    logger.info(
+        "POST /detect-quantitative-catalyst completed",
+        status="success",
+        has_catalyst=result.has_quantitative_catalyst,
+        catalyst_type=result.catalyst_type,
+        duration_ms=round(duration * 1000, 2),
+    )
     return result
 
 
@@ -290,5 +423,19 @@ async def detect_strategic_catalyst(request: StrategicCatalystRequest):
             "confidence": 0.94
         }
     """
+    logger.info(
+        "POST /detect-strategic-catalyst", headline_length=len(request.headline)
+    )
+    start_time = time.time()
+
     result = app.state.classifier.detect_strategic_catalyst(request.headline)
+
+    duration = time.time() - start_time
+    logger.info(
+        "POST /detect-strategic-catalyst completed",
+        status="success",
+        has_catalyst=result.has_strategic_catalyst,
+        catalyst_subtype=result.catalyst_subtype,
+        duration_ms=round(duration * 1000, 2),
+    )
     return result

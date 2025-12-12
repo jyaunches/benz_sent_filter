@@ -1,7 +1,9 @@
 """Classification service using zero-shot NLI."""
 
+import time
 from collections import namedtuple
 
+from loguru import logger
 from transformers import pipeline
 
 from benz_sent_filter.config.settings import (
@@ -54,12 +56,46 @@ class ClassificationService:
         Raises:
             RuntimeError: If model fails to load
         """
+        logger.info("Initializing ClassificationService", model_name=MODEL_NAME)
+        start_time = time.time()
+
+        # Load main MNLI pipeline
+        logger.info("Loading main NLI model", model=MODEL_NAME)
+        model_start = time.time()
         self._pipeline = pipeline("zero-shot-classification", model=MODEL_NAME)
+        model_duration = time.time() - model_start
+        logger.info(
+            "Main NLI model loaded successfully",
+            model=MODEL_NAME,
+            duration_seconds=round(model_duration, 2),
+        )
+
+        # Initialize routine operation detector
+        logger.info("Initializing RoutineOperationDetectorMNLS")
         self._routine_detector = RoutineOperationDetectorMNLS()
+        logger.info("RoutineOperationDetectorMNLS initialized")
+
         # Share pipeline with quantitative catalyst detector to avoid loading BART-MNLI separately
-        self._catalyst_detector = QuantitativeCatalystDetectorMNLS(pipeline=self._pipeline)
+        logger.info(
+            "Initializing QuantitativeCatalystDetectorMNLS with shared pipeline"
+        )
+        self._catalyst_detector = QuantitativeCatalystDetectorMNLS(
+            pipeline=self._pipeline
+        )
+        logger.info("QuantitativeCatalystDetectorMNLS initialized")
+
         # Share pipeline with strategic catalyst detector
-        self._strategic_catalyst_detector = StrategicCatalystDetectorMNLS(pipeline=self._pipeline)
+        logger.info("Initializing StrategicCatalystDetectorMNLS with shared pipeline")
+        self._strategic_catalyst_detector = StrategicCatalystDetectorMNLS(
+            pipeline=self._pipeline
+        )
+        logger.info("StrategicCatalystDetectorMNLS initialized")
+
+        total_duration = time.time() - start_time
+        logger.info(
+            "ClassificationService initialization complete",
+            total_duration_seconds=round(total_duration, 2),
+        )
 
     def _check_company_relevance(
         self, headline: str, company: str
@@ -185,6 +221,13 @@ class ClassificationService:
         Raises:
             RuntimeError: If inference fails
         """
+        logger.debug(
+            "Starting headline classification",
+            headline_length=len(headline),
+            company=company,
+        )
+        start_time = time.time()
+
         # Make one pipeline call with all 5 candidate labels
         result = self._pipeline(headline, candidate_labels=self.CANDIDATE_LABELS)
 
@@ -226,7 +269,7 @@ class ClassificationService:
         # Check company relevance if company provided
         if company is not None:
             relevance = self._check_company_relevance(headline, company)
-            return ClassificationResult(
+            result = ClassificationResult(
                 is_opinion=is_opinion,
                 is_straight_news=is_straight_news,
                 temporal_category=temporal_category,
@@ -241,7 +284,7 @@ class ClassificationService:
                 conditional_patterns=conditional_metadata["conditional_patterns"],
             )
         else:
-            return ClassificationResult(
+            result = ClassificationResult(
                 is_opinion=is_opinion,
                 is_straight_news=is_straight_news,
                 temporal_category=temporal_category,
@@ -252,6 +295,20 @@ class ClassificationService:
                 conditional_language=conditional_metadata["conditional_language"],
                 conditional_patterns=conditional_metadata["conditional_patterns"],
             )
+
+        duration = time.time() - start_time
+        logger.info(
+            "Headline classification completed",
+            is_opinion=is_opinion,
+            is_straight_news=is_straight_news,
+            temporal_category=temporal_category.value,
+            opinion_score=round(opinion_score, 3),
+            news_score=round(news_score, 3),
+            has_company_check=company is not None,
+            duration_ms=round(duration * 1000, 2),
+        )
+
+        return result
 
     def classify_headline_multi_ticker(
         self, headline: str, ticker_symbols: list[str]
@@ -292,6 +349,13 @@ class ClassificationService:
                 }
             }
         """
+        logger.debug(
+            "Starting multi-ticker classification",
+            headline_length=len(headline),
+            ticker_count=len(ticker_symbols),
+        )
+        start_time = time.time()
+
         # Perform core classification once
         result = self._pipeline(headline, candidate_labels=self.CANDIDATE_LABELS)
 
@@ -335,6 +399,14 @@ class ClassificationService:
             routine_result = self._analyze_routine_operation(headline, company_symbol=ticker)
             routine_operations_by_ticker[ticker] = routine_result
 
+        duration = time.time() - start_time
+        logger.info(
+            "Multi-ticker classification completed",
+            ticker_count=len(ticker_symbols),
+            temporal_category=temporal_category.value,
+            duration_ms=round(duration * 1000, 2),
+        )
+
         return {
             "core_classification": core_classification,
             "routine_operations_by_ticker": routine_operations_by_ticker,
@@ -355,9 +427,26 @@ class ClassificationService:
         Returns:
             List of ClassificationResult objects in same order as input
         """
-        return [
+        logger.debug(
+            "Starting batch classification",
+            batch_size=len(headlines),
+            has_company_check=company is not None,
+        )
+        start_time = time.time()
+
+        results = [
             self.classify_headline(headline, company=company) for headline in headlines
         ]
+
+        duration = time.time() - start_time
+        logger.info(
+            "Batch classification completed",
+            batch_size=len(headlines),
+            duration_ms=round(duration * 1000, 2),
+            avg_duration_ms=round((duration * 1000) / len(headlines), 2) if headlines else 0,
+        )
+
+        return results
 
     def check_company_relevance(self, headline: str, company: str) -> dict:
         """Check if a headline is relevant to a specific company.
