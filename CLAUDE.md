@@ -73,13 +73,47 @@ make serve            # Start dev server (port 8002)
 
 ## Deployment
 
-All deployment tasks (GitHub Actions, Fly.io deployments, production operations) are managed through the `benz_mgmt` repository's centralized deployment utilities. See `benz_deployment/fly/` in benz_mgmt for:
+### CPU Deployment (Fly.io)
+
+All CPU deployment tasks (GitHub Actions, Fly.io deployments, production operations) are managed through the `benz_mgmt` repository's centralized deployment utilities. See `benz_deployment/fly/` in benz_mgmt for:
 - Configuration management via `config.yml`
 - Workflow generation and updates
 - Secret management and auditing
 - Tier-based deployment orchestration
 
 If user requests deployment operations, direct them to use `benz_mgmt` repository.
+
+### GPU Deployment (RunPod Serverless)
+
+For GPU-accelerated inference, the service can be deployed to RunPod Serverless:
+
+**Files**:
+- `src/benz_sent_filter/runpod_handler.py` - Thin handler wrapper around ClassificationService
+- `Dockerfile.runpod` - GPU-optimized Docker image with pre-downloaded model
+- `scripts/test_runpod_local.sh` - Local testing script
+- `docs/RUNPOD_DEPLOYMENT.md` - Complete deployment guide
+
+**Quick Start**:
+```bash
+# Build and push Docker image
+docker build --platform linux/amd64 -f Dockerfile.runpod -t YOUR_DOCKERHUB/benz-sent-filter:v1.0.0 .
+docker push YOUR_DOCKERHUB/benz-sent-filter:v1.0.0
+
+# Local testing
+python src/benz_sent_filter/runpod_handler.py --rp_serve_api --rp_api_port 8080
+./scripts/test_runpod_local.sh
+```
+
+**RunPod Handler Operations**:
+- `classify` - Single headline classification
+- `classify_batch` - Batch headline processing
+- `routine_operations` - Multi-ticker routine operations
+- `company_relevance` - Company relevance check
+- `company_relevance_batch` - Batch company relevance
+- `detect_quantitative_catalyst` - Quantitative catalyst detection
+- `detect_strategic_catalyst` - Strategic catalyst detection
+
+See `docs/RUNPOD_DEPLOYMENT.md` for API reference, cost optimization, and troubleshooting.
 
 ## Integration Patterns
 

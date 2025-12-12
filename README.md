@@ -49,6 +49,22 @@ make serve-prod
 
 The service will be available at `http://localhost:8002`.
 
+## GPU Deployment (RunPod Serverless)
+
+For GPU-accelerated inference with auto-scaling, the service can be deployed to RunPod Serverless:
+
+```bash
+# Build and push Docker image
+docker build --platform linux/amd64 -f Dockerfile.runpod -t YOUR_DOCKERHUB/benz-sent-filter:v1.0.0 .
+docker push YOUR_DOCKERHUB/benz-sent-filter:v1.0.0
+
+# Local testing
+python src/benz_sent_filter/runpod_handler.py --rp_serve_api --rp_api_port 8080
+./scripts/test_runpod_local.sh
+```
+
+See `docs/RUNPOD_DEPLOYMENT.md` for complete deployment guide, API reference, and cost optimization tips.
+
 ## Development
 
 ### Available Commands
