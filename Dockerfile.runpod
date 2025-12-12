@@ -13,14 +13,13 @@ RUN apt-get update && apt-get install -y \
 COPY pyproject.toml uv.lock README.md ./
 COPY src/ ./src/
 
-# Install dependencies (torch already in base image)
+# Install dependencies (torch already in base image, skip editable install due to Python 3.10 in base)
 RUN pip install --no-cache-dir \
-    transformers>=4.35.0,<4.36.0 \
-    pydantic>=2.5.0 \
-    pydantic-settings>=2.1.0 \
-    loguru>=0.7.0 \
-    runpod>=1.6.0 \
-    && pip install --no-cache-dir -e .
+    "transformers>=4.35.0,<4.36.0" \
+    "pydantic>=2.5.0" \
+    "pydantic-settings>=2.1.0" \
+    "loguru>=0.7.0" \
+    "runpod>=1.6.0"
 
 # Pre-download the MNLI model during build for fast cold starts
 # This embeds the model weights in the Docker image (~500MB)
