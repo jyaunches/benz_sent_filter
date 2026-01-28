@@ -1,1 +1,0 @@
-/Users/jyaunches/Development/benzbout/benz_mgmt/ecosystem_agents/systemwide/feature-writer.md

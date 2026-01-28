@@ -1,0 +1,20 @@
+{
+  "extraKnownMarketplaces": {
+    "cc_workflow_tools": {
+      "source": {
+        "source": "directory",
+        "path": "~/Development/cc_workflow_tools"
+      }
+    },
+    "benz-marketplace": {
+      "source": {
+        "source": "directory",
+        "path": "../benz_mgmt"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "cc_workflow_tools@cc_workflow_tools": true,
+    "benz-ecosystem-tools@benz-marketplace": true
+  }
+}
