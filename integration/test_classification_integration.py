@@ -153,30 +153,38 @@ def test_classification_consistency_real_model(real_classifier):
 
 @pytest.mark.integration
 def test_response_time_single_headline_real_model(real_classifier):
-    """Test that single headline classification completes in < 2 seconds."""
+    """Test that single headline classification completes in < 5 seconds.
+
+    DeBERTa-v3-large is ~6x larger than DistilBERT, so inference times are expected
+    to be slower (~4-5s vs ~1s). This is acceptable for the accuracy improvement.
+    """
     headline = "Stock Market Reaches New High"
 
     start_time = time.time()
     result = real_classifier.classify_headline(headline)
     elapsed_time = time.time() - start_time
 
-    assert elapsed_time < 2.0, (
-        f"Expected classification in < 2s, took {elapsed_time:.2f}s"
+    assert elapsed_time < 5.0, (
+        f"Expected classification in < 5s, took {elapsed_time:.2f}s"
     )
     assert result is not None
 
 
 @pytest.mark.integration
 def test_response_time_batch_10_headlines_real_model(real_classifier):
-    """Test that batch of 10 headlines completes in < 10 seconds."""
+    """Test that batch of 10 headlines completes in < 50 seconds.
+
+    DeBERTa-v3-large processes ~4-5s per headline, so 10 headlines should take
+    ~40-50s. This is acceptable for the accuracy improvement over DistilBERT.
+    """
     headlines = [f"Test headline number {i}" for i in range(10)]
 
     start_time = time.time()
     results = real_classifier.classify_batch(headlines)
     elapsed_time = time.time() - start_time
 
-    assert elapsed_time < 10.0, (
-        f"Expected batch classification in < 10s, took {elapsed_time:.2f}s"
+    assert elapsed_time < 50.0, (
+        f"Expected batch classification in < 50s, took {elapsed_time:.2f}s"
     )
     assert len(results) == 10
 
