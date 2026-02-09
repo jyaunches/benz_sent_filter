@@ -33,8 +33,9 @@ class QuantitativeCatalystDetectorMNLS:
     # MNLI candidate labels for presence detection
     # Optimized to distinguish quantitative catalysts from vague updates and price movements
     # Tuned for DeBERTa-v3-large model - more precise language to avoid false negatives
+    # Includes both capital-returning (dividends, buybacks, divestitures) and capital-deploying/raising (acquisitions, equity offerings) events
     PRESENCE_LABELS = [
-        "This announces a corporate financial event with specific dollar amounts such as dividends, acquisitions, buybacks, earnings results, or revenue guidance",
+        "This announces a corporate financial event with specific dollar amounts such as dividends, acquisitions, buybacks, earnings results, revenue guidance, asset sales, divestitures, or equity and debt offerings",
         "This describes general commentary, stock price changes, analyst opinions, or vague business updates without specific financial transactions",
     ]
 
@@ -50,25 +51,26 @@ class QuantitativeCatalystDetectorMNLS:
 
     # MNLI labels for catalyst type classification
     # Tuned for DeBERTa-v3-large to distinguish directionality and transaction types
+    # Key improvements: directional clarity (buying vs selling, returning vs raising capital)
     CATALYST_TYPE_LABELS = {
         "dividend": [
-            "This announces that the company is paying out a dividend to shareholders",
-            "This does not announce a dividend payment to shareholders",
+            "This announces that the company is returning capital to shareholders by paying out a cash dividend or distribution",
+            "This does not announce a dividend payment or capital return to shareholders",
         ],
         "acquisition": [
-            "This announces that the company is purchasing or acquiring another company or assets",
-            "This is not about the company purchasing or acquiring another company",
+            "This announces that the company is buying, acquiring, or purchasing another company, assets, or business (the company is the BUYER, not the seller)",
+            "This is not about the company buying or acquiring another entity (it could be about selling assets or something else entirely)",
         ],
         "buyback": [
-            "This announces that the company is repurchasing its own shares from the market",
-            "This is not about the company repurchasing its own shares",
+            "This announces that the company is buying back or repurchasing its own shares from shareholders to reduce share count",
+            "This is not about the company buying back its own shares",
         ],
         "earnings": [
-            "This announces historical earnings results, net income, or profit from a completed reporting period",
-            "This is not about historical earnings results or net income from a completed reporting period",
+            "This announces actual profit, net income, or bottom-line earnings results from a completed reporting period (not just revenue or top-line growth)",
+            "This is not about actual profit or net income from a completed period",
         ],
         "guidance": [
-            "This provides forward-looking financial projections or guidance for future periods",
+            "This provides forward-looking financial projections, forecasts, or guidance for future periods",
             "This is not about forward-looking financial projections or guidance",
         ],
     }
@@ -268,7 +270,14 @@ class QuantitativeCatalystDetectorMNLS:
                 else:
                     values.append(f"${amount}/Share")
             else:
-                values.append(f"${amount}")
+                # Check if "per share" appears within 5 words after the dollar amount
+                # This handles "Tender Offer At $10 Per Share" where regex doesn't capture it
+                match_end = match.end()
+                remaining = headline[match_end:match_end+30]  # Look ahead up to 30 chars
+                if re.search(r'\s+per\s+share', remaining, re.IGNORECASE):
+                    values.append(f"${amount}/Share")
+                else:
+                    values.append(f"${amount}")
 
         # Extract percentages only if near financial keywords
         if self.FINANCIAL_KEYWORDS.search(headline):

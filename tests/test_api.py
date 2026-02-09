@@ -1224,14 +1224,14 @@ def test_detect_strategic_catalyst_endpoint_executive_change(mock_transformers_p
 
     # Mock MNLI scores for strategic catalyst detection (tuned labels)
     mock_transformers_pipeline({
-        "This announces a specific strategic corporate event like an executive change, merger, partnership, product launch, or rebranding": 0.9,
+        "This announces a specific strategic corporate event like an executive change, merger, partnership, product launch, rebranding, or clinical trial results": 0.9,
         "This describes financial results, stock price movements, routine operations, or general market commentary": 0.1,
         "This announces that a C-suite executive (CEO, CFO, President, or COO) is joining, leaving, stepping down from, or being appointed to their leadership position": 0.85,
         "This does not announce executive appointments, departures, or C-suite leadership transitions": 0.15,
-        "This announces that two or more separate companies are signing an agreement to collaborate, partner, or work together on a joint project while remaining independent companies": 0.2,
-        "This does not announce a partnership, collaboration agreement, or companies working together while staying separate": 0.8,
-        "This announces that a single company is launching, releasing, or making available a new finished product, service, or platform that is ready for customers to use now": 0.15,
-        "This does not announce a product launch, release, or new offering becoming available to customers": 0.85,
+        "This announces that two or more separate companies are forming a partnership agreement or signing a collaboration deal to work together, but NOT launching a finished product yet": 0.2,
+        "This does not announce a partnership, collaboration agreement, or joint venture between companies": 0.8,
+        "This announces that a company is actively launching, releasing, unveiling, or making available a new finished product, service, or platform for customers or the market right now": 0.15,
+        "This does not announce a product launch, release, unveiling, or new offering becoming immediately available": 0.85,
         "This announces a merger where companies combine into one entity or an acquisition where one company purchases and takes control of another company": 0.1,
         "This does not announce a merger, acquisition, or companies combining into a single entity": 0.9,
         "This announces a company is changing its corporate name, rebranding its identity, changing its ticker symbol, or restructuring its corporate structure": 0.1,
@@ -1276,14 +1276,14 @@ def test_detect_strategic_catalyst_endpoint_merger(mock_transformers_pipeline):
 
     # Mock MNLI scores for merger detection (tuned labels)
     mock_transformers_pipeline({
-        "This announces a specific strategic corporate event like an executive change, merger, partnership, product launch, or rebranding": 0.92,
+        "This announces a specific strategic corporate event like an executive change, merger, partnership, product launch, rebranding, or clinical trial results": 0.92,
         "This describes financial results, stock price movements, routine operations, or general market commentary": 0.08,
         "This announces that a C-suite executive (CEO, CFO, President, or COO) is joining, leaving, stepping down from, or being appointed to their leadership position": 0.1,
         "This does not announce executive appointments, departures, or C-suite leadership transitions": 0.9,
-        "This announces that two or more separate companies are signing an agreement to collaborate, partner, or work together on a joint project while remaining independent companies": 0.2,
-        "This does not announce a partnership, collaboration agreement, or companies working together while staying separate": 0.8,
-        "This announces that a single company is launching, releasing, or making available a new finished product, service, or platform that is ready for customers to use now": 0.15,
-        "This does not announce a product launch, release, or new offering becoming available to customers": 0.85,
+        "This announces that two or more separate companies are forming a partnership agreement or signing a collaboration deal to work together, but NOT launching a finished product yet": 0.2,
+        "This does not announce a partnership, collaboration agreement, or joint venture between companies": 0.8,
+        "This announces that a company is actively launching, releasing, unveiling, or making available a new finished product, service, or platform for customers or the market right now": 0.15,
+        "This does not announce a product launch, release, unveiling, or new offering becoming immediately available": 0.85,
         "This announces a merger where companies combine into one entity or an acquisition where one company purchases and takes control of another company": 0.88,
         "This does not announce a merger, acquisition, or companies combining into a single entity": 0.12,
         "This announces a company is changing its corporate name, rebranding its identity, changing its ticker symbol, or restructuring its corporate structure": 0.1,
@@ -1388,20 +1388,20 @@ def test_detect_strategic_catalyst_response_model_structure(mock_transformers_pi
 
     # Mock MNLI scores for clinical trial results
     mock_transformers_pipeline({
-        "This announces a specific strategic corporate event like an executive change, merger, partnership, product launch, or rebranding": 0.9,
+        "This announces a specific strategic corporate event like an executive change, merger, partnership, product launch, rebranding, or clinical trial results": 0.9,
         "This describes financial results, stock price movements, routine operations, or general market commentary": 0.1,
-        "This announces a C-suite executive appointment, departure, or transition including CEO, CFO, President, or other senior leadership": 0.1,
-        "This does not announce an executive leadership change": 0.9,
-        "This announces a strategic partnership, collaboration agreement, memorandum of understanding, or joint venture": 0.15,
-        "This does not announce a strategic partnership": 0.85,
-        "This announces a new product launch, technology platform deployment, or service introduction": 0.1,
-        "This does not announce a product launch": 0.9,
-        "This announces a merger agreement, acquisition announcement, or strategic combination": 0.1,
-        "This does not announce a merger or acquisition": 0.9,
-        "This announces a company name change, ticker symbol change, or corporate rebranding": 0.05,
-        "This does not announce a rebranding": 0.95,
-        "This announces clinical trial results, medical research findings, or drug efficacy data": 0.82,
-        "This does not announce clinical trial results": 0.18,
+        "This announces that a C-suite executive (CEO, CFO, President, or COO) is joining, leaving, stepping down from, or being appointed to their leadership position": 0.1,
+        "This does not announce executive appointments, departures, or C-suite leadership transitions": 0.9,
+        "This announces that two or more separate companies are forming a partnership agreement or signing a collaboration deal to work together, but NOT launching a finished product yet": 0.15,
+        "This does not announce a partnership, collaboration agreement, or joint venture between companies": 0.85,
+        "This announces that a company is actively launching, releasing, unveiling, or making available a new finished product, service, or platform for customers or the market right now": 0.1,
+        "This does not announce a product launch, release, unveiling, or new offering becoming immediately available": 0.9,
+        "This announces a merger where companies combine into one entity or an acquisition where one company purchases and takes control of another company": 0.1,
+        "This does not announce a merger, acquisition, or companies combining into a single entity": 0.9,
+        "This announces a company is changing its corporate name, rebranding its identity, changing its ticker symbol, or restructuring its corporate structure": 0.05,
+        "This does not announce a name change, rebranding, ticker change, or corporate restructuring": 0.95,
+        "This announces positive or negative results, outcomes, or data from a completed Phase 1, Phase 2, or Phase 3 clinical trial or medical study": 0.82,
+        "This does not announce clinical trial results, medical study outcomes, or research findings from completed trials": 0.18,
     })
 
     from benz_sent_filter.api.app import app

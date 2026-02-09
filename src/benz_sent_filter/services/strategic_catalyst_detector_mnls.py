@@ -74,12 +74,12 @@ class StrategicCatalystDetectorMNLS:
             "This does not announce executive appointments, departures, or C-suite leadership transitions",
         ],
         "partnership": [
-            "This announces that two or more separate companies are forming a partnership agreement or signing a collaboration deal to work together, but NOT launching a finished product yet",
-            "This does not announce a partnership, collaboration agreement, or joint venture between companies",
+            "This announces a partnership or collaboration agreement where companies sign a deal or MOU to work together, WITHOUT actually launching or releasing a product",
+            "This is not about a partnership or collaboration agreement",
         ],
         "product_launch": [
-            "This announces that a company is actively launching, releasing, unveiling, or making available a new finished product, service, or platform for customers or the market right now",
-            "This does not announce a product launch, release, unveiling, or new offering becoming immediately available",
+            "The main verb in this headline is Launch, Launches, Launching, Release, Unveil, or Deploy describing a product, platform, or service becoming available now",
+            "The main verb is NOT about launching or releasing a product",
         ],
         "corporate_restructuring": [
             "This announces a company is changing its corporate name, rebranding its identity, changing its ticker symbol, or restructuring its corporate structure",
@@ -269,8 +269,43 @@ class StrategicCatalystDetectorMNLS:
         best_type = max(type_scores, key=type_scores.get)
         best_score = type_scores[best_type]
 
+        logger.debug(
+            "Type scores calculated",
+            scores={k: round(v, 3) for k, v in type_scores.items()},
+            best_type=best_type,
+            best_score=round(best_score, 3),
+        )
+
+        # Disambiguation: If "Launch/Launches/Launching" appears in headline and
+        # product_launch score > 0.05, choose product_launch
+        # This handles edge cases like "Partners with X to Launch Y" where both
+        # partnership and product_launch are semantically valid, but the actual
+        # launch action is the primary catalyst (partnerships are preparatory)
+        # Also handles cases where product_launch score is low but keyword is present
+        headline_lower = headline.lower()
+        has_launch_keyword = any(keyword in headline_lower for keyword in ['launch', 'launches', 'launching'])
+        disambiguated = False
+        if (has_launch_keyword and
+            'product_launch' in type_scores and
+            type_scores['product_launch'] > 0.05):
+            # Override with product_launch if keyword present and score > threshold
+            # This applies whether best_type is partnership, mixed, or anything else
+            # Boost confidence to 0.6 minimum since keyword provides strong evidence
+            boosted_score = max(type_scores['product_launch'], 0.6)
+            logger.debug(
+                "Disambiguating to product_launch (launch keyword present)",
+                original_type=best_type,
+                original_score=round(best_score, 3),
+                product_launch_score=round(type_scores['product_launch'], 3),
+                boosted_score=round(boosted_score, 3),
+            )
+            best_type = 'product_launch'
+            best_score = boosted_score
+            disambiguated = True
+
         # If best score below threshold, return "mixed" (ambiguous)
-        if best_score < self.TYPE_THRESHOLD:
+        # UNLESS we just disambiguated using keyword logic
+        if not disambiguated and best_score < self.TYPE_THRESHOLD:
             return {"type": "mixed", "confidence": best_score}
 
         return {"type": best_type, "confidence": best_score}
