@@ -202,7 +202,7 @@ class RoutineOperationDetectorMNLS:
         re.IGNORECASE,
     )
 
-    def __init__(self, model_name: str = "facebook/bart-large-mnli"):
+    def __init__(self, model_name: str = "MoritzLaurer/deberta-v3-large-zeroshot-v2.0"):
         """Initialize the MNLS-based routine operation detector.
 
         Args:

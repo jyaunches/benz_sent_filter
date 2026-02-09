@@ -11,10 +11,17 @@
         "source": "directory",
         "path": "../benz_mgmt"
       }
+    },
+    "vd_workflow": {
+      "source": {
+        "source": "directory",
+        "path": "~/Development/vd_workflow"
+      }
     }
   },
   "enabledPlugins": {
     "cc_workflow_tools@cc_workflow_tools": true,
-    "benz-ecosystem-tools@benz-marketplace": true
+    "benz-ecosystem-tools@benz-marketplace": true,
+    "vd_workflow@vd_workflow": true
   }
 }

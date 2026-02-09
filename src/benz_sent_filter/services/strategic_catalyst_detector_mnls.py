@@ -49,8 +49,9 @@ class StrategicCatalystDetectorMNLS:
 
     # MNLI candidate labels for presence detection
     # Optimized to distinguish strategic catalysts from financial results and routine operations
+    # Tuned for DeBERTa-v3-large - explicitly list all 6 catalyst types for better detection
     PRESENCE_LABELS = [
-        "This announces a specific strategic corporate event like an executive change, merger, partnership, product launch, or rebranding",
+        "This announces a specific strategic corporate event like an executive change, merger, partnership, product launch, rebranding, or clinical trial results",
         "This describes financial results, stock price movements, routine operations, or general market commentary",
     ]
 
@@ -73,12 +74,12 @@ class StrategicCatalystDetectorMNLS:
             "This does not announce executive appointments, departures, or C-suite leadership transitions",
         ],
         "partnership": [
-            "This announces that two or more separate companies are signing an agreement to collaborate, partner, or work together on a joint project while remaining independent companies",
-            "This does not announce a partnership, collaboration agreement, or companies working together while staying separate",
+            "This announces that two or more separate companies are forming a partnership agreement or signing a collaboration deal to work together, but NOT launching a finished product yet",
+            "This does not announce a partnership, collaboration agreement, or joint venture between companies",
         ],
         "product_launch": [
-            "This announces that a single company is launching, releasing, or making available a new finished product, service, or platform that is ready for customers to use now",
-            "This does not announce a product launch, release, or new offering becoming available to customers",
+            "This announces that a company is actively launching, releasing, unveiling, or making available a new finished product, service, or platform for customers or the market right now",
+            "This does not announce a product launch, release, unveiling, or new offering becoming immediately available",
         ],
         "corporate_restructuring": [
             "This announces a company is changing its corporate name, rebranding its identity, changing its ticker symbol, or restructuring its corporate structure",
@@ -90,7 +91,7 @@ class StrategicCatalystDetectorMNLS:
         ],
     }
 
-    def __init__(self, model_name: str = "facebook/bart-large-mnli", pipeline=None):
+    def __init__(self, model_name: str = "MoritzLaurer/deberta-v3-large-zeroshot-v2.0", pipeline=None):
         """Initialize the MNLI-based strategic catalyst detector.
 
         Args:

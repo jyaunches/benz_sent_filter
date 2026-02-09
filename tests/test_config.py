@@ -8,7 +8,7 @@ def test_model_name_constant_exists():
     from benz_sent_filter.config.settings import MODEL_NAME
 
     assert isinstance(MODEL_NAME, str)
-    assert MODEL_NAME == "typeform/distilbert-base-uncased-mnli"
+    assert MODEL_NAME == "MoritzLaurer/deberta-v3-large-zeroshot-v2.0"
 
 
 def test_classification_threshold_constant():

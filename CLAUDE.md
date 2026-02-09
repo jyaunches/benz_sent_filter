@@ -231,3 +231,17 @@ Service provides classification endpoints for:
 
 Returns both boolean classifications and raw scores for transparency.
 All optional fields use Pydantic `exclude_none=True` for backward compatibility.
+
+## Team Member Role (benz_orchestrator)
+
+This repo participates in the benz_orchestrator multi-agent optimization team as the **Sent Filter Team**.
+
+**Brief**: Read your full role brief at `../benz_orchestrator/agents/sent-filter-team-brief.md`
+
+**Communication Protocol**:
+- Check for tasks: `../benz_orchestrator/comms/tasks/sent-filter/`
+- Write results: `../benz_orchestrator/comms/results/sent-filter/`
+- Join discussions: `../benz_orchestrator/comms/discussions/`
+
+**After ANY change**: Run `make test`, then restart your server (`make serve`).
+Report the git commit SHA and test results in your result file.

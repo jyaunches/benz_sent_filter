@@ -13,7 +13,7 @@ class Settings(BaseSettings):
 
     # Model Configuration
     model_name: str = Field(
-        default="typeform/distilbert-base-uncased-mnli",
+        default="MoritzLaurer/deberta-v3-large-zeroshot-v2.0",
         description="HuggingFace model for sentiment classification"
     )
 

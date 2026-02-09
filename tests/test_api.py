@@ -833,18 +833,18 @@ def test_detect_quantitative_catalyst_endpoint_with_dividend(mock_transformers_p
 
     # Mock MNLI scores for catalyst detection
     mock_transformers_pipeline({
-        "This announces a specific financial transaction like a dividend, acquisition, or buyback with a dollar amount": 0.9,
-        "This describes a stock price movement, milestone, or general business update": 0.1,
-        "This announces a dividend payment with a specific dollar amount": 0.85,
-        "This does not announce a dividend payment": 0.15,
-        "This announces an acquisition or merger with a specific purchase price": 0.2,
-        "This does not announce an acquisition or merger": 0.8,
-        "This announces a share buyback program with a specific dollar amount": 0.3,
-        "This does not announce a share buyback program": 0.7,
-        "This announces earnings results with specific dollar figures": 0.2,
-        "This does not announce earnings results": 0.8,
-        "This provides revenue guidance with specific dollar projections": 0.3,
-        "This does not provide revenue guidance": 0.7,
+        "This announces a corporate financial event with specific dollar amounts such as dividends, acquisitions, buybacks, earnings results, or revenue guidance": 0.9,
+        "This describes general commentary, stock price changes, analyst opinions, or vague business updates without specific financial transactions": 0.1,
+        "This announces that the company is paying out a dividend to shareholders": 0.85,
+        "This does not announce a dividend payment to shareholders": 0.15,
+        "This announces that the company is purchasing or acquiring another company or assets": 0.2,
+        "This is not about the company purchasing or acquiring another company": 0.8,
+        "This announces that the company is repurchasing its own shares from the market": 0.3,
+        "This is not about the company repurchasing its own shares": 0.7,
+        "This announces historical earnings results, net income, or profit from a completed reporting period": 0.2,
+        "This is not about historical earnings results or net income from a completed reporting period": 0.8,
+        "This provides forward-looking financial projections or guidance for future periods": 0.3,
+        "This is not about forward-looking financial projections or guidance": 0.7,
     })
 
     from benz_sent_filter.api.app import app
@@ -885,18 +885,18 @@ def test_detect_quantitative_catalyst_endpoint_with_acquisition(mock_transformer
 
     # Mock MNLI scores for acquisition
     mock_transformers_pipeline({
-        "This announces a specific financial transaction like a dividend, acquisition, or buyback with a dollar amount": 0.92,
-        "This describes a stock price movement, milestone, or general business update": 0.08,
-        "This announces a dividend payment with a specific dollar amount": 0.1,
-        "This does not announce a dividend payment": 0.9,
-        "This announces an acquisition or merger with a specific purchase price": 0.88,
-        "This does not announce an acquisition or merger": 0.12,
-        "This announces a share buyback program with a specific dollar amount": 0.2,
-        "This does not announce a share buyback program": 0.8,
-        "This announces earnings results with specific dollar figures": 0.15,
-        "This does not announce earnings results": 0.85,
-        "This provides revenue guidance with specific dollar projections": 0.25,
-        "This does not provide revenue guidance": 0.75,
+        "This announces a corporate financial event with specific dollar amounts such as dividends, acquisitions, buybacks, earnings results, or revenue guidance": 0.92,
+        "This describes general commentary, stock price changes, analyst opinions, or vague business updates without specific financial transactions": 0.08,
+        "This announces that the company is paying out a dividend to shareholders": 0.1,
+        "This does not announce a dividend payment to shareholders": 0.9,
+        "This announces that the company is purchasing or acquiring another company or assets": 0.88,
+        "This is not about the company purchasing or acquiring another company": 0.12,
+        "This announces that the company is repurchasing its own shares from the market": 0.2,
+        "This is not about the company repurchasing its own shares": 0.8,
+        "This announces historical earnings results, net income, or profit from a completed reporting period": 0.15,
+        "This is not about historical earnings results or net income from a completed reporting period": 0.85,
+        "This provides forward-looking financial projections or guidance for future periods": 0.25,
+        "This is not about forward-looking financial projections or guidance": 0.75,
     })
 
     from benz_sent_filter.api.app import app
@@ -929,18 +929,18 @@ def test_detect_quantitative_catalyst_endpoint_no_catalyst(mock_transformers_pip
 
     # Mock MNLI scores for non-catalyst (price movement)
     mock_transformers_pipeline({
-        "This announces a specific financial transaction like a dividend, acquisition, or buyback with a dollar amount": 0.2,
-        "This describes a stock price movement, milestone, or general business update": 0.8,
-        "This announces a dividend payment with a specific dollar amount": 0.1,
-        "This does not announce a dividend payment": 0.9,
-        "This announces an acquisition or merger with a specific purchase price": 0.15,
-        "This does not announce an acquisition or merger": 0.85,
-        "This announces a share buyback program with a specific dollar amount": 0.1,
-        "This does not announce a share buyback program": 0.9,
-        "This announces earnings results with specific dollar figures": 0.2,
-        "This does not announce earnings results": 0.8,
-        "This provides revenue guidance with specific dollar projections": 0.15,
-        "This does not provide revenue guidance": 0.85,
+        "This announces a corporate financial event with specific dollar amounts such as dividends, acquisitions, buybacks, earnings results, or revenue guidance": 0.2,
+        "This describes general commentary, stock price changes, analyst opinions, or vague business updates without specific financial transactions": 0.8,
+        "This announces that the company is paying out a dividend to shareholders": 0.1,
+        "This does not announce a dividend payment to shareholders": 0.9,
+        "This announces that the company is purchasing or acquiring another company or assets": 0.15,
+        "This is not about the company purchasing or acquiring another company": 0.85,
+        "This announces that the company is repurchasing its own shares from the market": 0.1,
+        "This is not about the company repurchasing its own shares": 0.9,
+        "This announces historical earnings results, net income, or profit from a completed reporting period": 0.2,
+        "This is not about historical earnings results or net income from a completed reporting period": 0.8,
+        "This provides forward-looking financial projections or guidance for future periods": 0.15,
+        "This is not about forward-looking financial projections or guidance": 0.85,
     })
 
     from benz_sent_filter.api.app import app
@@ -994,18 +994,18 @@ def test_detect_quantitative_catalyst_endpoint_response_structure(mock_transform
 
     # Mock MNLI scores
     mock_transformers_pipeline({
-        "This announces a specific financial transaction like a dividend, acquisition, or buyback with a dollar amount": 0.85,
-        "This describes a stock price movement, milestone, or general business update": 0.15,
-        "This announces a dividend payment with a specific dollar amount": 0.75,
-        "This does not announce a dividend payment": 0.25,
-        "This announces an acquisition or merger with a specific purchase price": 0.2,
-        "This does not announce an acquisition or merger": 0.8,
-        "This announces a share buyback program with a specific dollar amount": 0.3,
-        "This does not announce a share buyback program": 0.7,
-        "This announces earnings results with specific dollar figures": 0.2,
-        "This does not announce earnings results": 0.8,
-        "This provides revenue guidance with specific dollar projections": 0.3,
-        "This does not provide revenue guidance": 0.7,
+        "This announces a corporate financial event with specific dollar amounts such as dividends, acquisitions, buybacks, earnings results, or revenue guidance": 0.85,
+        "This describes general commentary, stock price changes, analyst opinions, or vague business updates without specific financial transactions": 0.15,
+        "This announces that the company is paying out a dividend to shareholders": 0.75,
+        "This does not announce a dividend payment to shareholders": 0.25,
+        "This announces that the company is purchasing or acquiring another company or assets": 0.2,
+        "This is not about the company purchasing or acquiring another company": 0.8,
+        "This announces that the company is repurchasing its own shares from the market": 0.3,
+        "This is not about the company repurchasing its own shares": 0.7,
+        "This announces historical earnings results, net income, or profit from a completed reporting period": 0.2,
+        "This is not about historical earnings results or net income from a completed reporting period": 0.8,
+        "This provides forward-looking financial projections or guidance for future periods": 0.3,
+        "This is not about forward-looking financial projections or guidance": 0.7,
     })
 
     from benz_sent_filter.api.app import app
