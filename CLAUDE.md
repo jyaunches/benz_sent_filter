@@ -153,10 +153,13 @@ Available via `.claude/commands/` (symlinked from benz_mgmt):
 ## Implemented Features
 
 ### Core Classification
-- **Model**: `typeform/distilbert-base-uncased-mnli` (DistilBERT fine-tuned for MNLI)
+- **Model**: `MoritzLaurer/deberta-v3-large-zeroshot-v2.0` (DeBERTa-v3-large fine-tuned for multi-dataset NLI)
+- **Parameters**: ~400M (6x larger than DistilBERT, superior financial text understanding)
 - **Method**: Zero-shot classification with carefully designed candidate labels
-- **Performance**: <2s single headline, <10s batch of 10 (CPU-only)
-- **Thresholds**: 0.6 for opinion/news, 0.5 for company relevance
+- **Performance**: ~4-5s single headline (CPU-only, accuracy tradeoff from ~1s DistilBERT)
+- **Memory**: ~1.5GB (increased from ~250MB)
+- **Startup**: 5.9s model load (increased from ~1s)
+- **Thresholds**: 0.6 for opinion/news, 0.5 for company relevance, 0.85 for quantitative catalyst presence
 
 ### Optional Filters
 
@@ -181,11 +184,12 @@ Available via `.claude/commands/` (symlinked from benz_mgmt):
 ### Catalyst Detection
 
 4. **Quantitative Catalyst Detection** (via `/detect-quantitative-catalyst` endpoint):
-   - MNLI-based presence detection + regex value extraction
+   - MNLI-based presence detection (PRESENCE_THRESHOLD: 0.85) + regex value extraction
    - Returns `has_quantitative_catalyst`, `catalyst_type`, `catalyst_values`, `confidence`
    - Types: dividend, acquisition, buyback, earnings, guidance
    - Extracts dollar amounts, percentages, and per-share values
-   - Performance: <1s for single headline
+   - Distinguishes divestiture/sell from acquisition, financing from dividend/buyback
+   - Performance: ~4-5s for single headline
 
 5. **Strategic Catalyst Detection** (via `/detect-strategic-catalyst` endpoint):
    - MNLI-based presence detection and type classification
@@ -195,8 +199,8 @@ Available via `.claude/commands/` (symlinked from benz_mgmt):
      - Executive change: "X4 Pharmaceuticals CEO and CFO Step Down" → executive_changes (0.94 confidence)
      - Merger: "Workhorse Group And ATW Partners Announce Merger Agreement" → m&a (0.88 confidence)
      - Product launch: "SMX Partners with UN to Launch Global Product Platform" → product_launch (0.82 confidence)
-   - Performance: <1s for single headline
-   - Accuracy: 90%+ on 11 real-world test cases
+   - Performance: ~4-5s for single headline
+   - Accuracy: 90%+ on 11 real-world test cases with improved disambiguation
    - Shares MNLI pipeline with other detectors for efficiency
 
 ## API Design

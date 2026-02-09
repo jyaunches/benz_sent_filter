@@ -22,9 +22,9 @@ RUN pip install --no-cache-dir \
     "runpod>=1.6.0"
 
 # Pre-download the MNLI model during build for fast cold starts
-# This embeds the model weights in the Docker image (~500MB)
+# This embeds the model weights in the Docker image (~1.5GB)
 ENV TRANSFORMERS_CACHE=/app/.cache
-RUN python -c "from transformers import pipeline; pipeline('zero-shot-classification', model='typeform/distilbert-base-uncased-mnli')"
+RUN python -c "from transformers import pipeline; pipeline('zero-shot-classification', model='MoritzLaurer/deberta-v3-large-zeroshot-v2.0')"
 
 # Set environment variables
 ENV PYTHONPATH=/app/src \

@@ -34,8 +34,7 @@ curl http://localhost:8002/version
   "service": "benz_sent_filter",
   "version": "1.0.0",
   "models": {
-    "primary": "typeform/distilbert-base-uncased-mnli",
-    "secondary": "facebook/bart-large-mnli"
+    "primary": "MoritzLaurer/deberta-v3-large-zeroshot-v2.0"
   }
 }
 ```
@@ -272,17 +271,15 @@ Response includes:
 
 ## Model Information
 
-### Primary Model: DistilBERT-MNLI
-- **Model**: `typeform/distilbert-base-uncased-mnli`
-- **Parameters**: ~67M (lightweight, fast)
-- **Use Cases**: Opinion detection, temporal classification
-- **Performance**: 200-500ms per classification (CPU)
-
-### Secondary Model: BART-Large-MNLI
-- **Model**: `facebook/bart-large-mnli`
-- **Parameters**: ~400M (more powerful, slower)
-- **Use Cases**: Routine detection, catalyst identification
-- **Performance**: 300-700ms per classification (CPU)
+### Primary Model: DeBERTa-v3-Large Zero-Shot
+- **Model**: `MoritzLaurer/deberta-v3-large-zeroshot-v2.0`
+- **Parameters**: ~400M (powerful, superior financial text understanding)
+- **Use Cases**: All classification tasks (opinion, temporal, company relevance, catalyst detection)
+- **Performance**: ~4-5s per classification (CPU)
+- **Memory**: ~1.5GB
+- **Startup**: 5.9s model load
+- **Training**: Multi-dataset NLI (MNLI, FEVER, ANLI, LingNLI, WANLI + 28 more)
+- **Advantages**: Better catalyst type disambiguation, improved accuracy on financial headlines
 
 ## Integration Patterns
 
@@ -350,8 +347,7 @@ WORKERS=2
 # Model Configuration
 MODEL_DEVICE=cpu  # or 'cuda' for GPU
 MODEL_CACHE_DIR=/models
-PRIMARY_MODEL=typeform/distilbert-base-uncased-mnli
-SECONDARY_MODEL=facebook/bart-large-mnli
+MODEL_NAME=MoritzLaurer/deberta-v3-large-zeroshot-v2.0
 
 # Classification Thresholds
 DEFAULT_OPINION_THRESHOLD=0.65

@@ -39,7 +39,7 @@ docker push YOUR_DOCKERHUB_USERNAME/benz-sent-filter:v1.0.0
 
 | Setting | Value | Notes |
 |---------|-------|-------|
-| **GPU Type** | RTX A4000 (16GB) | Sufficient for DistilBERT |
+| **GPU Type** | RTX A4000 (16GB) | Sufficient for DeBERTa-v3-large (~1.5GB) |
 | **Active Workers** | 1 | Keep 1 warm during peak hours |
 | **Max Workers** | 3 | Handle burst traffic |
 | **Idle Timeout** | 60 seconds | Keep workers warm between bursts |

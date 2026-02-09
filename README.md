@@ -543,10 +543,12 @@ This service is part of the benz ecosystem of financial data analysis microservi
 ## ML Model Details
 
 ### Model
-- **Name**: `typeform/distilbert-base-uncased-mnli`
-- **Type**: DistilBERT fine-tuned for Multi-Genre Natural Language Inference
-- **Size**: ~66M parameters (~250MB download)
+- **Name**: `MoritzLaurer/deberta-v3-large-zeroshot-v2.0`
+- **Type**: DeBERTa-v3-large fine-tuned for multi-dataset Natural Language Inference
+- **Size**: ~400M parameters (~1.5GB download)
 - **Runtime**: CPU-only (no GPU required)
+- **Training**: Multi-dataset (MNLI, FEVER, ANLI, LingNLI, WANLI + 28 more datasets)
+- **Advantages**: Superior financial text understanding, better catalyst type disambiguation
 
 ### Classification Method
 The service uses zero-shot classification with carefully designed candidate labels:
@@ -575,12 +577,13 @@ All 5 labels are evaluated in a single inference call for efficiency.
 - **Why lower threshold for company?**: Company mentions are typically binary (name appears or doesn't). Lower threshold reduces false negatives for edge cases like indirect references.
 
 ### Performance
-- **Single headline (no company)**: < 2 seconds on CPU
-- **Single headline (with company)**: < 3 seconds on CPU (adds < 500ms overhead)
-- **Batch of 10 (no company)**: < 10 seconds on CPU
-- **Batch of 10 (with company)**: < 15 seconds on CPU
-- **Startup time**: < 30 seconds (includes model download on first run)
-- **Memory**: < 1GB
+- **Single headline (no company)**: ~4-5 seconds on CPU
+- **Single headline (with company)**: ~5-6 seconds on CPU (adds ~1s overhead)
+- **Batch of 10 (no company)**: ~40-50 seconds on CPU
+- **Batch of 10 (with company)**: ~50-60 seconds on CPU
+- **Startup time**: 5.9s model load (first run includes ~1.5GB model download)
+- **Memory**: ~1.5GB
+- **Accuracy tradeoff**: Slower inference but superior financial text understanding and catalyst disambiguation
 
 ### Model Caching
 The model is downloaded once and cached locally in `~/.cache/huggingface/transformers/`.
