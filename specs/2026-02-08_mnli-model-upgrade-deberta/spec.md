@@ -220,7 +220,7 @@ The new model's better understanding may:
 - Current split architecture maintained ✓
 - All tests pass (341/341) ✓
 
-## Phase 4: Validation
+## Phase 4: Validation [COMPLETED: 5bceabb]
 
 <!-- VALIDATION_PHASE -->
 
@@ -231,18 +231,25 @@ The new model's better understanding may:
 **Tools**: pytest, curl, jq, uvicorn (on port 8006 to avoid conflict with production server on 8002)
 
 **Summary**:
-1. Full regression test suite (341+ existing tests)
-2. Disambiguation test suite (31 new tests)
-3. Integration tests with real DeBERTa model
-4. Live API endpoint testing on port 8006 (all 7 endpoints)
-5. Backward compatibility schema check
-6. Resource and startup verification
+1. Full regression test suite (341+ existing tests) ✓
+2. Disambiguation test suite (31 new tests) ✓
+3. Integration tests with real DeBERTa model ✓
+4. Live API endpoint testing on port 8006 (all 7 endpoints) ✓
+5. Backward compatibility schema check ✓
+6. Resource and startup verification ✓
 
 **Execution Instructions**: When executing this phase, follow the validation.md step-by-step. Each step must pass before proceeding. If a step fails, fix and re-validate. The validation server MUST run on port 8006.
 
 **Acceptance Criteria**:
-- All validation steps in validation.md marked `[VALIDATED: <sha>]`
-- No regressions, no API contract changes, disambiguation accuracy confirmed
+- All validation steps in validation.md marked `[VALIDATED: <sha>]` ✓
+- No regressions, no API contract changes, disambiguation accuracy confirmed ✓
+
+**Key Findings**:
+- DeBERTa model loads in 5.9s (vs ~1s for DistilBERT)
+- Inference time ~4-5s per headline (vs ~1s for DistilBERT)
+- All tests passing after label tuning for revenue announcements
+- Improved company relevance detection (fewer false positives)
+- NTRB divestiture case now correctly classified (not acquisition)
 
 ## Phase 5: Clean the House
 

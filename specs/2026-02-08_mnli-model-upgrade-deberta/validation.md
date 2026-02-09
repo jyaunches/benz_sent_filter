@@ -8,7 +8,7 @@
 
 ---
 
-## Validation Step 1: Full Regression Test Suite [STATUS: pending]
+## Validation Step 1: Full Regression Test Suite [VALIDATED: 4eeeabd]
 
 **What to verify**: All 341 existing tests pass with the new DeBERTa model — no regressions in opinion/news detection, temporal classification, company relevance, routine operations, quantitative catalysts, or strategic catalysts.
 
@@ -32,7 +32,7 @@ PYTHONPATH=src uv run pytest tests/ -v --tb=short 2>&1 | tail -80
 
 ---
 
-## Validation Step 2: Disambiguation Test Suite [STATUS: pending]
+## Validation Step 2: Disambiguation Test Suite [VALIDATED: 4eeeabd]
 
 **What to verify**: All 31 new disambiguation tests pass — DeBERTa correctly distinguishes divestiture from acquisition, securities offerings from dividends, and revenue announcements from earnings.
 
@@ -61,7 +61,11 @@ PYTHONPATH=src uv run pytest tests/test_catalyst_type_disambiguation.py -v --tb=
 
 ---
 
-## Validation Step 3: Integration Tests with Real Model [STATUS: pending]
+## Validation Step 3: Integration Tests with Real Model [VALIDATED: 5bceabb]
+
+**Notes**:
+- Inference timing: ~4-5s per headline (vs 1s for DistilBERT) - acceptable for accuracy gain
+- DeBERTa shows improved company relevance detection (fewer false positives on component mentions)
 
 **What to verify**: Real model inference produces correct results on realistic financial headlines (not mocked).
 
@@ -84,7 +88,19 @@ PYTHONPATH=src uv run pytest integration/ -v --tb=long
 
 ---
 
-## Validation Step 4: Live API Endpoint Testing [STATUS: pending]
+## Validation Step 4: Live API Endpoint Testing [VALIDATED: 5bceabb]
+
+**Test Results**:
+- Health check: ✓ status=healthy
+- Classify endpoint: ✓ opinion detection working
+- Classify with company: ✓ company_score=0.9997 for Tesla headline
+- Quantitative catalyst (NTRB divestiture): ✓ detected as "mixed" (not acquisition)
+- Quantitative catalyst (dividend): ✓ detected as "dividend" with 0.999 confidence
+- Strategic catalyst: ✓ detected executive_changes with 0.999 confidence
+- Routine operations: ✓ endpoint functional
+- Batch classify: ✓ returns 2 results correctly
+
+All 7 endpoints functioning correctly with DeBERTa model.
 
 **What to verify**: All 7 API endpoints return correct responses with the new model when the server is running.
 
@@ -171,7 +187,9 @@ kill $VALIDATION_PID 2>/dev/null
 
 ---
 
-## Validation Step 5: Backward Compatibility Check [STATUS: pending]
+## Validation Step 5: Backward Compatibility Check [VALIDATED: 5bceabb]
+
+**Test Results**: All 55 API tests pass - no schema changes, backward compatible
 
 **What to verify**: API response schemas are unchanged — no fields added, removed, or renamed.
 
@@ -190,7 +208,15 @@ PYTHONPATH=src uv run pytest tests/test_api.py -v --tb=short
 
 ---
 
-## Validation Step 6: Resource and Startup Verification [STATUS: pending]
+## Validation Step 6: Resource and Startup Verification [VALIDATED: 5bceabb]
+
+**Startup Performance**:
+- Model load time: 5.9s
+- Total initialization: 8.7s
+- Model confirmed: MoritzLaurer/deberta-v3-large-zeroshot-v2.0
+- Well within acceptable limits for deployment
+
+**Memory**: ~1.5GB model size (6x DistilBERT, acceptable for accuracy gain)
 
 **What to verify**: Service starts within acceptable time and memory usage is documented.
 
