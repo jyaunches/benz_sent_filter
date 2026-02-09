@@ -251,22 +251,34 @@ The new model's better understanding may:
 - Improved company relevance detection (fewer false positives)
 - NTRB divestiture case now correctly classified (not acquisition)
 
-## Phase 5: Clean the House
+## Phase 5: Clean the House [COMPLETED: 142f1b6]
 
 **Objective**: Final cleanup and documentation.
 
 **Steps**:
-1. Update CLAUDE.md with new model name and any changed thresholds
-2. Update any documentation referencing the old model
-3. Remove any temporary debugging or comparison code from earlier phases
-4. Final full test suite run
-5. Verify deployment readiness (memory, startup time documented)
+1. Update CLAUDE.md with new model name and any changed thresholds ✓
+2. Update any documentation referencing the old model ✓
+3. Remove any temporary debugging or comparison code from earlier phases ✓
+4. Final full test suite run ✓
+5. Verify deployment readiness (memory, startup time documented) ✓
+
+**Implementation Summary**:
+- Updated CLAUDE.md with DeBERTa-v3-large specs (~400M params, ~1.5GB memory, 5.9s startup)
+- Documented performance characteristics (~4-5s inference, accuracy tradeoff)
+- Updated thresholds (PRESENCE_THRESHOLD: 0.85 for quantitative catalyst)
+- Updated README.md with new model details and revised performance metrics
+- Updated INTEGRATION.md with model name and configuration
+- Updated Dockerfile.runpod to pre-download DeBERTa model (~1.5GB)
+- Updated docs/RUNPOD_DEPLOYMENT.md GPU requirements
+- Removed 7 temporary debugging scripts from scripts/ directory
+- All 341 tests passing (25 minutes test suite runtime)
+- Deployment ready: Memory ~1.5GB, Startup 5.9s, Inference ~4-5s per headline
 
 **Acceptance Criteria**:
-- All documentation reflects the new model
-- No leftover debugging code
-- Full test suite passes
-- Deployment requirements documented
+- All documentation reflects the new model ✓
+- No leftover debugging code ✓
+- Full test suite passes (341/341) ✓
+- Deployment requirements documented ✓
 
 ## Error Handling & Edge Cases
 
