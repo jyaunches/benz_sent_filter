@@ -34,8 +34,9 @@ class QuantitativeCatalystDetectorMNLS:
     # Optimized to distinguish quantitative catalysts from vague updates and price movements
     # Tuned for DeBERTa-v3-large model - more precise language to avoid false negatives
     # Includes both capital-returning (dividends, buybacks, divestitures) and capital-deploying/raising (acquisitions, equity offerings) events
+    # Includes revenue announcements (recurring revenue, contract revenue, booking revenue)
     PRESENCE_LABELS = [
-        "This announces a corporate financial event with specific dollar amounts such as dividends, acquisitions, buybacks, earnings results, revenue guidance, asset sales, divestitures, or equity and debt offerings",
+        "This announces a corporate financial event with specific dollar amounts such as dividends, acquisitions, buybacks, earnings results, revenue guidance, revenue announcements, asset sales, divestitures, or equity and debt offerings",
         "This describes general commentary, stock price changes, analyst opinions, or vague business updates without specific financial transactions",
     ]
 
